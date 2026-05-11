@@ -1,26 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Quoter } from "@/components/quoter/Quoter";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Kinder Togas — Cotizador de togas y birretes" },
+      {
+        name: "description",
+        content:
+          "Cotiza en minutos togas y birretes para graduación. Renta para preescolar, primaria, secundaria, preparatoria y universidad en Tijuana y Ensenada.",
+      },
+      { property: "og:title", content: "Kinder Togas — Cotizador" },
+      {
+        property: "og:description",
+        content:
+          "Cotiza tu paquete de graduación en 4 pasos. Descarga tu cotización en PDF.",
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
-
 function Index() {
-  return <PlaceholderIndex />;
+  return <Quoter />;
 }
