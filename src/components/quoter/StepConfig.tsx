@@ -48,7 +48,7 @@ const FEATURES_B: Record<PackageBVariant, { icon: typeof Camera; text: string }[
   ],
 };
 
-const STOLE_COLORS = ["#112244", "#7c1d1d", "#2f5d3a", "#8a6d3b", "#3b3b3b"];
+
 
 export function StepConfig({
   city, pkg, quantity, onCity, onPkg, onQty, canContinue, onContinue,
