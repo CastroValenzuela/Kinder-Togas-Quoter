@@ -117,6 +117,18 @@ export function Quoter() {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-hairline bg-background mt-auto">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 relative flex items-center">
+          <div className="h-9 w-9 rounded-full bg-foreground text-background flex items-center justify-center font-display text-sm">
+            K
+          </div>
+          <p className="absolute left-1/2 -translate-x-1/2 text-sm text-muted-foreground whitespace-nowrap">
+            © {new Date().getFullYear()} Kinder Togas. Todos los derechos reservados.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
