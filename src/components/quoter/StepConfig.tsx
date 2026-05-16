@@ -48,7 +48,7 @@ const FEATURES_B: Record<PackageBVariant, { icon: typeof Camera; text: string }[
   ],
 };
 
-const STOLE_COLORS = ["#112244", "#7c1d1d", "#2f5d3a", "#8a6d3b", "#3b3b3b"];
+
 
 export function StepConfig({
   city, pkg, quantity, onCity, onPkg, onQty, canContinue, onContinue,
@@ -86,7 +86,7 @@ export function StepConfig({
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col items-center gap-4">
+            <div className="absolute inset-x-0 bottom-0 p-6 flex justify-center">
               <div className="flex items-center gap-1.5">
                 {[0, 1, 2].map((i) => (
                   <span
@@ -95,20 +95,6 @@ export function StepConfig({
                       "h-1.5 rounded-full transition-all",
                       i === 0 ? "w-6 bg-navy" : "w-1.5 bg-foreground/20",
                     )}
-                  />
-                ))}
-              </div>
-              <div className="flex items-center gap-2.5">
-                {STOLE_COLORS.map((c, i) => (
-                  <button
-                    key={c}
-                    type="button"
-                    aria-label={`Color de estola ${i + 1}`}
-                    className={cn(
-                      "h-5 w-5 rounded-full ring-1 ring-foreground/10 transition-transform hover:scale-110",
-                      i === 0 && "ring-2 ring-offset-2 ring-navy",
-                    )}
-                    style={{ backgroundColor: c }}
                   />
                 ))}
               </div>
