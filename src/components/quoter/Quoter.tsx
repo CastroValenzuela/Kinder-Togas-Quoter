@@ -46,22 +46,15 @@ export function Quoter() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
-      {/* Top progress bar */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-hairline">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-3 pb-2">
-          <Stepper step={step} />
-        </div>
-      </div>
-
-      {/* Header */}
-      <header className="bg-background">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-5 flex items-center justify-between">
-          <div className="font-display text-xl tracking-tight text-foreground">
+      {/* Header — centered logo + progress bar below */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-hairline">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-6 pb-3 flex justify-center">
+          <div className="font-display text-2xl tracking-tight text-foreground">
             Kinder Togas
           </div>
-          <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-            Cotizador
-          </span>
+        </div>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-3">
+          <Stepper step={step} />
         </div>
       </header>
 
