@@ -6,7 +6,6 @@ import { StepLevel } from "./StepLevel";
 import { StepService } from "./StepService";
 import { StepConfig } from "./StepConfig";
 import { StepSummary } from "./StepSummary";
-import { FloatingTotal } from "./FloatingTotal";
 import {
   unitPrice,
   type Level,
@@ -26,6 +25,7 @@ export function Quoter() {
   const [quantity, setQuantity] = useState(1);
 
   const total = useMemo(() => unitPrice(pkg) * quantity, [pkg, quantity]);
+  void total;
 
   const canNext: Record<Step, boolean> = {
     1: !!level,
@@ -42,11 +42,20 @@ export function Quoter() {
     if (step > 1) setStep((s) => (s - 1) as Step);
   };
 
+  const wide = step === 3;
+
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+      {/* Top progress bar */}
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-hairline">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-3 pb-2">
+          <Stepper step={step} />
+        </div>
+      </div>
+
       {/* Header */}
-      <header className="border-b border-hairline">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 py-5 flex items-center justify-between">
+      <header className="bg-background">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-5 flex items-center justify-between">
           <div className="font-display text-xl tracking-tight text-foreground">
             Kinder Togas
           </div>
@@ -56,20 +65,16 @@ export function Quoter() {
         </div>
       </header>
 
-      {/* Stepper */}
-      <div className="mx-auto max-w-3xl w-full px-4 sm:px-6 pt-10">
-        <Stepper step={step} />
-      </div>
-
       {/* Content */}
-      <main className="mx-auto max-w-3xl w-full px-4 sm:px-6 pt-12 pb-40 flex-1">
+      <main className="w-full pt-8 pb-16 flex-1">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
-            initial={{ opacity: 0, x: 15 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -15 }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
+            className={wide ? "" : "mx-auto max-w-3xl px-4 sm:px-6"}
           >
             {step === 1 && (
               <StepLevel
@@ -97,6 +102,8 @@ export function Quoter() {
                 onCity={setCity}
                 onPkg={setPkg}
                 onQty={setQuantity}
+                canContinue={canNext[3]}
+                onContinue={goNext}
               />
             )}
             {step === 4 && (
@@ -106,7 +113,7 @@ export function Quoter() {
         </AnimatePresence>
 
         {step > 1 && (
-          <div className="mt-12">
+          <div className={wide ? "mx-auto max-w-6xl px-4 sm:px-6 mt-8" : "mt-12"}>
             <button
               type="button"
               onClick={goBack}
@@ -117,17 +124,6 @@ export function Quoter() {
           </div>
         )}
       </main>
-
-      {/* Floating total — only on step 3 */}
-      <AnimatePresence>
-        {step === 3 && (
-          <FloatingTotal
-            total={total}
-            canContinue={canNext[3]}
-            onContinue={goNext}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
