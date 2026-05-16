@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
-import { Stepper } from "./Stepper";
+import { StepperBar, StepperLabel } from "./Stepper";
 import { StepLevel } from "./StepLevel";
 import { StepService } from "./StepService";
 import { StepConfig } from "./StepConfig";
@@ -46,15 +46,16 @@ export function Quoter() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
-      {/* Header — centered logo + progress bar below */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-hairline">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-6 pb-3 flex justify-center">
+      {/* Header — centered logo, full-width progress bar, label */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-6 pb-4 flex justify-center">
           <div className="font-display text-2xl tracking-tight text-foreground">
             Kinder Togas
           </div>
         </div>
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-3">
-          <Stepper step={step} />
+        <StepperBar step={step} />
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-3">
+          <StepperLabel step={step} />
         </div>
       </header>
 
