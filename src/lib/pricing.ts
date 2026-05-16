@@ -1,4 +1,4 @@
-import { Baby, BookOpen, School, GraduationCap, University, Award, type LucideIcon } from "lucide-react";
+import { Sparkle, BookOpen, Library, GraduationCap, University, Award, type LucideIcon } from "lucide-react";
 
 export type Level =
   | "preescolar"
@@ -16,9 +16,9 @@ export type PackageChoice =
   | { kind: "B"; variant: PackageBVariant };
 
 export const LEVELS: { id: Level; label: string; icon: LucideIcon }[] = [
-  { id: "preescolar", label: "Preescolar", icon: Baby },
+  { id: "preescolar", label: "Preescolar", icon: Sparkle },
   { id: "primaria", label: "Primaria", icon: BookOpen },
-  { id: "secundaria", label: "Secundaria", icon: School },
+  { id: "secundaria", label: "Secundaria", icon: Library },
   { id: "preparatoria", label: "Preparatoria", icon: GraduationCap },
   { id: "universidad", label: "Universidad", icon: University },
   { id: "posgrado", label: "Posgrado", icon: Award },
