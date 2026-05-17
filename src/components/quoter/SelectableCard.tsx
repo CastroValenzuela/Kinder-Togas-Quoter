@@ -23,7 +23,7 @@ export function SelectableCard({ selected, disabled, onClick, children, classNam
       whileTap={disabled ? undefined : { scale: 0.995 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
       className={cn(
-        "group relative w-full text-left rounded-lg border bg-card px-6 py-6 transition-colors",
+        "group relative w-full text-left rounded-lg border bg-card px-6 py-6 transition-colors cursor-pointer",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         disabled && "opacity-40 cursor-not-allowed",
         !disabled && !selected && "border-hairline hover:border-navy",

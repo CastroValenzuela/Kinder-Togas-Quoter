@@ -10,10 +10,13 @@ import {
   type City,
   type PackageChoice,
   type PackageBVariant,
+  type Level,
 } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
 type Props = {
+  level?: Level;
+  service?: "renta" | "venta";
   city?: City;
   pkg?: PackageChoice;
   quantity: number;
@@ -48,18 +51,76 @@ const FEATURES_B: Record<PackageBVariant, { icon: typeof Camera; text: string }[
   ],
 };
 
+const FEATURES_B_SEC: Record<"sec_a" | "sec_b", { icon: typeof Camera; text: string }[]> = {
+  sec_a: [
+    { icon: Camera, text: "Impresión mixta: institucional + datos discretos." },
+    { icon: Shirt, text: "Toga, birrete, borla y estola personalizada." },
+    { icon: Sparkles, text: "Presencia visual con equilibrio formal." },
+  ],
+  sec_b: [
+    { icon: Camera, text: "Impresión discreta, sobria en ambos lados." },
+    { icon: Shirt, text: "Toga, birrete, borla y estola personalizada." },
+    { icon: Sparkles, text: "Recomendado para colegios de imagen clásica." },
+  ],
+};
 
+const FEATURES_B_PRI: Record<"pri_a" | "pri_b" | "pri_c", { icon: typeof Camera; text: string }[]> = {
+  pri_a: [
+    { icon: Camera, text: "Impresión grande en ambos lados (alta visibilidad)." },
+    { icon: Shirt, text: "Toga, birrete, borla y estola representativa." },
+    { icon: Sparkles, text: "Ideal para eventos oficiales y fotos grupales." },
+  ],
+  pri_b: [
+    { icon: Camera, text: "Nombre grande + generación en tamaño discreto." },
+    { icon: Shirt, text: "Toga, birrete, borla y estola armónica." },
+    { icon: Sparkles, text: "Diseño limpio y ordenado, elegancia visual." },
+  ],
+  pri_c: [
+    { icon: Camera, text: "Impresión sencilla y clara en ambos lados." },
+    { icon: Shirt, text: "Toga, birrete, borla y estola básica funcional." },
+    { icon: Layers, text: "Ideal para grupos grandes o presupuestos ajustados." },
+  ],
+};
+
+const FEATURES_UNI_A = [
+  { icon: Shirt, text: "Renta de toga y birrete (incluida)." },
+  { icon: Sparkles, text: "Estola personalizada por IMPRESIÓN (DTF o sublimación)." },
+];
+
+const FEATURES_UNI_B = [
+  { icon: Shirt, text: "Renta de toga y birrete (incluida)." },
+  { icon: Layers, text: "Estola personalizada con BORDADO." },
+];
 
 export function StepConfig({
-  city, pkg, quantity, onCity, onPkg, onQty, canContinue, onContinue,
+  level, service, city, pkg, quantity, onCity, onPkg, onQty, canContinue, onContinue,
 }: Props) {
   const isB = pkg?.kind === "B";
-  const features = !pkg
-    ? FEATURES_A
-    : pkg.kind === "A"
-      ? FEATURES_A
-      : FEATURES_B[pkg.variant];
-  const total = unitPrice(pkg) * quantity;
+  const isSecundaria = level === "secundaria";
+  const isPrimaria = level === "primaria";
+  const isUni = level === "universidad" || level === "posgrado";
+  
+  // Filtrar variantes según el nivel
+  const visibleVariants = B_VARIANTS.filter((v) => {
+    if (isSecundaria) return v.id.startsWith("sec_");
+    if (isPrimaria) return v.id.startsWith("pri_");
+    return !v.id.startsWith("sec_") && !v.id.startsWith("pri_") && !v.id.startsWith("uni_");
+  });
+
+  let features = FEATURES_A;
+  if (isUni) {
+    features = pkg?.kind === "A" ? FEATURES_UNI_A : FEATURES_UNI_B;
+  } else if (pkg?.kind === "B") {
+    if (pkg.variant.startsWith("sec_")) {
+      features = FEATURES_B_SEC[pkg.variant as "sec_a" | "sec_b"] || FEATURES_A;
+    } else if (pkg.variant.startsWith("pri_")) {
+      features = FEATURES_B_PRI[pkg.variant as "pri_a" | "pri_b" | "pri_c"] || FEATURES_A;
+    } else {
+      features = FEATURES_B[pkg.variant as "standard" | "hybrid" | "max"] || FEATURES_A;
+    }
+  }
+
+  const total = unitPrice(pkg, level) * quantity;
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -103,33 +164,35 @@ export function StepConfig({
 
           {/* RIGHT — Control panel */}
           <div className="p-6 sm:p-10 space-y-10">
-            {/* Ciudad */}
-            <section>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                Ciudad
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {CITIES.map((c) => {
-                  const active = city === c.id;
-                  return (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => onCity(c.id)}
-                      className={cn(
-                        "px-5 py-2 rounded-full border text-sm transition-all",
-                        "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                        active
-                          ? "bg-navy text-navy-foreground border-navy"
-                          : "border-hairline text-foreground hover:border-navy/40",
-                      )}
-                    >
-                      {c.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
+            {/* Ciudad — Only for Renta */}
+            {service === "renta" && (
+              <section>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
+                  Ciudad
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {CITIES.map((c) => {
+                    const active = city === c.id;
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => onCity(c.id)}
+                        className={cn(
+                          "px-5 py-2 rounded-full border text-sm transition-all cursor-pointer",
+                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                          active
+                            ? "bg-navy text-navy-foreground border-navy"
+                            : "border-hairline text-foreground hover:border-navy/40",
+                        )}
+                      >
+                        {c.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             {/* Paquete — segmented */}
             <section>
@@ -139,7 +202,9 @@ export function StepConfig({
               <div className="relative inline-flex w-full rounded-full border border-hairline bg-muted/40 p-1">
                 {(["A", "B"] as const).map((k) => {
                   const active = pkg?.kind === k;
-                  const label = k === "A" ? "Paquete A — Básico" : "Paquete B — Personalizado";
+                  const label = k === "A" 
+                    ? (isUni ? "Opción A — Impresión" : "Paquete A — Básico") 
+                    : (isUni ? "Opción B — Bordado" : "Paquete B — Personalizado");
                   return (
                     <button
                       key={k}
@@ -148,10 +213,10 @@ export function StepConfig({
                         onPkg(
                           k === "A"
                             ? { kind: "A" }
-                            : { kind: "B", variant: pkg?.kind === "B" ? pkg.variant : "standard" },
+                            : { kind: "B", variant: isSecundaria ? "sec_b" : isPrimaria ? "pri_a" : isUni ? "uni_b" : "standard" },
                         )
                       }
-                      className="relative flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      className="relative flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       {active && (
                         <motion.span
@@ -170,7 +235,7 @@ export function StepConfig({
 
               {/* Variants */}
               <AnimatePresence initial={false} mode="wait">
-                {isB && (
+                {isB && !isUni && (
                   <motion.div
                     key="b-variants"
                     initial={{ height: 0, opacity: 0 }}
@@ -180,7 +245,7 @@ export function StepConfig({
                     className="overflow-hidden"
                   >
                     <div className="pt-4 space-y-2.5">
-                      {B_VARIANTS.map((v) => {
+                      {visibleVariants.map((v) => {
                         const active = pkg?.kind === "B" && pkg.variant === v.id;
                         return (
                           <button
@@ -188,7 +253,7 @@ export function StepConfig({
                             type="button"
                             onClick={() => onPkg({ kind: "B", variant: v.id })}
                             className={cn(
-                              "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors",
+                              "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
                               "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                               active
                                 ? "border-navy bg-cream"
@@ -204,7 +269,7 @@ export function StepConfig({
                                 <p className="text-xs text-muted-foreground truncate">{v.desc}</p>
                               </div>
                             </div>
-                            <span className="font-display text-base tabular-nums text-foreground whitespace-nowrap">
+                            <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
                               {formatMXN(v.price)}
                             </span>
                           </button>
@@ -215,13 +280,13 @@ export function StepConfig({
                 )}
               </AnimatePresence>
 
-              {/* Paquete A price hint */}
-              {pkg?.kind === "A" && (
+              {/* Package price hint */}
+              {(pkg?.kind === "A" || (pkg?.kind === "B" && isUni)) && (
                 <div className="pt-4">
                   <div className="rounded-xl border border-navy bg-cream px-4 py-3.5 flex items-center justify-between">
                     <span className="text-sm font-medium text-foreground">Precio por alumno</span>
-                    <span className="font-display text-base tabular-nums text-foreground">
-                      {formatMXN(PRICES.A)}
+                    <span className="font-sans font-semibold text-base tabular-nums text-foreground">
+                      {formatMXN(unitPrice(pkg, level))}
                     </span>
                   </div>
                 </div>
@@ -256,7 +321,7 @@ export function StepConfig({
               <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                 Total estimado
               </p>
-              <p className="font-display text-2xl sm:text-3xl text-foreground tabular-nums leading-tight">
+              <p className="font-sans font-semibold text-2xl sm:text-3xl text-foreground tabular-nums leading-tight">
                 {formatMXN(total)}{" "}
                 <span className="text-xs font-sans text-muted-foreground">MXN</span>
               </p>
@@ -266,7 +331,7 @@ export function StepConfig({
               <button
                 type="button"
                 onClick={() => onQty(Math.max(1, quantity - 1))}
-                className="h-10 w-10 rounded-full border border-hairline hover:border-navy/50 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-10 w-10 rounded-full border border-hairline hover:border-navy/50 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
                 aria-label="Disminuir"
               >
                 <Minus className="h-4 w-4" />
@@ -279,13 +344,13 @@ export function StepConfig({
                   const n = parseInt(e.target.value, 10);
                   onQty(Number.isFinite(n) && n >= 1 ? n : 1);
                 }}
-                className="font-display text-xl w-14 text-center bg-transparent border-0 focus:outline-none focus:ring-0 tabular-nums"
+                className="font-sans font-semibold text-xl w-14 text-center bg-transparent border-0 focus:outline-none focus:ring-0 tabular-nums"
                 aria-label="Cantidad de alumnos"
               />
               <button
                 type="button"
                 onClick={() => onQty(quantity + 1)}
-                className="h-10 w-10 rounded-full border border-hairline hover:border-navy/50 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-10 w-10 rounded-full border border-hairline hover:border-navy/50 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
                 aria-label="Aumentar"
               >
                 <Plus className="h-4 w-4" />
@@ -296,7 +361,7 @@ export function StepConfig({
               type="button"
               onClick={onContinue}
               disabled={!canContinue}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-navy text-navy-foreground px-6 py-3 text-sm font-medium hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-navy text-navy-foreground px-6 py-3 text-sm font-medium hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               Continuar <ArrowRight className="h-4 w-4" />
             </button>

@@ -1,14 +1,13 @@
 import { motion } from "framer-motion";
 
-const LABELS = ["Nivel", "Servicio", "Configuración", "Resumen"];
+const LABELS = ["Nivel", "Servicio", "Configuración", "Tus Datos", "Resumen"];
 
-export function StepperBar({ step }: { step: 1 | 2 | 3 | 4 }) {
-  const pct = (step / 4) * 100;
+export function StepperBar({ step }: { step: number }) {
+  const pct = ((step - 1) / 4) * 100;
   return (
     <div className="h-[3px] w-full overflow-hidden" style={{ backgroundColor: "#E2E8F0" }}>
       <motion.div
-        className="h-full"
-        style={{ backgroundColor: "#2DD4BF" }}
+        className="h-full bg-gradient-to-r from-[#25B1B3] from-60% to-[#EA2B71]"
         initial={false}
         animate={{ width: `${pct}%` }}
         transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
@@ -17,10 +16,10 @@ export function StepperBar({ step }: { step: 1 | 2 | 3 | 4 }) {
   );
 }
 
-export function StepperLabel({ step }: { step: 1 | 2 | 3 | 4 }) {
+export function StepperLabel({ step }: { step: number }) {
   return (
     <p className="text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
-      Paso {step} de 4
+      Paso {step} de 5
       <span className="mx-2 text-muted-foreground/50">·</span>
       <span className="text-foreground/80">{LABELS[step - 1]}</span>
     </p>

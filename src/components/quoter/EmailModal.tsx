@@ -11,8 +11,8 @@ type Props = {
 };
 
 export function EmailModal({ open, onOpenChange, quote }: Props) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(quote.contact || "");
+  const [email, setEmail] = useState(quote.email || "");
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
