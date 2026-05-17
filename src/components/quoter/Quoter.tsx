@@ -215,36 +215,34 @@ export function Quoter() {
               </div>
             </div>
           </div>
-          {(step > 1 || level || service) && (
-            <div className="absolute right-4 sm:right-6 flex items-center gap-2">
-              {step < 5 && (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={resetQuoter}
-                    className="text-xs uppercase tracking-widest text-muted-foreground hover:text-destructive transition-colors px-2 h-8"
-                  >
-                    Reiniciar
-                  </Button>
-                  <div className="h-4 w-px bg-border mx-1" />
-                </>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => { 
-                  resetQuoter(); 
-                  setTimeout(() => {
-                    window.location.href = "/";
-                  }, 50);
-                }}
-                className="text-xs uppercase tracking-widest text-muted-foreground hover:text-navy transition-colors px-2 h-8"
-              >
-                Salir
-              </Button>
-            </div>
-          )}
+          <div className="absolute right-4 sm:right-6 flex items-center gap-2">
+            {(step > 1 || level || service) && step < 5 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetQuoter}
+                  className="text-xs uppercase tracking-widest text-muted-foreground hover:text-destructive transition-colors px-2 h-8"
+                >
+                  Reiniciar
+                </Button>
+                <div className="h-4 w-px bg-border mx-1" />
+              </>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => { 
+                resetQuoter(); 
+                setTimeout(() => {
+                  window.location.href = "https://kindertogas.com/";
+                }, 50);
+              }}
+              className="text-xs uppercase tracking-widest text-muted-foreground hover:text-navy transition-colors px-2 h-8"
+            >
+              Salir
+            </Button>
+          </div>
         </div>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 -mt-3 pb-3 flex justify-center">
           <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground/60 font-medium text-center">
