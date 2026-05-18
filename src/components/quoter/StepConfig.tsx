@@ -314,7 +314,7 @@ export function StepConfig({
           {/* LEFT — Visual showcase */}
           {/* LEFT — Visual showcase */}
           <div className="relative bg-cream/60 lg:sticky lg:top-0 lg:self-start">
-            <div className="aspect-[4/5] lg:aspect-auto lg:h-[680px] w-full overflow-hidden relative flex items-center justify-center p-0">
+            <div className={`aspect-[4/5] lg:aspect-auto lg:h-[680px] w-full overflow-hidden relative flex items-center justify-center ${level === "universidad" ? "p-[2%]" : "p-0"}`}>
               <AnimatePresence mode="wait">
                 <motion.img
                   key={showcaseImage}
@@ -326,7 +326,7 @@ export function StepConfig({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25 }}
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full ${level === "universidad" ? "object-contain rounded-xl" : "object-cover"}`}
                 />
               </AnimatePresence>
             </div>
