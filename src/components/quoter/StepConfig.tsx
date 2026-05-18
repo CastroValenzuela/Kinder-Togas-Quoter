@@ -38,13 +38,10 @@ const preescolarMagenta = preescolarTurquesaDorado;
 const preescolarVerde = preescolarVerdeDorado;
 const preescolarRojo = preescolarRojoDorado;
 
-import primariaAzul from "@/assets/Primaria/azul.jpg";
-import primariaBalance from "@/assets/Primaria/balance.jpg";
-import primariaMagenta from "@/assets/Primaria/magenta.jpg";
-import primariaNegro from "@/assets/Primaria/negro.jpg";
-import primariaPremium from "@/assets/Primaria/premium.jpg";
-import primariaRojo from "@/assets/Primaria/rojo.jpg";
-import primariaVerde from "@/assets/Primaria/verde.jpg";
+import primariaPaqueteANegroDorado from "@/assets/Primaria/Paquete A/negro-dorado.jpg";
+import primariaB1 from "@/assets/Primaria/B1.jpg";
+import primariaB2 from "@/assets/Primaria/B2.jpg";
+import primariaB3 from "@/assets/Primaria/B3.jpg";
 
 import {
   CITIES,
@@ -215,15 +212,12 @@ export function StepConfig({
       }
     } else if (level === "primaria") {
       if (pkg?.kind === "A") {
-        if (togaColor === "azul") return primariaAzul;
-        if (togaColor === "magenta") return primariaMagenta;
-        if (togaColor === "rojo") return primariaRojo;
-        if (togaColor === "verde") return primariaVerde;
-        return primariaNegro;
+        return primariaPaqueteANegroDorado;
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "pri_b") return primariaBalance;
-        if (pkg.variant === "pri_a") return primariaPremium;
-        return primariaNegro; // fallback for pri_c
+        if (pkg.variant === "pri_c") return primariaB1;
+        if (pkg.variant === "pri_b") return primariaB2;
+        if (pkg.variant === "pri_a") return primariaB3;
+        return primariaB1; // fallback for other variants
       }
     }
     return gownImg; // default generic fallback for other levels
@@ -418,7 +412,7 @@ export function StepConfig({
                   Color de Toga
                 </p>
                 <div className="flex flex-wrap gap-2.5">
-                  {TOGA_COLORS.map((c) => {
+                  {TOGA_COLORS.filter((c) => level !== "primaria" || c.id === "negro").map((c) => {
                     const active = togaColor === c.id;
                     return (
                       <button

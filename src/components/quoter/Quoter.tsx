@@ -340,6 +340,9 @@ export function Quoter() {
                 value={level}
                 onChange={(l) => {
                   setLevel(l);
+                  if (l === "primaria") {
+                    setTogaColor("negro");
+                  }
                   setTimeout(() => setStep(2), 220);
                 }}
               />
