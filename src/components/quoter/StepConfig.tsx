@@ -439,14 +439,14 @@ export function StepConfig({
               </section>
             )}
 
-            {/* Color de Estola — Only for Preescolar */}
-            {level === "preescolar" && (
+            {/* Color de Estola — Preescolar, and Primaria Paquete A */}
+            {(level === "preescolar" || (level === "primaria" && pkg?.kind === "A")) && (
               <section className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
                   Color de Estola
                 </p>
                 <div className="flex flex-wrap gap-2.5">
-                  {STOLA_COLORS.map((s) => {
+                  {STOLA_COLORS.filter((s) => level !== "primaria" || s.id === "dorada").map((s) => {
                     const active = stolaColor === s.id;
                     return (
                       <button

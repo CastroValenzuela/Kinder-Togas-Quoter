@@ -342,6 +342,7 @@ export function Quoter() {
                   setLevel(l);
                   if (l === "primaria") {
                     setTogaColor("negro");
+                    setStolaColor("dorada");
                   }
                   setTimeout(() => setStep(2), 220);
                 }}

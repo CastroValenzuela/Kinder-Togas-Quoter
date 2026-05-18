@@ -101,9 +101,9 @@ export const B_VARIANTS: {
   { id: "max", code: "B.3", title: "Premium", desc: "9×35 cm en ambos lados", price: PRICES.B_PREMIUM },
   { id: "sec_a", code: "S.A", title: "Diseño A - Mixto", desc: "Impresión mixta (institucional + discreta)", price: PRICES.SEC_A },
   { id: "sec_b", code: "S.B", title: "Diseño B - Discreto", desc: "Impresión discreta en ambos lados", price: PRICES.SEC_B },
-  { id: "pri_a", code: "P.A", title: "Diseño A - Clásico Destacado", desc: "Impresión grande en ambos lados", price: PRICES.PRI_A },
-  { id: "pri_b", code: "P.B", title: "Diseño B - Clásico Equilibrado", desc: "Impresión grande + pequeña", price: PRICES.PRI_B },
-  { id: "pri_c", code: "P.C", title: "Diseño C - Básico Funcional", desc: "Impresión sencilla en ambos lados", price: PRICES.PRI_C },
+  { id: "pri_a", code: "B.3", title: "Diseño A - Clásico Destacado", desc: "Impresión grande en ambos lados", price: PRICES.PRI_A },
+  { id: "pri_b", code: "B.2", title: "Diseño B - Clásico Equilibrado", desc: "Impresión grande + pequeña", price: PRICES.PRI_B },
+  { id: "pri_c", code: "B.1", title: "Diseño C - Básico Funcional", desc: "Impresión sencilla en ambos lados", price: PRICES.PRI_C },
   { id: "uni_b", code: "U.B", title: "Opción B - Bordado", desc: "Estola personalizada con bordado", price: PRICES.UNI_B },
 ];
 
