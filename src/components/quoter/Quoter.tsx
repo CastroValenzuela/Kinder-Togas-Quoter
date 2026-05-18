@@ -13,6 +13,8 @@ import {
   levelLabel,
   cityLabel,
   packageLabel,
+  colorLabel,
+  stolaLabel,
   formatMXN,
   type Level,
   type ServiceType,
@@ -25,24 +27,29 @@ import { supabase } from "@/lib/supabase";
 type Step = 1 | 2 | 3 | 4 | 5;
 
 export function Quoter() {
+  // SSR-safe localStorage helper
+  const ls = (key: string) => typeof window !== "undefined" ? localStorage.getItem(key) : null;
+
   const [step, setStep] = useState<Step>(() => {
-    const saved = localStorage.getItem("kt-quote-step");
+    const saved = ls("kt-quote-step");
     return saved ? (Number(saved) as Step) : 1;
   });
-  const [level, setLevel] = useState<Level>(() => (localStorage.getItem("kt-quote-level") as Level) || undefined);
-  const [service, setService] = useState<ServiceType | undefined>(() => (localStorage.getItem("kt-quote-service") as ServiceType) || undefined);
-  const [city, setCity] = useState<City>(() => (localStorage.getItem("kt-quote-city") as City) || undefined);
+  const [level, setLevel] = useState<Level>(() => (ls("kt-quote-level") as Level) || undefined);
+  const [service, setService] = useState<ServiceType | undefined>(() => (ls("kt-quote-service") as ServiceType) || undefined);
+  const [city, setCity] = useState<City>(() => (ls("kt-quote-city") as City) || undefined);
   const [pkg, setPkg] = useState<PackageChoice>(() => {
-    const saved = localStorage.getItem("kt-quote-pkg");
+    const saved = ls("kt-quote-pkg");
     return saved ? JSON.parse(saved) : undefined;
   });
-  const [quantity, setQuantity] = useState(() => Number(localStorage.getItem("kt-quote-qty")) || 1);
-  const [school, setSchool] = useState(() => localStorage.getItem("kt-quote-school") || "");
-  const [contact, setContact] = useState(() => localStorage.getItem("kt-quote-contact") || "");
-  const [phone, setPhone] = useState(() => localStorage.getItem("kt-quote-phone") || "");
-  const [date, setDate] = useState(() => localStorage.getItem("kt-quote-date") || "");
-  const [email, setEmail] = useState(() => localStorage.getItem("kt-quote-email") || "");
-  const [quoteNumber, setQuoteNumber] = useState(() => localStorage.getItem("kt-quote-number") || "");
+  const [quantity, setQuantity] = useState(() => Number(ls("kt-quote-qty")) || 1);
+  const [school, setSchool] = useState(() => ls("kt-quote-school") || "");
+  const [contact, setContact] = useState(() => ls("kt-quote-contact") || "");
+  const [phone, setPhone] = useState(() => ls("kt-quote-phone") || "");
+  const [date, setDate] = useState(() => ls("kt-quote-date") || "");
+  const [email, setEmail] = useState(() => ls("kt-quote-email") || "");
+  const [quoteNumber, setQuoteNumber] = useState(() => ls("kt-quote-number") || "");
+  const [togaColor, setTogaColor] = useState<string>(() => ls("kt-quote-toga-color") || "negro");
+  const [stolaColor, setStolaColor] = useState<string>(() => ls("kt-quote-stola-color") || "dorada");
   const [honeypot, setHoneypot] = useState("");
   const [startTime] = useState(() => Date.now());
   const [isSaving, setIsSaving] = useState(false);
@@ -65,9 +72,11 @@ export function Quoter() {
     localStorage.setItem("kt-quote-phone", phone);
     localStorage.setItem("kt-quote-date", date);
     localStorage.setItem("kt-quote-email", email);
+    localStorage.setItem("kt-quote-toga-color", togaColor);
+    localStorage.setItem("kt-quote-stola-color", stolaColor);
     if (quoteNumber) localStorage.setItem("kt-quote-number", quoteNumber);
     else localStorage.removeItem("kt-quote-number");
-  }, [step, level, service, city, pkg, quantity, school, contact, phone, date, email, quoteNumber]);
+  }, [step, level, service, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, togaColor, stolaColor]);
 
   const total = useMemo(() => unitPrice(pkg) * quantity, [pkg, quantity]);
 
@@ -116,6 +125,8 @@ export function Quoter() {
             student_count: quantity,
             unit_price: unitPrice(pkg),
             total_price: total,
+            toga_color: pkg?.kind === 'A' && (level === 'preescolar' || level === 'primaria') ? togaColor : 'negro',
+            stola_color: level === 'preescolar' ? stolaColor : (pkg?.kind === 'A' ? 'oro' : (pkg?.variant === 'hybrid' || pkg?.variant === 'pri_b' ? 'balance' : 'premium')),
           });
 
           if (!error) {
@@ -132,7 +143,7 @@ export function Quoter() {
       }
     }
     save();
-  }, [step, quoteNumber, isSaved, isSaving, school, contact, phone, email, level, city, pkg, quantity, date, total]);
+  }, [step, quoteNumber, isSaved, isSaving, school, contact, phone, email, level, city, pkg, quantity, date, total, service, honeypot, startTime, togaColor, stolaColor]);
   void total;
 
   const canNext: Record<Step, boolean> = {
@@ -180,6 +191,8 @@ export function Quoter() {
     setDate("");
     setEmail("");
     setQuoteNumber("");
+    setTogaColor("negro");
+    setStolaColor("dorada");
     setIsSaved(false);
   };
 
@@ -291,6 +304,18 @@ export function Quoter() {
                   <span className="text-foreground/80">{quantity}</span>
                 </button>
               )}
+              {pkg?.kind === "A" && (level === "preescolar" || level === "primaria") && togaColor && step > 3 && (
+                <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring animate-in fade-in slide-in-from-top-1 duration-300">
+                  <span className="text-[9px] text-muted-foreground/40 font-medium">Toga:</span>
+                  <span className="text-foreground/80">{colorLabel(togaColor)}</span>
+                </button>
+              )}
+              {pkg?.kind === "A" && level === "preescolar" && stolaColor && step > 3 && (
+                <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring animate-in fade-in slide-in-from-top-1 duration-300">
+                  <span className="text-[9px] text-muted-foreground/40 font-medium">Estola:</span>
+                  <span className="text-foreground/80">{stolaLabel(stolaColor)}</span>
+                </button>
+              )}
               {total > 0 && step > 3 && (
                 <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-navy border border-navy rounded-full text-[10px] uppercase tracking-wider font-bold text-navy-foreground flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <span className="text-[9px] text-navy-foreground/70 font-medium">Total:</span>
@@ -335,9 +360,13 @@ export function Quoter() {
                 city={city}
                 pkg={pkg}
                 quantity={quantity}
+                togaColor={togaColor}
+                stolaColor={stolaColor}
                 onCity={setCity}
                 onPkg={setPkg}
                 onQty={setQuantity}
+                onTogaColor={setTogaColor}
+                onStolaColor={setStolaColor}
                 canContinue={canNext[3]}
                 onContinue={goNext}
               />
@@ -372,6 +401,8 @@ export function Quoter() {
                 date={date}
                 email={email}
                 quoteNumber={quoteNumber}
+                togaColor={togaColor}
+                stolaColor={stolaColor}
                 onEditStep={(targetStep) => {
                   if (isSaved) {
                     setIsSaved(false);

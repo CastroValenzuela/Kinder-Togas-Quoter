@@ -6,6 +6,8 @@ import {
   levelLabel,
   cityLabel,
   formatDate,
+  colorLabel,
+  stolaLabel,
   type Level,
   type City,
   type PackageChoice,
@@ -24,11 +26,13 @@ type Props = {
   date: string;
   email: string;
   quoteNumber?: string;
+  togaColor?: string;
+  stolaColor?: string;
   onEditStep?: (step: 1 | 2 | 3 | 4 | 5) => void;
   service?: "renta" | "venta";
 };
 
-export function StepSummary({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, onEditStep }: Props) {
+export function StepSummary({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor, onEditStep }: Props) {
   const unit = unitPrice(pkg);
   const total = unit * quantity;
 
@@ -39,12 +43,30 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
     { label: "Nivel escolar", value: levelLabel(level), step: 1 },
     { label: "Servicio", value: service === "renta" ? "Renta" : "Venta", step: 2 },
     { label: "Ciudad", value: cityLabel(city), step: 3 },
-    { label: "Paquete", value: packageLabel(pkg), step: 3 },
+    { label: "Paquete", value: packageLabel(pkg, level), step: 3 },
     { label: "Precio unitario", value: formatMXN(unit), step: 3 },
     { label: "Cantidad de alumnos", value: String(quantity), step: 3 },
     { label: "Teléfono", value: phone, step: 4 },
   ];
   if (date) rows.splice(3, 0, { label: "Fecha evento", value: formatDate(date), step: 4 });
+
+  // Add Toga Color and Estola Design details specifically for Preescolar and Primaria
+  if (level === "preescolar" || level === "primaria") {
+    const selectedToga = pkg?.kind === "A" ? colorLabel(togaColor) : "Negro";
+    const stolaVal = level === "preescolar"
+      ? stolaLabel(stolaColor)
+      : (pkg?.kind === "A" 
+          ? "Oro / Amarillo" 
+          : (pkg?.variant === "hybrid" || pkg?.variant === "pri_b" ? "Blanco (Diseño Balance)" : "Blanco (Diseño Premium)"));
+
+    const packageIndex = rows.findIndex(r => r.label === "Paquete");
+    if (packageIndex !== -1) {
+      rows.splice(packageIndex + 1, 0, 
+        { label: "Color Toga", value: selectedToga, step: pkg?.kind === "A" ? 3 : null },
+        { label: "Estola", value: stolaVal, step: 3 }
+      );
+    }
+  }
 
   return (
     <div>
@@ -158,7 +180,7 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
       <div className="order-2 lg:order-3 lg:col-span-2 pt-8 pb-4 flex flex-col sm:flex-row justify-center items-center gap-6 lg:mt-4 lg:border-t border-hairline">
         <button
           type="button"
-          onClick={() => generateQuotePDF({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber })}
+          onClick={() => generateQuotePDF({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, togaColor, stolaColor })}
           className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-full bg-navy text-navy-foreground px-10 py-4.5 text-base font-semibold hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-md hover:scale-[1.02] active:scale-[0.98]"
         >
           <Download className="h-5 w-5" /> Descargar mi Cotización (PDF)

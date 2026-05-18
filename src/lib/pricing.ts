@@ -10,7 +10,7 @@ export type Level =
 
 export type ServiceType = "renta" | "venta";
 export type City = "tijuana" | "ensenada";
-export type PackageBVariant = "standard" | "hybrid" | "max" | "sec_a" | "sec_b" | "pri_a" | "pri_b" | "pri_c";
+export type PackageBVariant = "hybrid" | "max" | "sec_a" | "sec_b" | "pri_a" | "pri_b" | "pri_c";
 export type PackageChoice =
   | { kind: "A" }
   | { kind: "B"; variant: PackageBVariant };
@@ -24,6 +24,53 @@ export const LEVELS: { id: Level; label: string; icon: LucideIcon }[] = [
   { id: "posgrado", label: "Posgrado", icon: Award },
 ];
 
+export interface TogaColorOption {
+  id: string;
+  label: string;
+  hex: string;
+}
+
+export const TOGA_COLORS: TogaColorOption[] = [
+  { id: "negro", label: "Negro", hex: "#1A1A1A" },
+  { id: "azul", label: "Azul", hex: "#1E40AF" },
+  { id: "magenta", label: "Turquesa", hex: "#06B6D4" },
+  { id: "rojo", label: "Rojo", hex: "#DC2626" },
+  { id: "verde", label: "Verde", hex: "#16A34A" },
+];
+
+export function colorLabel(color?: string): string {
+  if (!color) return "—";
+  const dict: Record<string, string> = {
+    negro: "Negro",
+    azul: "Azul",
+    magenta: "Turquesa",
+    rojo: "Rojo",
+    verde: "Verde",
+  };
+  return dict[color.toLowerCase()] || color;
+}
+
+export const STOLA_COLORS = [
+  { id: "dorada", label: "Dorado", hex: "#EAB308" },
+  { id: "plateada", label: "Plateada", hex: "#94A3B8" },
+  { id: "azul", label: "Azul", hex: "#1D4ED8" },
+  { id: "roja", label: "Roja", hex: "#DC2626" },
+];
+
+export function stolaLabel(stola?: string): string {
+  if (!stola) return "—";
+  const dict: Record<string, string> = {
+    oro: "Dorado",
+    dorada: "Dorado",
+    plateada: "Plateada",
+    azul: "Azul",
+    roja: "Roja",
+    balance: "Blanco (Diseño Balance)",
+    premium: "Blanco (Diseño Premium)",
+  };
+  return dict[stola.toLowerCase()] || stola;
+}
+
 export const CITIES: { id: City; label: string }[] = [
   { id: "tijuana", label: "Tijuana" },
   { id: "ensenada", label: "Ensenada" },
@@ -31,10 +78,9 @@ export const CITIES: { id: City; label: string }[] = [
 
 // Precios editables (MXN, por alumno)
 export const PRICES = {
-  A: 350,
-  B_STANDARD: 450, // B.1 9x12 ambos lados
-  B_HYBRID: 550,   // B.2 9x12 + 9x35
-  B_MAX: 650,      // B.3 9x35 ambos lados
+  A: 450,
+  B_BALANCE: 480,  // B.2 Balance
+  B_PREMIUM: 510,  // B.3 Premium
   SEC_A: 550,      // Secundaria Diseño A (Mixto)
   SEC_B: 450,      // Secundaria Diseño B (Discreto)
   PRI_A: 650,      // Primaria Diseño A (Clásico Destacado - Grande ambos lados)
@@ -51,9 +97,8 @@ export const B_VARIANTS: {
   desc: string;
   price: number;
 }[] = [
-  { id: "standard", code: "B.1", title: "Estándar Duo", desc: "9×12 cm en ambos lados (sin diseño)", price: PRICES.B_STANDARD },
-  { id: "hybrid", code: "B.2", title: "Híbrido", desc: "9×12 cm + 9×35 cm", price: PRICES.B_HYBRID },
-  { id: "max", code: "B.3", title: "Max Duo", desc: "9×35 cm en ambos lados", price: PRICES.B_MAX },
+  { id: "hybrid", code: "B.2", title: "Balance", desc: "9×12 cm + 9×35 cm", price: PRICES.B_BALANCE },
+  { id: "max", code: "B.3", title: "Premium", desc: "9×35 cm en ambos lados", price: PRICES.B_PREMIUM },
   { id: "sec_a", code: "S.A", title: "Diseño A - Mixto", desc: "Impresión mixta (institucional + discreta)", price: PRICES.SEC_A },
   { id: "sec_b", code: "S.B", title: "Diseño B - Discreto", desc: "Impresión discreta en ambos lados", price: PRICES.SEC_B },
   { id: "pri_a", code: "P.A", title: "Diseño A - Clásico Destacado", desc: "Impresión grande en ambos lados", price: PRICES.PRI_A },

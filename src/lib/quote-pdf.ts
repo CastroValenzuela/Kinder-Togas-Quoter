@@ -10,6 +10,8 @@ import {
   cityLabel,
   formatMXN,
   formatDate,
+  colorLabel,
+  stolaLabel,
 } from "./pricing";
 import { LOGO_BASE64 } from "./logo-data";
 
@@ -24,11 +26,21 @@ export type QuoteData = {
   date: string;
   email?: string;
   quoteNumber?: string;
+  togaColor?: string;
+  stolaColor?: string;
 };
 
 export function buildSummaryText(q: QuoteData): string {
   const unit = unitPrice(q.pkg);
   const total = unit * q.quantity;
+  const isA = q.pkg?.kind === "A";
+  const selectedToga = isA ? colorLabel(q.togaColor) : "Negro";
+  const stolaVal = q.level === "preescolar"
+    ? stolaLabel(q.stolaColor)
+    : (isA 
+        ? "Oro / Amarillo" 
+        : (q.pkg?.variant === "hybrid" || q.pkg?.variant === "pri_b" ? "Blanco (Diseño Balance)" : "Blanco (Diseño Premium)"));
+
   return [
     `Cotización Kinder Togas - Folio: ${q.quoteNumber || 'N/A'}`,
     "",
@@ -38,7 +50,9 @@ export function buildSummaryText(q: QuoteData): string {
     `Teléfono: ${q.phone}`,
     `Fecha evento: ${q.date ? formatDate(q.date) : 'N/A'}`,
     `Ciudad: ${cityLabel(q.city)}`,
-    `Paquete: ${packageLabel(q.pkg)}`,
+    `Paquete: ${packageLabel(q.pkg, q.level)}`,
+    `Color Toga: ${selectedToga}`,
+    `Estola: ${stolaVal}`,
     `Cantidad de alumnos: ${q.quantity}`,
     `Precio unitario: ${formatMXN(unit)}`,
     `Total: ${formatMXN(total)}`,
@@ -124,6 +138,26 @@ export function generateQuotePDF(q: QuoteData): void {
     doc.text(formatDate(q.date), detailsX + 330, currentY + 45);
   }
 
+  if (q.level === "preescolar" || q.level === "primaria") {
+    const isA = q.pkg?.kind === "A";
+    const selectedToga = isA ? colorLabel(q.togaColor) : "Negro";
+    const stolaVal = q.level === "preescolar"
+      ? stolaLabel(q.stolaColor)
+      : (isA 
+          ? "Oro / Amarillo" 
+          : (q.pkg?.variant === "hybrid" || q.pkg?.variant === "pri_b" ? "Blanco (Diseño Balance)" : "Blanco (Diseño Premium)"));
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Color Toga:", detailsX + 250, currentY + 60);
+    doc.setFont("helvetica", "normal");
+    doc.text(selectedToga, detailsX + 330, currentY + 60);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Estola:", detailsX + 250, currentY + 75);
+    doc.setFont("helvetica", "normal");
+    doc.text(stolaVal, detailsX + 330, currentY + 75);
+  }
+
   currentY += 140;
 
   // 4. SERVICE DESCRIPTION
@@ -145,13 +179,25 @@ export function generateQuotePDF(q: QuoteData): void {
   const unit = unitPrice(q.pkg);
   const total = unit * q.quantity;
 
+  const isA = q.pkg?.kind === "A";
+  const selectedToga = isA ? colorLabel(q.togaColor) : "Negro";
+  const stolaVal = q.level === "preescolar"
+    ? stolaLabel(q.stolaColor)
+    : (isA 
+        ? "Oro / Amarillo" 
+        : (q.pkg?.variant === "hybrid" || q.pkg?.variant === "pri_b" ? "Blanco (Diseño Balance)" : "Blanco (Diseño Premium)"));
+
+  const itemDescription = q.level === "preescolar" || q.level === "primaria"
+    ? `Paquete ${packageLabel(q.pkg, q.level)}\n(Toga: ${selectedToga}, Birrete, Estola: ${stolaVal})`
+    : `Paquete ${packageLabel(q.pkg, q.level)}\n(Toga, Birrete, Estola)`;
+
   autoTable(doc, {
     startY: currentY,
     margin: { left: margin, right: margin },
     head: [["DESCRIPCIÓN", "CANTIDAD", "UNITARIO", "TOTAL"]],
     body: [
       [
-        { content: `Paquete ${packageLabel(q.pkg)}\n(Toga, Birrete, Estola)`, styles: { fontStyle: "bold" } },
+        { content: itemDescription, styles: { fontStyle: "bold" } },
         q.quantity.toString(),
         formatMXN(unit),
         formatMXN(total)
@@ -222,5 +268,5 @@ export function generateQuotePDF(q: QuoteData): void {
   doc.setTextColor(150, 150, 150);
   doc.text("Esta es una cotización informativa y no representa un contrato legal hasta su firma y pago de anticipo.", pageW / 2, pageH - 30, { align: "center" });
 
-  doc.save(`Cotizacion_KinderTogas_${q.school.replace(/\s+/g, "_")}.pdf`);
+  doc.save(`Cotizacion_KinderTogas_${q.quoteNumber || 'N_A'}.pdf`);
 }

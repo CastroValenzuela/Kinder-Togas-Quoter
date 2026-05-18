@@ -1,10 +1,57 @@
+import { useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers } from "lucide-react";
 import gownImg from "@/assets/gown-showcase.jpg";
+
+import preescolarBalance from "@/assets/Preescolar/balance.jpg";
+
+import preescolarNegroAzul from "@/assets/Preescolar/Paquete A/negro-azul.jpg";
+import preescolarNegroDorado from "@/assets/Preescolar/Paquete A/negro-dorado.jpg";
+import preescolarNegroPlata from "@/assets/Preescolar/Paquete A/negro-plata.jpg";
+import preescolarNegroRojo from "@/assets/Preescolar/Paquete A/negro-rojo.jpg";
+
+import preescolarAzulAzul from "@/assets/Preescolar/Paquete A/azul-azul.jpg";
+import preescolarAzulDorado from "@/assets/Preescolar/Paquete A/azul-dorado.jpg";
+import preescolarAzulPlata from "@/assets/Preescolar/Paquete A/azul-plata.jpg";
+import preescolarAzulRojo from "@/assets/Preescolar/Paquete A/azul-rojo.jpg";
+
+import preescolarVerdeAzul from "@/assets/Preescolar/Paquete A/verde-azul.jpg";
+import preescolarVerdeDorado from "@/assets/Preescolar/Paquete A/verde-dorado.jpg";
+import preescolarVerdePlata from "@/assets/Preescolar/Paquete A/verde-plata.jpg";
+import preescolarVerdeRojo from "@/assets/Preescolar/Paquete A/verde-rojo.jpg";
+
+import preescolarTurquesaAzul from "@/assets/Preescolar/Paquete A/turquesa-turquesa.jpg";
+import preescolarTurquesaDorado from "@/assets/Preescolar/Paquete A/turquesa-dorado.jpg";
+import preescolarTurquesaPlata from "@/assets/Preescolar/Paquete A/turquesa-plata.jpg";
+import preescolarTurquesaRojo from "@/assets/Preescolar/Paquete A/turquesa-rojo.jpg";
+
+import preescolarRojoAzul from "@/assets/Preescolar/Paquete A/rojo-azul.jpg";
+import preescolarRojoDorado from "@/assets/Preescolar/Paquete A/rojo-dorado.jpg";
+import preescolarRojoPlata from "@/assets/Preescolar/Paquete A/rojo-plata.jpg";
+import preescolarRojoRojo from "@/assets/Preescolar/Paquete A/rojo-rojo.jpg";
+
+import preescolarPremium from "@/assets/Preescolar/premium.jpg";
+
+const preescolarNegro = preescolarNegroDorado;
+const preescolarAzul = preescolarAzulDorado;
+const preescolarMagenta = preescolarTurquesaDorado;
+const preescolarVerde = preescolarVerdeDorado;
+const preescolarRojo = preescolarRojoDorado;
+
+import primariaAzul from "@/assets/Primaria/azul.jpg";
+import primariaBalance from "@/assets/Primaria/balance.jpg";
+import primariaMagenta from "@/assets/Primaria/magenta.jpg";
+import primariaNegro from "@/assets/Primaria/negro.jpg";
+import primariaPremium from "@/assets/Primaria/premium.jpg";
+import primariaRojo from "@/assets/Primaria/rojo.jpg";
+import primariaVerde from "@/assets/Primaria/verde.jpg";
+
 import {
   CITIES,
   B_VARIANTS,
   PRICES,
+  TOGA_COLORS,
+  STOLA_COLORS,
   formatMXN,
   unitPrice,
   type City,
@@ -20,25 +67,24 @@ type Props = {
   city?: City;
   pkg?: PackageChoice;
   quantity: number;
+  togaColor: string;
+  stolaColor: string;
   onCity: (c: City) => void;
   onPkg: (p: PackageChoice) => void;
   onQty: (n: number) => void;
+  onTogaColor: (color: string) => void;
+  onStolaColor: (color: string) => void;
   canContinue: boolean;
   onContinue: () => void;
 };
 
 const FEATURES_A = [
-  { icon: Camera, text: "Sesión fotográfica esencial en estudio." },
+  { icon: Camera, text: "Impresión combinada 9×12 cm." },
   { icon: Shirt, text: "Renta de toga, birrete y borla del año." },
   { icon: Sparkles, text: "Entrega y recolección coordinadas." },
 ];
 
-const FEATURES_B: Record<PackageBVariant, { icon: typeof Camera; text: string }[]> = {
-  standard: [
-    { icon: Camera, text: "Impresión 9×12 cm en ambos lados (sin diseño)." },
-    { icon: Shirt, text: "Toga premium, birrete, borla del año y estola." },
-    { icon: Layers, text: "Acabado mate sobre papel fotográfico profesional." },
-  ],
+const FEATURES_B: Record<"hybrid" | "max", { icon: typeof Camera; text: string }[]> = {
   hybrid: [
     { icon: Camera, text: "Impresión combinada 9×12 cm + 9×35 cm panorámica." },
     { icon: Shirt, text: "Toga premium, birrete, borla del año y estola." },
@@ -93,7 +139,7 @@ const FEATURES_UNI_B = [
 ];
 
 export function StepConfig({
-  level, service, city, pkg, quantity, onCity, onPkg, onQty, canContinue, onContinue,
+  level, service, city, pkg, quantity, togaColor, stolaColor, onCity, onPkg, onQty, onTogaColor, onStolaColor, canContinue, onContinue,
 }: Props) {
   const isB = pkg?.kind === "B";
   const isSecundaria = level === "secundaria";
@@ -116,11 +162,72 @@ export function StepConfig({
     } else if (pkg.variant.startsWith("pri_")) {
       features = FEATURES_B_PRI[pkg.variant as "pri_a" | "pri_b" | "pri_c"] || FEATURES_A;
     } else {
-      features = FEATURES_B[pkg.variant as "standard" | "hybrid" | "max"] || FEATURES_A;
+      features = FEATURES_B[pkg.variant as "hybrid" | "max"] || FEATURES_A;
     }
   }
 
   const total = unitPrice(pkg, level) * quantity;
+
+  // Get dynamic image showcase based on level and selected configuration
+  const showcaseImage = useMemo(() => {
+    if (level === "preescolar") {
+      if (pkg?.kind === "A") {
+        if (togaColor === "azul") {
+          if (stolaColor === "dorada") return preescolarAzulDorado;
+          if (stolaColor === "plateada") return preescolarAzulPlata;
+          if (stolaColor === "azul") return preescolarAzulAzul;
+          if (stolaColor === "roja") return preescolarAzulRojo;
+          return preescolarAzul;
+        }
+        if (togaColor === "magenta") {
+          if (stolaColor === "dorada") return preescolarTurquesaDorado;
+          if (stolaColor === "plateada") return preescolarTurquesaPlata;
+          if (stolaColor === "azul") return preescolarTurquesaAzul;
+          if (stolaColor === "roja") return preescolarTurquesaRojo;
+          return preescolarMagenta;
+        }
+        if (togaColor === "rojo") {
+          if (stolaColor === "dorada") return preescolarRojoDorado;
+          if (stolaColor === "plateada") return preescolarRojoPlata;
+          if (stolaColor === "azul") return preescolarRojoAzul;
+          if (stolaColor === "roja") return preescolarRojoRojo;
+          return preescolarRojo;
+        }
+        if (togaColor === "verde") {
+          if (stolaColor === "dorada") return preescolarVerdeDorado;
+          if (stolaColor === "plateada") return preescolarVerdePlata;
+          if (stolaColor === "azul") return preescolarVerdeAzul;
+          if (stolaColor === "roja") return preescolarVerdeRojo;
+          return preescolarVerde;
+        }
+        
+        // stolaColor specific check for black toga
+        if (stolaColor === "dorada") return preescolarNegroDorado;
+        if (stolaColor === "plateada") return preescolarNegroPlata;
+        if (stolaColor === "azul") return preescolarNegroAzul;
+        if (stolaColor === "roja") return preescolarNegroRojo;
+        
+        return preescolarNegro;
+      } else if (pkg?.kind === "B") {
+        if (pkg.variant === "hybrid") return preescolarBalance;
+        if (pkg.variant === "max") return preescolarPremium;
+        return preescolarNegro; // fallback
+      }
+    } else if (level === "primaria") {
+      if (pkg?.kind === "A") {
+        if (togaColor === "azul") return primariaAzul;
+        if (togaColor === "magenta") return primariaMagenta;
+        if (togaColor === "rojo") return primariaRojo;
+        if (togaColor === "verde") return primariaVerde;
+        return primariaNegro;
+      } else if (pkg?.kind === "B") {
+        if (pkg.variant === "pri_b") return primariaBalance;
+        if (pkg.variant === "pri_a") return primariaPremium;
+        return primariaNegro; // fallback for pri_c
+      }
+    }
+    return gownImg; // default generic fallback for other levels
+  }, [level, pkg, togaColor, stolaColor]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -136,29 +243,23 @@ export function StepConfig({
       <div className="rounded-2xl border border-hairline bg-card overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.04),0_20px_50px_-30px_rgba(17,34,68,0.18)]">
         <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr]">
           {/* LEFT — Visual showcase */}
+          {/* LEFT — Visual showcase */}
           <div className="relative bg-cream/60 lg:sticky lg:top-0 lg:self-start">
-            <div className="aspect-[4/5] lg:aspect-auto lg:h-[680px] w-full overflow-hidden">
-              <img
-                src={gownImg}
-                alt="Toga de graduación premium con estola"
-                width={896}
-                height={1152}
-                loading="lazy"
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="absolute inset-x-0 bottom-0 p-6 flex justify-center">
-              <div className="flex items-center gap-1.5">
-                {[0, 1, 2].map((i) => (
-                  <span
-                    key={i}
-                    className={cn(
-                      "h-1.5 rounded-full transition-all",
-                      i === 0 ? "w-6 bg-navy" : "w-1.5 bg-foreground/20",
-                    )}
-                  />
-                ))}
-              </div>
+            <div className="aspect-[4/5] lg:aspect-auto lg:h-[680px] w-full overflow-hidden relative">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={showcaseImage}
+                  src={showcaseImage}
+                  alt="Toga de graduación premium con estola"
+                  width={896}
+                  height={1152}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </AnimatePresence>
             </div>
           </div>
 
@@ -213,7 +314,7 @@ export function StepConfig({
                         onPkg(
                           k === "A"
                             ? { kind: "A" }
-                            : { kind: "B", variant: isSecundaria ? "sec_b" : isPrimaria ? "pri_a" : isUni ? "uni_b" : "standard" },
+                            : { kind: "B", variant: isSecundaria ? "sec_b" : isPrimaria ? "pri_a" : isUni ? "uni_b" : "hybrid" },
                         )
                       }
                       className="relative flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -283,15 +384,103 @@ export function StepConfig({
               {/* Package price hint */}
               {(pkg?.kind === "A" || (pkg?.kind === "B" && isUni)) && (
                 <div className="pt-4">
-                  <div className="rounded-xl border border-navy bg-cream px-4 py-3.5 flex items-center justify-between">
-                    <span className="text-sm font-medium text-foreground">Precio por alumno</span>
-                    <span className="font-sans font-semibold text-base tabular-nums text-foreground">
-                      {formatMXN(unitPrice(pkg, level))}
-                    </span>
-                  </div>
+                  {pkg?.kind === "A" && !isUni ? (
+                    <div className="w-full flex items-center justify-between gap-4 rounded-xl border border-navy bg-cream px-4 py-3.5 text-left">
+                      <div className="flex items-baseline gap-3 min-w-0">
+                        <span className="text-[10px] tracking-[0.18em] text-navy font-semibold w-8 shrink-0">
+                          A
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground">Básico</p>
+                          <p className="text-xs text-muted-foreground truncate">9×12 cm en ambos lados</p>
+                        </div>
+                      </div>
+                      <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
+                        {formatMXN(unitPrice(pkg, level))}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-navy bg-cream px-4 py-3.5 flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">Precio por alumno</span>
+                      <span className="font-sans font-semibold text-base tabular-nums text-foreground">
+                        {formatMXN(unitPrice(pkg, level))}
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </section>
+
+            {/* Color de Toga — Only for Paquete A and levels Preescolar/Primaria */}
+            {pkg?.kind === "A" && (level === "preescolar" || level === "primaria") && (
+              <section className="animate-in fade-in slide-in-from-top-2 duration-300">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
+                  Color de Toga
+                </p>
+                <div className="flex flex-wrap gap-2.5">
+                  {TOGA_COLORS.map((c) => {
+                    const active = togaColor === c.id;
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => onTogaColor(c.id)}
+                        className={cn(
+                          "flex items-center gap-2.5 px-4 py-2.5 rounded-full border text-xs sm:text-sm font-medium transition-all cursor-pointer relative",
+                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                          active
+                            ? "border-navy bg-cream text-foreground"
+                            : "border-hairline text-foreground/80 hover:border-navy/40",
+                        )}
+                      >
+                        <span
+                          className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
+                          style={{ backgroundColor: c.hex }}
+                        />
+                        <span>{c.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* Color de Estola — Only for Preescolar */}
+            {level === "preescolar" && (
+              <section className="animate-in fade-in slide-in-from-top-2 duration-300">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
+                  Color de Estola
+                </p>
+                <div className="flex flex-wrap gap-2.5">
+                  {STOLA_COLORS.map((s) => {
+                    const active = stolaColor === s.id;
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => onStolaColor(s.id)}
+                        className={cn(
+                          "flex items-center gap-2.5 px-4 py-2.5 rounded-full border text-xs sm:text-sm font-medium transition-all cursor-pointer relative",
+                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                          active
+                            ? "border-navy bg-cream text-foreground"
+                            : "border-hairline text-foreground/80 hover:border-navy/40",
+                        )}
+                      >
+                        <span
+                          className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
+                          style={{ backgroundColor: s.hex }}
+                        />
+                        <span>{s.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[10px] text-muted-foreground/50 mt-2.5 italic leading-relaxed">
+                  Nota: La estola será confeccionada en el color seleccionado; las imágenes de muestra representan el estilo general del paquete.
+                </p>
+              </section>
+            )}
 
             {/* Features */}
             <section>
