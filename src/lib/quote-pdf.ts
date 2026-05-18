@@ -31,15 +31,10 @@ export type QuoteData = {
 };
 
 export function buildSummaryText(q: QuoteData): string {
-  const unit = unitPrice(q.pkg);
+  const unit = unitPrice(q.pkg, q.level);
   const total = unit * q.quantity;
-  const isA = q.pkg?.kind === "A";
-  const selectedToga = isA ? colorLabel(q.togaColor) : "Negro";
-  const stolaVal = q.level === "preescolar"
-    ? stolaLabel(q.stolaColor)
-    : (isA 
-        ? "Oro / Amarillo" 
-        : (q.pkg?.variant === "hybrid" || q.pkg?.variant === "pri_b" ? "Blanco (Diseño Balance)" : "Blanco (Diseño Premium)"));
+  const selectedToga = (q.level !== "preescolar" || q.pkg?.kind === "A") ? colorLabel(q.togaColor) : "Negro";
+  const stolaVal = stolaLabel(q.stolaColor);
 
   return [
     `Cotización Kinder Togas - Folio: ${q.quoteNumber || 'N/A'}`,
@@ -69,9 +64,9 @@ export function generateQuotePDF(q: QuoteData): void {
   let currentY = 50;
 
   // Helper for colors
-  const navy = [30, 35, 70];
-  const gold = [184, 158, 105]; // Stylized gold/cream
-  const lightGray = [245, 245, 250];
+  const navy: [number, number, number] = [30, 35, 70];
+  const gold: [number, number, number] = [184, 158, 105]; // Stylized gold/cream
+  const lightGray: [number, number, number] = [245, 245, 250];
 
   // 1. WATERMARK (Light text in background)
   doc.saveGraphicsState();
@@ -138,14 +133,9 @@ export function generateQuotePDF(q: QuoteData): void {
     doc.text(formatDate(q.date), detailsX + 330, currentY + 45);
   }
 
-  if (q.level === "preescolar" || q.level === "primaria") {
-    const isA = q.pkg?.kind === "A";
-    const selectedToga = isA ? colorLabel(q.togaColor) : "Negro";
-    const stolaVal = q.level === "preescolar"
-      ? stolaLabel(q.stolaColor)
-      : (isA 
-          ? "Oro / Amarillo" 
-          : (q.pkg?.variant === "hybrid" || q.pkg?.variant === "pri_b" ? "Blanco (Diseño Balance)" : "Blanco (Diseño Premium)"));
+  if (q.level) {
+    const selectedToga = (q.level !== "preescolar" || q.pkg?.kind === "A") ? colorLabel(q.togaColor) : "Negro";
+    const stolaVal = stolaLabel(q.stolaColor);
 
     doc.setFont("helvetica", "bold");
     doc.text("Color Toga:", detailsX + 250, currentY + 60);
@@ -176,20 +166,13 @@ export function generateQuotePDF(q: QuoteData): void {
   currentY += splitDesc.length * 12 + 25;
 
   // 5. PRICING TABLE
-  const unit = unitPrice(q.pkg);
+  const unit = unitPrice(q.pkg, q.level);
   const total = unit * q.quantity;
 
-  const isA = q.pkg?.kind === "A";
-  const selectedToga = isA ? colorLabel(q.togaColor) : "Negro";
-  const stolaVal = q.level === "preescolar"
-    ? stolaLabel(q.stolaColor)
-    : (isA 
-        ? "Oro / Amarillo" 
-        : (q.pkg?.variant === "hybrid" || q.pkg?.variant === "pri_b" ? "Blanco (Diseño Balance)" : "Blanco (Diseño Premium)"));
+  const selectedToga = (q.level !== "preescolar" || q.pkg?.kind === "A") ? colorLabel(q.togaColor) : "Negro";
+  const stolaVal = stolaLabel(q.stolaColor);
 
-  const itemDescription = q.level === "preescolar" || q.level === "primaria"
-    ? `Paquete ${packageLabel(q.pkg, q.level)}\n(Toga: ${selectedToga}, Birrete, Estola: ${stolaVal})`
-    : `Paquete ${packageLabel(q.pkg, q.level)}\n(Toga, Birrete, Estola)`;
+  const itemDescription = `Paquete ${packageLabel(q.pkg, q.level)}\n(Toga: ${selectedToga}, Birrete, Estola: ${stolaVal})`;
 
   autoTable(doc, {
     startY: currentY,

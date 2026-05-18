@@ -34,10 +34,10 @@ export function Quoter() {
     const saved = ls("kt-quote-step");
     return saved ? (Number(saved) as Step) : 1;
   });
-  const [level, setLevel] = useState<Level>(() => (ls("kt-quote-level") as Level) || undefined);
+  const [level, setLevel] = useState<Level | undefined>(() => (ls("kt-quote-level") as Level) || undefined);
   const [service, setService] = useState<ServiceType | undefined>(() => (ls("kt-quote-service") as ServiceType) || undefined);
-  const [city, setCity] = useState<City>(() => (ls("kt-quote-city") as City) || undefined);
-  const [pkg, setPkg] = useState<PackageChoice>(() => {
+  const [city, setCity] = useState<City | undefined>(() => (ls("kt-quote-city") as City) || undefined);
+  const [pkg, setPkg] = useState<PackageChoice | undefined>(() => {
     const saved = ls("kt-quote-pkg");
     return saved ? JSON.parse(saved) : undefined;
   });
@@ -123,10 +123,10 @@ export function Quoter() {
             package_kind: pkg?.kind,
             package_variant: pkg?.kind === 'B' ? pkg.variant : null,
             student_count: quantity,
-            unit_price: unitPrice(pkg),
+            unit_price: unitPrice(pkg, level),
             total_price: total,
-            toga_color: pkg?.kind === 'A' && (level === 'preescolar' || level === 'primaria') ? togaColor : 'negro',
-            stola_color: level === 'preescolar' ? stolaColor : (pkg?.kind === 'A' ? 'oro' : (pkg?.variant === 'hybrid' || pkg?.variant === 'pri_b' ? 'balance' : 'premium')),
+            toga_color: togaColor,
+            stola_color: stolaColor,
           });
 
           if (!error) {
@@ -149,7 +149,10 @@ export function Quoter() {
   const canNext: Record<Step, boolean> = {
     1: !!level,
     2: !!service,
-    3: (service === 'renta' ? !!city : true) && !!pkg && quantity >= 1,
+    3: (service === 'renta' ? !!city : true) && 
+       !!pkg && 
+       (pkg.kind === "A" || !!pkg.variant) && 
+       quantity >= 1,
     4: school.trim().length >= 3 && 
        contact.trim().length >= 3 && 
        phone.replace(/\D/g, '').length === 10 && 
@@ -304,13 +307,13 @@ export function Quoter() {
                   <span className="text-foreground/80">{quantity}</span>
                 </button>
               )}
-              {pkg?.kind === "A" && (level === "preescolar" || level === "primaria") && togaColor && step > 3 && (
+              {((pkg?.kind === "A" && level === "preescolar") || level !== "preescolar") && togaColor && step > 3 && (
                 <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring animate-in fade-in slide-in-from-top-1 duration-300">
                   <span className="text-[9px] text-muted-foreground/40 font-medium">Toga:</span>
                   <span className="text-foreground/80">{colorLabel(togaColor)}</span>
                 </button>
               )}
-              {pkg?.kind === "A" && level === "preescolar" && stolaColor && step > 3 && (
+              {stolaColor && step > 3 && (
                 <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring animate-in fade-in slide-in-from-top-1 duration-300">
                   <span className="text-[9px] text-muted-foreground/40 font-medium">Estola:</span>
                   <span className="text-foreground/80">{stolaLabel(stolaColor)}</span>

@@ -50,19 +50,15 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
   ];
   if (date) rows.splice(3, 0, { label: "Fecha evento", value: formatDate(date), step: 4 });
 
-  // Add Toga Color and Estola Design details specifically for Preescolar and Primaria
-  if (level === "preescolar" || level === "primaria") {
-    const selectedToga = pkg?.kind === "A" ? colorLabel(togaColor) : "Negro";
-    const stolaVal = level === "preescolar"
-      ? stolaLabel(stolaColor)
-      : (pkg?.kind === "A" 
-          ? "Oro / Amarillo" 
-          : (pkg?.variant === "hybrid" || pkg?.variant === "pri_b" ? "Blanco (Diseño Balance)" : "Blanco (Diseño Premium)"));
+  // Add Toga Color and Estola Design details for all levels
+  if (level) {
+    const selectedToga = (level !== "preescolar" || pkg?.kind === "A") ? colorLabel(togaColor) : "Negro";
+    const stolaVal = stolaLabel(stolaColor);
 
     const packageIndex = rows.findIndex(r => r.label === "Paquete");
     if (packageIndex !== -1) {
       rows.splice(packageIndex + 1, 0, 
-        { label: "Color Toga", value: selectedToga, step: pkg?.kind === "A" ? 3 : null },
+        { label: "Color Toga", value: selectedToga, step: (pkg?.kind === "A" || level !== "preescolar") ? 3 : null },
         { label: "Estola", value: stolaVal, step: 3 }
       );
     }
