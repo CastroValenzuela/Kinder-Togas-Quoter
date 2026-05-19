@@ -417,6 +417,10 @@ function AdminDashboard() {
                   <GraduationCap className="h-4 w-4 text-[#C5A85A]" />
                   <span className="text-xs text-white/80 font-medium">Personaliza tu paquete</span>
                 </div>
+                <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
+                  <Truck className="h-4 w-4 text-[#C5A85A]" />
+                  <span className="text-xs text-white/80 font-medium">Envíos a todo México 🇲🇽</span>
+                </div>
               </div>
             </div>
 
@@ -504,19 +508,6 @@ function AdminDashboard() {
                   ? 'Accede a tu cuenta para gestionar tus cotizaciones, compras y realizar pagos en línea.'
                   : 'Crea tu cuenta gratis para cotizar, comprar y personalizar tu graduación.'}
               </p>
-
-              {/* Shipping and Sale badges */}
-              <div className="flex items-center justify-center gap-3 py-2.5 px-4 bg-white/5 lg:bg-slate-50 border border-white/5 lg:border-slate-100 rounded-xl">
-                <div className="flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[11px] font-bold text-white/80 lg:text-slate-700 tracking-wide">Renta y Venta</span>
-                </div>
-                <div className="h-3 w-px bg-white/10 lg:bg-slate-200" />
-                <div className="flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#C5A85A]" />
-                  <span className="text-[11px] font-bold text-white/80 lg:text-slate-700 tracking-wide">Envíos a todo México 🇲🇽</span>
-                </div>
-              </div>
 
               {/* SLIDING FORM CONTAINER */}
               <div className="w-full overflow-hidden relative px-1 py-1">
