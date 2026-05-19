@@ -476,204 +476,65 @@ function AdminDashboard() {
                   : 'Crea tu cuenta gratis para cotizar, personalizar y pagar tu graduación en línea.'}
               </p>
 
-              {/* LOGIN FORM */}
-              {authMode === 'login' && (
-                <form onSubmit={handleLogin} className="space-y-4">
-                  {/* Email */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs uppercase tracking-wider font-semibold text-white/50 lg:text-[#94A3B8]">
-                      Correo electrónico
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
-                      <input
-                        type="email"
-                        value={loginEmail}
-                        onChange={(e) => setLoginEmail(e.target.value)}
-                        placeholder="ejemplo@correo.com"
-                        autoFocus
-                        className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
-                          bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
-                          text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
-                          focus:ring-[#C5A85A] focus:border-transparent
-                          backdrop-blur-sm lg:backdrop-blur-0"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs uppercase tracking-wider font-semibold text-white/50 lg:text-[#94A3B8]">
-                      Contraseña
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Escribe tu contraseña"
-                        autoFocus
-                        className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
-                          bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
-                          text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
-                          focus:ring-[#C5A85A] focus:border-transparent
-                          backdrop-blur-sm lg:backdrop-blur-0"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B] transition-colors cursor-pointer"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {authError && (
-                    <div className="flex items-center gap-2 text-xs bg-red-500/10 lg:bg-red-50 text-red-300 lg:text-red-600 py-3 px-4 rounded-xl border border-red-500/20 lg:border-red-200 font-medium">
-                      <div className="h-1.5 w-1.5 bg-red-400 rounded-full shrink-0" />
-                      {authError}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-4 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
-                  >
-                    Iniciar Sesión
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                  </button>
-                </form>
-              )}
-
-              {/* REGISTER FORM */}
-              {authMode === 'register' && (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (!regName.trim() || !regEmail.trim() || !regPhone.trim() || !regPassword.trim() || !regConfirmPassword.trim()) {
-                      setAuthError('Por favor completa todos los campos.');
-                      return;
-                    }
-                    if (regPassword !== regConfirmPassword) {
-                      setAuthError('Las contraseñas no coinciden.');
-                      return;
-                    }
-                    setAuthError('');
-                    setRegSuccess(true);
-                  }}
-                  className="space-y-3"
+              {/* SLIDING FORM CONTAINER */}
+              <div className="w-full overflow-hidden relative">
+                <div 
+                  className="flex w-[200%] transition-transform duration-500 ease-in-out"
+                  style={{ transform: authMode === 'login' ? 'translateX(0%)' : 'translateX(-50%)' }}
                 >
-                  {regSuccess ? (
-                    <div className="text-center space-y-4 py-4">
-                      <div className="h-14 w-14 bg-emerald-500/10 lg:bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto">
-                        <ShieldCheck className="h-7 w-7 text-emerald-500" />
-                      </div>
-                      <div className="space-y-1">
-                        <h3 className="font-display text-lg font-bold text-white lg:text-[#1E2346]">¡Registro exitoso!</h3>
-                        <p className="text-xs text-white/50 lg:text-[#64748B] leading-relaxed">
-                          Tu cuenta ha sido creada. Pronto recibirás un correo de confirmación. Ya puedes iniciar sesión.
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => { setAuthMode('login'); setRegSuccess(false); }}
-                        className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-3.5 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
-                      >
-                        Ir a Iniciar Sesión
-                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Name */}
-                      <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
-                        <input
-                          type="text"
-                          value={regName}
-                          onChange={(e) => setRegName(e.target.value)}
-                          placeholder="Nombre completo"
-                          className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
-                            bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
-                            text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
-                            focus:ring-[#C5A85A] focus:border-transparent
-                            backdrop-blur-sm lg:backdrop-blur-0"
-                        />
-                      </div>
-
+                  {/* PANEL 1: LOGIN FORM */}
+                  <div className="w-1/2 shrink-0 pr-4 transition-opacity duration-300" style={{ opacity: authMode === 'login' ? 1 : 0 }}>
+                    <form onSubmit={handleLogin} className="space-y-4">
                       {/* Email */}
-                      <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
-                        <input
-                          type="email"
-                          value={regEmail}
-                          onChange={(e) => setRegEmail(e.target.value)}
-                          placeholder="Correo electrónico"
-                          className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
-                            bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
-                            text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
-                            focus:ring-[#C5A85A] focus:border-transparent
-                            backdrop-blur-sm lg:backdrop-blur-0"
-                        />
+                      <div className="space-y-1.5">
+                        <label className="text-xs uppercase tracking-wider font-semibold text-white/50 lg:text-[#94A3B8]">
+                          Correo electrónico
+                        </label>
+                        <div className="relative">
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                          <input
+                            type="email"
+                            value={loginEmail}
+                            onChange={(e) => setLoginEmail(e.target.value)}
+                            placeholder="ejemplo@correo.com"
+                            autoFocus
+                            className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                              bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                              text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                              focus:ring-[#C5A85A] focus:border-transparent
+                              backdrop-blur-sm lg:backdrop-blur-0"
+                          />
+                        </div>
                       </div>
 
-                      {/* Phone */}
-                      <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
-                        <input
-                          type="tel"
-                          value={regPhone}
-                          onChange={(e) => setRegPhone(e.target.value)}
-                          placeholder="Teléfono (10 dígitos)"
-                          className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
-                            bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
-                            text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
-                            focus:ring-[#C5A85A] focus:border-transparent
-                            backdrop-blur-sm lg:backdrop-blur-0"
-                        />
+                      <div className="space-y-1.5">
+                        <label className="text-xs uppercase tracking-wider font-semibold text-white/50 lg:text-[#94A3B8]">
+                          Contraseña
+                        </label>
+                        <div className="relative">
+                          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Escribe tu contraseña"
+                            className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                              bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                              text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                              focus:ring-[#C5A85A] focus:border-transparent
+                              backdrop-blur-sm lg:backdrop-blur-0"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B] transition-colors cursor-pointer"
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
                       </div>
 
-                      {/* Password */}
-                      <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          value={regPassword}
-                          onChange={(e) => setRegPassword(e.target.value)}
-                          placeholder="Crea una contraseña"
-                          className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
-                            bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
-                            text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
-                            focus:ring-[#C5A85A] focus:border-transparent
-                            backdrop-blur-sm lg:backdrop-blur-0"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B] transition-colors cursor-pointer"
-                        >
-                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-
-                      {/* Confirm Password */}
-                      <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          value={regConfirmPassword}
-                          onChange={(e) => setRegConfirmPassword(e.target.value)}
-                          placeholder="Confirma tu contraseña"
-                          className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
-                            bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
-                            text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
-                            focus:ring-[#C5A85A] focus:border-transparent
-                            backdrop-blur-sm lg:backdrop-blur-0"
-                        />
-                      </div>
-
-                      {authError && (
+                      {authError && authMode === 'login' && (
                         <div className="flex items-center gap-2 text-xs bg-red-500/10 lg:bg-red-50 text-red-300 lg:text-red-600 py-3 px-4 rounded-xl border border-red-500/20 lg:border-red-200 font-medium">
                           <div className="h-1.5 w-1.5 bg-red-400 rounded-full shrink-0" />
                           {authError}
@@ -682,15 +543,161 @@ function AdminDashboard() {
 
                       <button
                         type="submit"
-                        className="w-full bg-[#C5A85A] hover:bg-[#b8993f] text-white py-4 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-[#C5A85A]/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group mt-1"
+                        className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-4 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
                       >
-                        Crear mi Cuenta
+                        Iniciar Sesión
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                       </button>
-                    </>
-                  )}
-                </form>
-              )}
+                    </form>
+                  </div>
+
+                  {/* PANEL 2: REGISTER FORM */}
+                  <div className="w-1/2 shrink-0 pl-4 transition-opacity duration-300" style={{ opacity: authMode === 'register' ? 1 : 0 }}>
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!regName.trim() || !regEmail.trim() || !regPhone.trim() || !regPassword.trim() || !regConfirmPassword.trim()) {
+                          setAuthError('Por favor completa todos los campos.');
+                          return;
+                        }
+                        if (regPassword !== regConfirmPassword) {
+                          setAuthError('Las contraseñas no coinciden.');
+                          return;
+                        }
+                        setAuthError('');
+                        setRegSuccess(true);
+                      }}
+                      className="space-y-3"
+                    >
+                      {regSuccess ? (
+                        <div className="text-center space-y-4 py-4">
+                          <div className="h-14 w-14 bg-emerald-500/10 lg:bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto">
+                            <ShieldCheck className="h-7 w-7 text-emerald-500" />
+                          </div>
+                          <div className="space-y-1">
+                            <h3 className="font-display text-lg font-bold text-white lg:text-[#1E2346]">¡Registro exitoso!</h3>
+                            <p className="text-xs text-white/50 lg:text-[#64748B] leading-relaxed">
+                              Tu cuenta ha sido creada. Pronto recibirás un correo de confirmación. Ya puedes iniciar sesión.
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => { setAuthMode('login'); setRegSuccess(false); }}
+                            className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-3.5 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
+                          >
+                            Ir a Iniciar Sesión
+                            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          {/* Name */}
+                          <div className="relative">
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                            <input
+                              type="text"
+                              value={regName}
+                              onChange={(e) => setRegName(e.target.value)}
+                              placeholder="Nombre completo"
+                              className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                                bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                                text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                                focus:ring-[#C5A85A] focus:border-transparent
+                                backdrop-blur-sm lg:backdrop-blur-0"
+                            />
+                          </div>
+
+                          {/* Email */}
+                          <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                            <input
+                              type="email"
+                              value={regEmail}
+                              onChange={(e) => setRegEmail(e.target.value)}
+                              placeholder="Correo electrónico"
+                              className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                                bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                                text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                                focus:ring-[#C5A85A] focus:border-transparent
+                                backdrop-blur-sm lg:backdrop-blur-0"
+                            />
+                          </div>
+
+                          {/* Phone */}
+                          <div className="relative">
+                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                            <input
+                              type="tel"
+                              value={regPhone}
+                              onChange={(e) => setRegPhone(e.target.value)}
+                              placeholder="Teléfono (10 dígitos)"
+                              className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                                bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                                text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                                focus:ring-[#C5A85A] focus:border-transparent
+                                backdrop-blur-sm lg:backdrop-blur-0"
+                            />
+                          </div>
+
+                          {/* Password */}
+                          <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                            <input
+                              type={showPassword ? "text" : "password"}
+                              value={regPassword}
+                              onChange={(e) => setRegPassword(e.target.value)}
+                              placeholder="Crea una contraseña"
+                              className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                                bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                                text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                                focus:ring-[#C5A85A] focus:border-transparent
+                                backdrop-blur-sm lg:backdrop-blur-0"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B] transition-colors cursor-pointer"
+                            >
+                              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                          </div>
+
+                          {/* Confirm Password */}
+                          <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                            <input
+                              type={showPassword ? "text" : "password"}
+                              value={regConfirmPassword}
+                              onChange={(e) => setRegConfirmPassword(e.target.value)}
+                              placeholder="Confirma tu contraseña"
+                              className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                                bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                                text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                                focus:ring-[#C5A85A] focus:border-transparent
+                                backdrop-blur-sm lg:backdrop-blur-0"
+                            />
+                          </div>
+
+                          {authError && authMode === 'register' && (
+                            <div className="flex items-center gap-2 text-xs bg-red-500/10 lg:bg-red-50 text-red-300 lg:text-red-600 py-3 px-4 rounded-xl border border-red-500/20 lg:border-red-200 font-medium">
+                              <div className="h-1.5 w-1.5 bg-red-400 rounded-full shrink-0" />
+                              {authError}
+                            </div>
+                          )}
+
+                          <button
+                            type="submit"
+                            className="w-full bg-[#C5A85A] hover:bg-[#b8993f] text-white py-4 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-[#C5A85A]/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group mt-1"
+                          >
+                            Crear mi Cuenta
+                            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                          </button>
+                        </>
+                      )}
+                    </form>
+                  </div>
+                </div>
+              </div>
 
               {/* Divider */}
               <div className="flex items-center gap-4">
