@@ -86,6 +86,7 @@ const CHART_PIE_COLORS = ["#1E2346", "#C5A85A", "#3B82F6", "#10B981", "#EC4899",
 
 const ADMIN_EMAILS = [
   "castrovalenzuela@hotmail.com",
+  "kindertogas@gmail.com",
   "admin@kindertogas.com"
 ];
 
