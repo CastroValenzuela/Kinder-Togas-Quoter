@@ -473,9 +473,26 @@ export function StepConfig({
                           type="button"
                           onClick={() => {
                             if (k === "C") {
-                              onPkg({ kind: "C", variant: "prep_c1" });
+                              const hasValidCVariant = pkg?.kind === "C" && pkg?.variant && (
+                                pkg.variant === "prep_c1" || pkg.variant === "prep_c2"
+                              );
+                              const variant = hasValidCVariant ? pkg.variant : "prep_c1";
+                              onPkg({ kind: "C", variant });
                             } else if (k === "B") {
-                              const variant = level === "preparatoria" ? "prep_b" : undefined;
+                              let defaultVariant: PackageBVariant | undefined = undefined;
+                              if (level === "preescolar") defaultVariant = "hybrid";
+                              else if (level === "primaria") defaultVariant = "pri_c";
+                              else if (level === "secundaria") defaultVariant = "sec_b";
+                              else if (level === "preparatoria") defaultVariant = "prep_b";
+
+                              const hasValidBVariant = pkg?.kind === "B" && pkg?.variant && (
+                                (level === "preescolar" && (pkg.variant === "hybrid" || pkg.variant === "max")) ||
+                                (level === "primaria" && (pkg.variant === "pri_c" || pkg.variant === "pri_b" || pkg.variant === "pri_a")) ||
+                                (level === "secundaria" && (pkg.variant === "sec_b" || pkg.variant === "sec_a")) ||
+                                (level === "preparatoria" && (pkg.variant === "prep_b" || pkg.variant === "prep_a"))
+                              );
+
+                              const variant = hasValidBVariant ? pkg.variant : defaultVariant;
                               onPkg({ kind: "B", variant });
                             } else {
                               onPkg({ kind: "A" });
