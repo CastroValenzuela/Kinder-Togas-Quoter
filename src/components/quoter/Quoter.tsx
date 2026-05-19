@@ -10,6 +10,8 @@ import { StepDetails } from "./StepDetails";
 import { StepSummary } from "./StepSummary";
 import {
   unitPrice,
+  unitOriginalPrice,
+  getDiscountPercent,
   levelLabel,
   cityLabel,
   packageLabel,
@@ -136,6 +138,8 @@ export function Quoter() {
             total_price: total,
             toga_color: togaColor,
             stola_color: stolaColor,
+            discount_percent: getDiscountPercent(pkg, level),
+            original_unit_price: unitOriginalPrice(pkg, level),
           });
 
           if (!error) {

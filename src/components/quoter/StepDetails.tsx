@@ -105,23 +105,34 @@ export function StepDetails({
           <Input
             id="phone"
             type="tel"
-            placeholder="Ej. (646) 1234567"
+            placeholder="Ej. (646) 123-4567"
             value={phone}
             onChange={(e) => {
               const digits = e.target.value.replace(/\D/g, '').substring(0, 10);
-              let formatted = digits;
-              if (digits.length > 3) {
-                formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-              } else if (digits.length > 0) {
-                formatted = `(${digits}`;
+              let formatted = "";
+              if (digits.length > 0) {
+                if (digits.length <= 3) {
+                  formatted = `(${digits}`;
+                } else if (digits.length <= 6) {
+                  formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+                } else {
+                  formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+                }
               }
               onPhone(formatted);
             }}
             className="h-12 text-base"
           />
-          <p className="text-[10px] text-muted-foreground mt-1.5 ml-1">
-            Ingresa los 10 dígitos (3 del área y 7 del número)
-          </p>
+          {phone.length > 0 && phone.replace(/\D/g, '').length < 10 && (
+            <p className="text-[10px] text-destructive mt-1.5 ml-1 font-medium animate-pulse">
+              El teléfono debe tener exactamente 10 dígitos (llevas {phone.replace(/\D/g, '').length} de 10).
+            </p>
+          )}
+          {phone.replace(/\D/g, '').length === 10 && (
+            <p className="text-[10px] text-emerald-600 mt-1.5 ml-1 font-semibold flex items-center gap-1">
+              <span>✓ Teléfono de 10 dígitos válido</span>
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">

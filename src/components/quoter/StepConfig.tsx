@@ -65,6 +65,8 @@ import {
   STOLA_COLORS,
   formatMXN,
   unitPrice,
+  unitOriginalPrice,
+  getDiscountPercent,
   type City,
   type PackageChoice,
   type PackageBVariant,
@@ -434,33 +436,51 @@ export function StepConfig({
                       payload: { kind: "B", variant: "uni_c" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "uni_c"
                     }
-                  ].map((opt) => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => onPkg(opt.payload)}
-                      className={cn(
-                        "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
-                        "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        opt.isActive
-                          ? "border-navy bg-cream"
-                          : "border-hairline hover:border-navy/40",
-                      )}
-                    >
-                      <div className="flex items-baseline gap-3 min-w-0">
-                        <span className="text-[10px] tracking-[0.18em] text-navy font-semibold w-8 shrink-0">
-                          {opt.code}
-                        </span>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-foreground">{opt.title}</p>
-                          <p className="text-xs text-muted-foreground truncate">{opt.desc}</p>
+                   ].map((opt) => {
+                    const originalPrice = unitOriginalPrice(opt.payload, level);
+                    const netPrice = unitPrice(opt.payload, level);
+                    const discount = getDiscountPercent(opt.payload, level);
+                    
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => onPkg(opt.payload)}
+                        className={cn(
+                          "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
+                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                          opt.isActive
+                            ? "border-navy bg-cream"
+                            : "border-hairline hover:border-navy/40",
+                        )}
+                      >
+                        <div className="flex items-baseline gap-3 min-w-0">
+                          <span className="text-[10px] tracking-[0.18em] text-navy font-semibold w-8 shrink-0">
+                            {opt.code}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-foreground">{opt.title}</p>
+                            <p className="text-xs text-muted-foreground truncate">{opt.desc}</p>
+                          </div>
                         </div>
-                      </div>
-                      <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
-                        {formatMXN(opt.price)}
-                      </span>
-                    </button>
-                  ))}
+                        <div className="flex flex-col items-end shrink-0 select-none">
+                          <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
+                            {formatMXN(netPrice)}
+                          </span>
+                          {discount > 0 && (
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="text-[10px] line-through text-muted-foreground tabular-nums">
+                                {formatMXN(originalPrice)}
+                              </span>
+                              <span className="text-[9px] font-bold text-white bg-[#C5A85A] px-1.5 py-0.5 rounded-md tracking-wider">
+                                -{discount}%
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               ) : (
                 <>
@@ -534,6 +554,11 @@ export function StepConfig({
                         <div className="pt-4 space-y-2.5">
                           {visibleVariants.map((v) => {
                             const active = (pkg?.kind === "B" || pkg?.kind === "C") && pkg.variant === v.id;
+                            const currentPayload = { kind: pkg?.kind || "B", variant: v.id } as const;
+                            const originalPrice = unitOriginalPrice(currentPayload, level);
+                            const netPrice = unitPrice(currentPayload, level);
+                            const discount = getDiscountPercent(currentPayload, level);
+
                             return (
                               <button
                                 key={v.id}
@@ -556,9 +581,21 @@ export function StepConfig({
                                     <p className="text-xs text-muted-foreground truncate">{v.desc}</p>
                                   </div>
                                 </div>
-                                <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
-                                  {formatMXN(v.price)}
-                                </span>
+                                <div className="flex flex-col items-end shrink-0 select-none">
+                                  <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
+                                    {formatMXN(netPrice)}
+                                  </span>
+                                  {discount > 0 && (
+                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                      <span className="text-[10px] line-through text-muted-foreground tabular-nums">
+                                        {formatMXN(originalPrice)}
+                                      </span>
+                                      <span className="text-[9px] font-bold text-white bg-[#C5A85A] px-1.5 py-0.5 rounded-md tracking-wider">
+                                        -{discount}%
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
                               </button>
                             );
                           })}
@@ -568,24 +605,42 @@ export function StepConfig({
                   </AnimatePresence>
 
                   {/* Package price hint */}
-                  {pkg?.kind === "A" && (
-                    <div className="pt-4">
-                      <div className="w-full flex items-center justify-between gap-4 rounded-xl border border-navy bg-cream px-4 py-3.5 text-left">
-                        <div className="flex items-baseline gap-3 min-w-0">
-                          <span className="text-[10px] tracking-[0.18em] text-navy font-semibold w-8 shrink-0">
-                            A
-                          </span>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-foreground">Básico</p>
-                            <p className="text-xs text-muted-foreground truncate font-sans">Estola Lisa</p>
+                  {pkg?.kind === "A" && (() => {
+                    const originalPrice = unitOriginalPrice(pkg, level);
+                    const netPrice = unitPrice(pkg, level);
+                    const discount = getDiscountPercent(pkg, level);
+                    
+                    return (
+                      <div className="pt-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                        <div className="w-full flex items-center justify-between gap-4 rounded-xl border border-navy bg-cream px-4 py-3.5 text-left">
+                          <div className="flex items-baseline gap-3 min-w-0">
+                            <span className="text-[10px] tracking-[0.18em] text-navy font-semibold w-8 shrink-0">
+                              A
+                            </span>
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-foreground">Básico</p>
+                              <p className="text-xs text-muted-foreground truncate font-sans">Estola Lisa</p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end shrink-0 select-none">
+                            <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
+                              {formatMXN(netPrice)}
+                            </span>
+                            {discount > 0 && (
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="text-[10px] line-through text-muted-foreground tabular-nums">
+                                  {formatMXN(originalPrice)}
+                                </span>
+                                <span className="text-[9px] font-bold text-white bg-[#C5A85A] px-1.5 py-0.5 rounded-md tracking-wider">
+                                  -{discount}%
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
-                        <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
-                          {formatMXN(unitPrice(pkg, level))}
-                        </span>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </>
               )}
             </section>

@@ -5,6 +5,8 @@ import {
   type City,
   type PackageChoice,
   unitPrice,
+  unitOriginalPrice,
+  getDiscountPercent,
   packageLabel,
   levelLabel,
   cityLabel,
@@ -167,6 +169,8 @@ export function generateQuotePDF(q: QuoteData): void {
 
   // 5. PRICING TABLE
   const unit = unitPrice(q.pkg, q.level);
+  const originalUnit = unitOriginalPrice(q.pkg, q.level);
+  const discountPercent = getDiscountPercent(q.pkg, q.level);
   const total = unit * q.quantity;
 
   const selectedToga = (q.level !== "preescolar" || q.pkg?.kind === "A") ? colorLabel(q.togaColor) : "Negro";
@@ -174,18 +178,40 @@ export function generateQuotePDF(q: QuoteData): void {
 
   const itemDescription = `Paquete ${packageLabel(q.pkg, q.level)}\n(Toga: ${selectedToga}, Birrete, Estola: ${stolaVal})`;
 
+  // Construir filas dinámicas según si hay descuento o no
+  const tableBody: any[] = [];
+  if (discountPercent > 0) {
+    const originalTotal = originalUnit * q.quantity;
+    const savings = (originalUnit - unit) * q.quantity;
+    
+    tableBody.push(
+      [
+        { content: itemDescription, styles: { fontStyle: "bold" } },
+        q.quantity.toString(),
+        formatMXN(originalUnit),
+        formatMXN(originalTotal)
+      ],
+      [
+        { content: `Descuento Promocional Especial (${discountPercent}%)`, styles: { fontStyle: "italic", textColor: [184, 158, 105] as [number, number, number] } },
+        "1",
+        `-${formatMXN(originalUnit - unit)}`,
+        `-${formatMXN(savings)}`
+      ]
+    );
+  } else {
+    tableBody.push([
+      { content: itemDescription, styles: { fontStyle: "bold" } },
+      q.quantity.toString(),
+      formatMXN(unit),
+      formatMXN(total)
+    ]);
+  }
+
   autoTable(doc, {
     startY: currentY,
     margin: { left: margin, right: margin },
     head: [["DESCRIPCIÓN", "CANTIDAD", "UNITARIO", "TOTAL"]],
-    body: [
-      [
-        { content: itemDescription, styles: { fontStyle: "bold" } },
-        q.quantity.toString(),
-        formatMXN(unit),
-        formatMXN(total)
-      ]
-    ],
+    body: tableBody,
     foot: [
       ["", "", "TOTAL GENERAL", formatMXN(total)]
     ],

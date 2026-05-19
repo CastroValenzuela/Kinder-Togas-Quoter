@@ -2,6 +2,8 @@ import { Download, Facebook, Loader2, Mail, MessageCircle, ShieldCheck, Star, Tr
 import {
   formatMXN,
   unitPrice,
+  unitOriginalPrice,
+  getDiscountPercent,
   packageLabel,
   levelLabel,
   cityLabel,
@@ -34,6 +36,8 @@ type Props = {
 
 export function StepSummary({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor, onEditStep }: Props) {
   const unit = unitPrice(pkg, level);
+  const originalUnit = unitOriginalPrice(pkg, level);
+  const discountPercent = getDiscountPercent(pkg, level);
   const total = unit * quantity;
 
   const rows = [
@@ -44,7 +48,13 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
     { label: "Servicio", value: service === "renta" ? "Renta" : "Venta", step: 2 },
     { label: "Ciudad", value: cityLabel(city), step: 3 },
     { label: "Paquete", value: packageLabel(pkg, level), step: 3 },
-    { label: "Precio unitario", value: formatMXN(unit), step: 3 },
+    ...(discountPercent > 0 ? [
+      { label: "Precio de Lista (Unitario)", value: formatMXN(originalUnit), step: 3 },
+      { label: "Descuento Promocional", value: `-${discountPercent}%`, step: 3 },
+      { label: "Precio Neto (Unitario)", value: formatMXN(unit), step: 3 },
+    ] : [
+      { label: "Precio unitario", value: formatMXN(unit), step: 3 },
+    ]),
     { label: "Cantidad de alumnos", value: String(quantity), step: 3 },
     { label: "Teléfono", value: phone, step: 4 },
   ];
@@ -100,13 +110,28 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
           </div>
         ))}
 
-        <div className="flex items-baseline justify-between gap-6 pt-8 pb-2">
-          <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Total</span>
-          <span className="font-sans font-semibold text-4xl sm:text-5xl text-navy tabular-nums">
-            {formatMXN(total)}
-          </span>
+        <div className="flex flex-col gap-1.5 pt-8 pb-2">
+          <div className="flex items-baseline justify-between gap-6">
+            <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Total Neto</span>
+            <span className="font-sans font-semibold text-4xl sm:text-5xl text-navy tabular-nums select-none">
+              {formatMXN(total)}
+            </span>
+          </div>
+          {discountPercent > 0 && (
+            <div className="flex flex-col items-end gap-1 select-none animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Precio de Lista:</span>
+                <span className="text-sm line-through text-muted-foreground font-sans tabular-nums">
+                  {formatMXN(originalUnit * quantity)}
+                </span>
+              </div>
+              <div className="text-[10px] font-bold text-white bg-[#C5A85A] px-2 py-0.5 rounded-md tracking-wide mt-0.5">
+                🎉 ¡Ahorro total de {formatMXN((originalUnit - unit) * quantity)} MXN!
+              </div>
+            </div>
+          )}
         </div>
-        <p className="text-xs text-muted-foreground text-right">Cotización válida 15 días.</p>
+        <p className="text-xs text-muted-foreground text-right mt-1">Cotización válida 15 días.</p>
       </div>
 
       {/* 2. Thank You Card (Shows up on right for desktop, bottom for mobile) */}
@@ -172,16 +197,54 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
         </div>
       </div>
 
-      {/* 3. Action Buttons (Download) */}
-      <div className="order-2 lg:order-3 lg:col-span-2 pt-8 pb-4 flex flex-col sm:flex-row justify-center items-center gap-6 lg:mt-4 lg:border-t border-hairline">
-        <button
-          type="button"
-          onClick={() => generateQuotePDF({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, togaColor, stolaColor })}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-full bg-navy text-navy-foreground px-10 py-4.5 text-base font-semibold hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-md hover:scale-[1.02] active:scale-[0.98]"
-        >
-          <Download className="h-5 w-5" /> Descargar mi Cotización (PDF)
-        </button>
-      </div>
+      {/* 3. Action Buttons (Download & Share) */}
+      {(() => {
+        const handleShareWhatsApp = () => {
+          const selectedToga = (level !== "preescolar" || pkg?.kind === "A") ? colorLabel(togaColor) : "Negro";
+          const selectedStola = stolaLabel(stolaColor);
+          const serviceLabel = service === "renta" ? "Renta" : "Venta";
+
+          const text = `🎓 *¡Hola a todos!* Les comparto la propuesta oficial de *Kinder Togas* para la graduación de nuestros hijos:
+
+🏫 *Colegio:* ${school}
+🏛️ *Nivel:* ${levelLabel(level)}
+📋 *Servicio:* ${serviceLabel}
+🏷️ *Paquete:* ${packageLabel(pkg, level)}
+🎨 *Toga:* Color ${selectedToga}
+🎗️ *Estola:* ${selectedStola}
+📦 *Cantidad:* ${quantity} graduados
+💰 *Precio Unitario:* ${formatMXN(unit)}
+💵 *Inversión Total:* ${formatMXN(total)}
+
+📄 *Folio de Cotización:* ${quoteNumber || "—"}
+✨ *Incluye:* Toga, Birrete, Borla del año, Estola personalizada y logística coordinada.
+
+¿Qué opinan? ¡Está súper completa! 🎓✨`;
+
+          const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+          window.open(url, "_blank", "noopener,noreferrer");
+        };
+
+        return (
+          <div className="order-2 lg:order-3 lg:col-span-2 pt-8 pb-4 flex flex-col sm:flex-row justify-center items-center gap-6 lg:mt-4 lg:border-t border-hairline">
+            <button
+              type="button"
+              onClick={() => generateQuotePDF({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, togaColor, stolaColor })}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-full bg-navy text-navy-foreground px-10 py-4.5 text-base font-semibold hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            >
+              <Download className="h-5 w-5" /> Descargar mi Cotización (PDF)
+            </button>
+
+            <button
+              type="button"
+              onClick={handleShareWhatsApp}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-full bg-[#25D366] text-white px-10 py-4.5 text-base font-semibold hover:opacity-95 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-md shadow-[#25D366]/20 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            >
+              <MessageCircle className="h-5 w-5" /> Compartir con el Comité (WhatsApp)
+            </button>
+          </div>
+        );
+      })()}
 
       </div>
       )}

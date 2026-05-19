@@ -79,21 +79,63 @@ export const CITIES: { id: City; label: string }[] = [
 
 // Precios editables (MXN, por alumno) — Objeto mutable de base para compatibilidad hacia atrás
 export const PRICES = {
-  A: 350,
-  B_BALANCE: 480,  // B.2 Balance
-  B_PREMIUM: 510,  // B.3 Premium
-  SEC_A: 550,      // Secundaria Diseño A (Mixto)
-  SEC_B: 500,      // Secundaria Diseño B (Discreto)
-  PRI_A: 510,      // Primaria Diseño A (Clásico Destacado - Grande ambos lados)
-  PRI_B: 480,      // Primaria Diseño B (Clásico Equilibrado - Grande + Pequeño)
-  PRI_C: 450,      // Primaria Diseño C (Básico Funcional - Sencillo ambos lados)
-  UNI_A: 550,      // Universidad/Posgrado Opción A (Impresión)
-  UNI_B: 600,      // Universidad/Posgrado Opción B (Bordado Sencillo)
-  UNI_C: 720,      // Universidad/Posgrado Opción C (Bordado Premium)
-  PREP_A: 550,     // Preparatoria Diseño A (Mixto)
-  PREP_B: 500,     // Preparatoria Diseño B (Discreto)
-  PREP_C1: 600,    // Preparatoria Diseño C1 (Bordado Sencillo)
-  PREP_C2: 720,    // Preparatoria Diseño C2 (Bordado Premium)
+  // Preescolar (desacoplado)
+  A_PREESCOLAR: 350,
+  B_BALANCE_PREESCOLAR: 480,
+  B_PREMIUM_PREESCOLAR: 510,
+
+  // Primaria (desacoplado)
+  A_PRIMARIA: 350,
+  B_BALANCE_PRIMARIA: 480,
+  B_PREMIUM_PRIMARIA: 510,
+  PRI_C: 450,
+  PRI_B: 480,
+  PRI_A: 510,
+
+  // Secundaria (desacoplado)
+  A_SECUNDARIA: 350,
+  SEC_B: 500,
+  SEC_A: 550,
+
+  // Preparatoria (desacoplado)
+  A_PREPARATORIA: 350,
+  PREP_B: 500,
+  PREP_A: 550,
+  PREP_C1: 600,
+  PREP_C2: 720,
+
+  // Universidad / Posgrado
+  UNI_A: 550,
+  UNI_B: 600,
+  UNI_C: 720,
+};
+
+// Descuentos editables (% de descuento) — Objeto mutable
+export const DISCOUNTS = {
+  A_PREESCOLAR: 0,
+  B_BALANCE_PREESCOLAR: 0,
+  B_PREMIUM_PREESCOLAR: 0,
+
+  A_PRIMARIA: 0,
+  B_BALANCE_PRIMARIA: 0,
+  B_PREMIUM_PRIMARIA: 0,
+  PRI_C: 0,
+  PRI_B: 0,
+  PRI_A: 0,
+
+  A_SECUNDARIA: 0,
+  SEC_B: 0,
+  SEC_A: 0,
+
+  A_PREPARATORIA: 0,
+  PREP_B: 0,
+  PREP_A: 0,
+  PREP_C1: 0,
+  PREP_C2: 0,
+
+  UNI_A: 0,
+  UNI_B: 0,
+  UNI_C: 0,
 };
 
 export const B_VARIANTS: {
@@ -103,8 +145,8 @@ export const B_VARIANTS: {
   desc: string;
   price: number;
 }[] = [
-  { id: "hybrid", code: "B.2", title: "Balance", desc: "9×12 cm + 9×35 cm", price: PRICES.B_BALANCE },
-  { id: "max", code: "B.3", title: "Premium", desc: "9×35 cm en ambos lados", price: PRICES.B_PREMIUM },
+  { id: "hybrid", code: "B.2", title: "Balance", desc: "9×12 cm + 9×35 cm", price: PRICES.B_BALANCE_PRIMARIA },
+  { id: "max", code: "B.3", title: "Premium", desc: "9×35 cm en ambos lados", price: PRICES.B_PREMIUM_PRIMARIA },
   { id: "sec_b", code: "B.1", title: "Diseño B1", desc: "Impresión discreta en ambos lados", price: PRICES.SEC_B },
   { id: "sec_a", code: "B.2", title: "Diseño B2", desc: "Impresión mixta (institucional + discreta)", price: PRICES.SEC_A },
   { id: "prep_b", code: "B.1", title: "Diseño B1", desc: "Impresión discreta en ambos lados", price: PRICES.PREP_B },
@@ -119,14 +161,14 @@ export const B_VARIANTS: {
 ];
 
 /**
- * Carga los precios reales configurados en Supabase.
- * Actualiza el objeto PRICES y el array B_VARIANTS en caliente.
+ * Carga los precios y descuentos reales configurados en Supabase.
+ * Actualiza los objetos PRICES, DISCOUNTS y el array B_VARIANTS en caliente.
  */
 export async function loadDynamicPrices(): Promise<boolean> {
   try {
     const { data, error } = await supabase
       .from("pricing")
-      .select("key, price");
+      .select("key, price, discount_percent");
 
     if (error) {
       console.warn("No se pudieron cargar precios de Supabase, usando valores locales:", error.message);
@@ -134,18 +176,21 @@ export async function loadDynamicPrices(): Promise<boolean> {
     }
 
     if (data && data.length > 0) {
-      // 1. Actualizar las propiedades de PRICES en caliente
-      data.forEach((row: { key: string; price: number | string }) => {
+      // 1. Actualizar las propiedades de PRICES y DISCOUNTS en caliente
+      data.forEach((row: { key: string; price: number | string; discount_percent?: number | string }) => {
         const valKey = row.key as keyof typeof PRICES;
         if (valKey in PRICES) {
           PRICES[valKey] = Number(row.price);
+        }
+        if (valKey in DISCOUNTS) {
+          DISCOUNTS[valKey] = Number(row.discount_percent || 0);
         }
       });
 
       // 2. Sincronizar los precios dentro de B_VARIANTS para que las opciones del cotizador se enteren de la tarifa real
       B_VARIANTS.forEach((variant) => {
-        if (variant.id === "hybrid") variant.price = PRICES.B_BALANCE;
-        if (variant.id === "max") variant.price = PRICES.B_PREMIUM;
+        if (variant.id === "hybrid") variant.price = PRICES.B_BALANCE_PRIMARIA;
+        if (variant.id === "max") variant.price = PRICES.B_PREMIUM_PRIMARIA;
         if (variant.id === "sec_b") variant.price = PRICES.SEC_B;
         if (variant.id === "sec_a") variant.price = PRICES.SEC_A;
         if (variant.id === "prep_b") variant.price = PRICES.PREP_B;
@@ -159,7 +204,7 @@ export async function loadDynamicPrices(): Promise<boolean> {
         if (variant.id === "uni_c") variant.price = PRICES.UNI_C;
       });
 
-      console.log("Tarifas cargadas y aplicadas desde Supabase correctamente.");
+      console.log("Tarifas y descuentos cargados y aplicados desde Supabase correctamente.");
       return true;
     }
     return false;
@@ -169,14 +214,81 @@ export async function loadDynamicPrices(): Promise<boolean> {
   }
 }
 
-export function unitPrice(pkg?: PackageChoice, level?: Level): number {
-  if (!pkg) return 0;
+/**
+ * Mapea un paquete o variante a su llave (key) de precios
+ */
+export function getPriceKey(pkg?: PackageChoice, level?: Level): keyof typeof PRICES | undefined {
+  if (!pkg) return undefined;
+  
   if (pkg.kind === "A") {
-    if (level === "universidad") return PRICES.UNI_A;
-    return PRICES.A;
+    if (level === "preescolar") return "A_PREESCOLAR";
+    if (level === "primaria") return "A_PRIMARIA";
+    if (level === "secundaria") return "A_SECUNDARIA";
+    if (level === "preparatoria") return "A_PREPARATORIA";
+    if (level === "universidad") return "UNI_A";
+    return "A_PRIMARIA"; // fallback seguro
   }
-  const variant = B_VARIANTS.find((v) => v.id === pkg.variant);
-  return variant ? variant.price : 0;
+  
+  if (pkg.variant === "hybrid") {
+    if (level === "preescolar") return "B_BALANCE_PREESCOLAR";
+    if (level === "primaria") return "B_BALANCE_PRIMARIA";
+    return "B_BALANCE_PRIMARIA"; // fallback seguro
+  }
+  
+  if (pkg.variant === "max") {
+    if (level === "preescolar") return "B_PREMIUM_PREESCOLAR";
+    if (level === "primaria") return "B_PREMIUM_PRIMARIA";
+    return "B_PREMIUM_PRIMARIA"; // fallback seguro
+  }
+
+  if (pkg.variant === "sec_b") return "SEC_B";
+  if (pkg.variant === "sec_a") return "SEC_A";
+  if (pkg.variant === "prep_b") return "PREP_B";
+  if (pkg.variant === "prep_a") return "PREP_A";
+  if (pkg.variant === "prep_c1") return "PREP_C1";
+  if (pkg.variant === "prep_c2") return "PREP_C2";
+  if (pkg.variant === "pri_c") return "PRI_C";
+  if (pkg.variant === "pri_b") return "PRI_B";
+  if (pkg.variant === "pri_a") return "PRI_A";
+  if (pkg.variant === "uni_b") return "UNI_B";
+  if (pkg.variant === "uni_c") return "UNI_C";
+  
+  return undefined;
+}
+
+/**
+ * Obtiene el precio unitario original de un paquete sin aplicar descuento.
+ */
+export function unitOriginalPrice(pkg?: PackageChoice, level?: Level): number {
+  if (!pkg) return 0;
+  const key = getPriceKey(pkg, level);
+  if (key && key in PRICES) {
+    return PRICES[key];
+  }
+  return 0;
+}
+
+/**
+ * Obtiene el porcentaje de descuento de un paquete.
+ */
+export function getDiscountPercent(pkg?: PackageChoice, level?: Level): number {
+  const key = getPriceKey(pkg, level);
+  if (key && key in DISCOUNTS) {
+    return DISCOUNTS[key];
+  }
+  return 0;
+}
+
+/**
+ * Retorna el precio unitario neto (aplicando descuento si existiera).
+ */
+export function unitPrice(pkg?: PackageChoice, level?: Level): number {
+  const basePrice = unitOriginalPrice(pkg, level);
+  const discountPercent = getDiscountPercent(pkg, level);
+  if (discountPercent > 0) {
+    return Math.round(basePrice * (1 - discountPercent / 100));
+  }
+  return basePrice;
 }
 
 export function packageLabel(pkg?: PackageChoice, level?: Level): string {
