@@ -86,6 +86,7 @@ const CHART_PIE_COLORS = ["#1E2346", "#C5A85A", "#3B82F6", "#10B981", "#EC4899",
 
 function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [loginEmail, setLoginEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [authError, setAuthError] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -150,6 +151,10 @@ function AdminDashboard() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!loginEmail.trim()) {
+      setAuthError("Por favor ingresa tu correo electrónico.");
+      return;
+    }
     if (password === "adminKT2026") {
       sessionStorage.setItem("kt_admin_session", "authorized");
       setIsAuthenticated(true);
@@ -474,9 +479,31 @@ function AdminDashboard() {
               {/* LOGIN FORM */}
               {authMode === 'login' && (
                 <form onSubmit={handleLogin} className="space-y-4">
+                  {/* Email */}
                   <div className="space-y-1.5">
                     <label className="text-xs uppercase tracking-wider font-semibold text-white/50 lg:text-[#94A3B8]">
-                      Contraseña de acceso
+                      Correo electrónico
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                      <input
+                        type="email"
+                        value={loginEmail}
+                        onChange={(e) => setLoginEmail(e.target.value)}
+                        placeholder="ejemplo@correo.com"
+                        autoFocus
+                        className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                          bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                          text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                          focus:ring-[#C5A85A] focus:border-transparent
+                          backdrop-blur-sm lg:backdrop-blur-0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs uppercase tracking-wider font-semibold text-white/50 lg:text-[#94A3B8]">
+                      Contraseña
                     </label>
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
