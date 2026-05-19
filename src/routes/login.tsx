@@ -84,6 +84,11 @@ const BRAND_COLORS = {
 
 const CHART_PIE_COLORS = ["#1E2346", "#C5A85A", "#3B82F6", "#10B981", "#EC4899", "#8B5CF6"];
 
+const ADMIN_EMAILS = [
+  "castrovalenzuela@hotmail.com",
+  "admin@kindertogas.com"
+];
+
 function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loginEmail, setLoginEmail] = useState<string>("");
@@ -114,10 +119,30 @@ function AdminDashboard() {
 
   // Check auth session
   useEffect(() => {
+    // 1. Check legacy sessionStorage backup
     const session = sessionStorage.getItem("kt_admin_session");
     if (session === "authorized") {
       setIsAuthenticated(true);
+      return;
     }
+
+    // 2. Check active Supabase session on mount
+    supabase.auth.getSession().then(({ data: { session: activeSession } }) => {
+      if (activeSession?.user?.email && ADMIN_EMAILS.includes(activeSession.user.email.toLowerCase())) {
+        setIsAuthenticated(true);
+      }
+    });
+
+    // 3. Listen to auth state changes (crucial for Google OAuth redirection callback)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, activeSession) => {
+      if (activeSession?.user?.email && ADMIN_EMAILS.includes(activeSession.user.email.toLowerCase())) {
+        setIsAuthenticated(true);
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   // Fetch quotes
@@ -179,8 +204,9 @@ function AdminDashboard() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     sessionStorage.removeItem("kt_admin_session");
+    await supabase.auth.signOut();
     setIsAuthenticated(false);
     setPassword("");
   };
