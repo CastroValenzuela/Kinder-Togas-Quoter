@@ -50,6 +50,8 @@ import secundariaB2 from "@/assets/Secundaria/B2.jpg";
 import preparatoriaPaqueteANegroDorado from "@/assets/Preparatoria/Paquete A/negro-dorado.jpg";
 import preparatoriaB1 from "@/assets/Preparatoria/B.1.jpg";
 import preparatoriaB2 from "@/assets/Preparatoria/B.2.jpg";
+import preparatoriaC1 from "@/assets/Preparatoria/C1.jpg";
+import preparatoriaC2 from "@/assets/Preparatoria/C2.jpg";
 
 import uniA from "@/assets/Universidad/A.jpg";
 import uniB from "@/assets/Universidad/B.jpg";
@@ -134,6 +136,21 @@ const FEATURES_B_PREP: Record<"prep_a" | "prep_b", { icon: typeof Camera; text: 
   ],
 };
 
+const FEATURES_C_PREP: Record<"prep_c1" | "prep_c2", { icon: typeof Camera; text: string }[]> = {
+  prep_c1: [
+    { icon: Layers, text: "Estola bordada de alta calidad." },
+    { icon: Shirt, text: "Toga, birrete, borla y estola personalizada." },
+    { icon: Truck, text: "Entrega y recolección coordinadas." },
+    { icon: Gem, text: "Calidad premium en cada detalle." },
+  ],
+  prep_c2: [
+    { icon: Layers, text: "Estola bordada premium de alta definición." },
+    { icon: Shirt, text: "Toga, birrete, borla y estola personalizada." },
+    { icon: Truck, text: "Entrega y recolección coordinadas." },
+    { icon: Gem, text: "Calidad premium en cada detalle." },
+  ],
+};
+
 const FEATURES_B_PRI: Record<"pri_a" | "pri_b" | "pri_c", { icon: typeof Camera; text: string }[]> = {
   pri_a: [
     { icon: Camera, text: "Impresión grande en ambos lados (alta visibilidad)." },
@@ -179,6 +196,7 @@ export function StepConfig({
   level, service, city, pkg, quantity, togaColor, stolaColor, onCity, onPkg, onQty, onTogaColor, onStolaColor, canContinue, onContinue,
 }: Props) {
   const isB = pkg?.kind === "B";
+  const isC = pkg?.kind === "C";
   const isSecundaria = level === "secundaria";
   const isPrimaria = level === "primaria";
   const isPreparatoria = level === "preparatoria";
@@ -188,7 +206,10 @@ export function StepConfig({
   const visibleVariants = B_VARIANTS.filter((v) => {
     if (isSecundaria) return v.id.startsWith("sec_");
     if (isPrimaria) return v.id.startsWith("pri_");
-    if (isPreparatoria) return v.id.startsWith("prep_");
+    if (isPreparatoria) {
+      if (pkg?.kind === "C") return v.id === "prep_c1" || v.id === "prep_c2";
+      return v.id === "prep_a" || v.id === "prep_b";
+    }
     if (isUni) return v.id.startsWith("uni_");
     return !v.id.startsWith("sec_") && !v.id.startsWith("pri_") && !v.id.startsWith("prep_") && !v.id.startsWith("uni_");
   });
@@ -202,13 +223,17 @@ export function StepConfig({
     } else {
       features = FEATURES_UNI_B;
     }
-  } else if (pkg?.kind === "B" && pkg.variant) {
+  } else if ((pkg?.kind === "B" || pkg?.kind === "C") && pkg?.variant) {
     if (pkg.variant.startsWith("sec_")) {
       features = FEATURES_B_SEC[pkg.variant as "sec_a" | "sec_b"] || FEATURES_A;
     } else if (pkg.variant.startsWith("pri_")) {
       features = FEATURES_B_PRI[pkg.variant as "pri_a" | "pri_b" | "pri_c"] || FEATURES_A;
     } else if (pkg.variant.startsWith("prep_")) {
-      features = FEATURES_B_PREP[pkg.variant as "prep_a" | "prep_b"] || FEATURES_A;
+      if (pkg.kind === "C") {
+        features = FEATURES_C_PREP[pkg.variant as "prep_c1" | "prep_c2"] || FEATURES_A;
+      } else {
+        features = FEATURES_B_PREP[pkg.variant as "prep_a" | "prep_b"] || FEATURES_A;
+      }
     } else {
       features = FEATURES_B[pkg.variant as "hybrid" | "max"] || FEATURES_A;
     }
@@ -285,6 +310,10 @@ export function StepConfig({
         if (pkg.variant === "prep_b") return preparatoriaB1;
         if (pkg.variant === "prep_a") return preparatoriaB2;
         return preparatoriaB1; // fallback
+      } else if (pkg?.kind === "C") {
+        if (pkg.variant === "prep_c1") return preparatoriaC1;
+        if (pkg.variant === "prep_c2") return preparatoriaC2;
+        return preparatoriaC1; // fallback
       }
     } else if (level === "universidad") {
       if (pkg?.kind === "A") {
@@ -431,14 +460,27 @@ export function StepConfig({
               ) : (
                 <>
                   <div className="relative inline-flex w-full rounded-full border border-hairline bg-muted/40 p-1">
-                    {(["A", "B"] as const).map((k) => {
+                    {(level === "preparatoria" ? (["A", "B", "C"] as const) : (["A", "B"] as const)).map((k) => {
                       const active = pkg?.kind === k;
-                      const label = k === "A" ? "Paquete A — Básico" : "Paquete B — Personalizado";
+                      let label = "";
+                      if (k === "A") label = "Paquete A — Básico";
+                      else if (k === "B") label = "Paquete B — Personalizado";
+                      else label = "Paquete C — Bordado";
+                      
                       return (
                         <button
                           key={k}
                           type="button"
-                          onClick={() => onPkg({ kind: k })}
+                          onClick={() => {
+                            if (k === "C") {
+                              onPkg({ kind: "C", variant: "prep_c1" });
+                            } else if (k === "B") {
+                              const variant = level === "preparatoria" ? "prep_b" : undefined;
+                              onPkg({ kind: "B", variant });
+                            } else {
+                              onPkg({ kind: "A" });
+                            }
+                          }}
                           className="relative flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           {active && (
@@ -458,9 +500,9 @@ export function StepConfig({
 
                   {/* Variants */}
                   <AnimatePresence initial={false} mode="wait">
-                    {isB && (
+                    {(isB || isC) && (
                       <motion.div
-                        key="b-variants"
+                        key={pkg?.kind === "C" ? "c-variants" : "b-variants"}
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
@@ -469,12 +511,12 @@ export function StepConfig({
                       >
                         <div className="pt-4 space-y-2.5">
                           {visibleVariants.map((v) => {
-                            const active = pkg?.kind === "B" && pkg.variant === v.id;
+                            const active = (pkg?.kind === "B" || pkg?.kind === "C") && pkg.variant === v.id;
                             return (
                               <button
                                 key={v.id}
                                 type="button"
-                                onClick={() => onPkg({ kind: "B", variant: v.id })}
+                                onClick={() => onPkg({ kind: pkg?.kind || "B", variant: v.id })}
                                 className={cn(
                                   "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
                                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",

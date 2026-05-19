@@ -33,7 +33,7 @@ type Props = {
 };
 
 export function StepSummary({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor, onEditStep }: Props) {
-  const unit = unitPrice(pkg);
+  const unit = unitPrice(pkg, level);
   const total = unit * quantity;
 
   const rows = [

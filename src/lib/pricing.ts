@@ -9,10 +9,11 @@ export type Level =
 
 export type ServiceType = "renta" | "venta";
 export type City = "tijuana" | "ensenada";
-export type PackageBVariant = "hybrid" | "max" | "sec_a" | "sec_b" | "pri_a" | "pri_b" | "pri_c" | "prep_a" | "prep_b" | "uni_b" | "uni_c";
+export type PackageBVariant = "hybrid" | "max" | "sec_a" | "sec_b" | "pri_a" | "pri_b" | "pri_c" | "prep_a" | "prep_b" | "prep_c1" | "prep_c2" | "uni_b" | "uni_c";
 export type PackageChoice =
   | { kind: "A" }
-  | { kind: "B"; variant?: PackageBVariant };
+  | { kind: "B"; variant?: PackageBVariant }
+  | { kind: "C"; variant?: PackageBVariant };
 
 export const LEVELS: { id: Level; label: string; icon: LucideIcon }[] = [
   { id: "preescolar", label: "Preescolar", icon: Shapes },
@@ -89,6 +90,8 @@ export const PRICES = {
   UNI_C: 720,      // Universidad/Posgrado Opción C (Bordado Premium)
   PREP_A: 550,     // Preparatoria Diseño A (Mixto)
   PREP_B: 500,     // Preparatoria Diseño B (Discreto)
+  PREP_C1: 600,    // Preparatoria Diseño C1 (Bordado Sencillo)
+  PREP_C2: 720,    // Preparatoria Diseño C2 (Bordado Premium)
 } as const;
 
 export const B_VARIANTS: {
@@ -104,6 +107,8 @@ export const B_VARIANTS: {
   { id: "sec_a", code: "B.2", title: "Diseño B2", desc: "Impresión mixta (institucional + discreta)", price: PRICES.SEC_A },
   { id: "prep_b", code: "B.1", title: "Diseño B1", desc: "Impresión discreta en ambos lados", price: PRICES.PREP_B },
   { id: "prep_a", code: "B.2", title: "Diseño B2", desc: "Impresión mixta (institucional + discreta)", price: PRICES.PREP_A },
+  { id: "prep_c1", code: "C.1", title: "Diseño C1", desc: "Estola bordada de alta calidad", price: PRICES.PREP_C1 },
+  { id: "prep_c2", code: "C.2", title: "Diseño C2", desc: "Estola bordada premium de alta definición", price: PRICES.PREP_C2 },
   { id: "pri_c", code: "B.1", title: "Básico Funcional", desc: "Impresión sencilla en ambos lados (9 x 12 cm)", price: PRICES.PRI_C },
   { id: "pri_b", code: "B.2", title: "Clásico Equilibrado", desc: "Impresión grande en un lado (9 x 28 cm) y chica en el otro (9 x 12 cm).", price: PRICES.PRI_B },
   { id: "pri_a", code: "B.3", title: "Clásico Destacado", desc: "Impresión grande en ambos lados 9 x 28 cm", price: PRICES.PRI_A },
@@ -133,8 +138,12 @@ export function packageLabel(pkg?: PackageChoice, level?: Level): string {
     return v.title;
   }
   const v = B_VARIANTS.find((x) => x.id === pkg.variant);
-  if (!v) return "Paquete B — Personalizado";
-  return `Paquete B — ${v.code} ${v.title}`;
+  if (!v) {
+    if (pkg.kind === "C") return "Paquete C — Bordado";
+    return "Paquete B — Personalizado";
+  }
+  const prefix = pkg.kind === "C" ? "Paquete C" : "Paquete B";
+  return `${prefix} — ${v.code} ${v.title}`;
 }
 
 export function levelLabel(l?: Level): string {

@@ -78,7 +78,7 @@ export function Quoter() {
     else localStorage.removeItem("kt-quote-number");
   }, [step, level, service, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, togaColor, stolaColor]);
 
-  const total = useMemo(() => unitPrice(pkg) * quantity, [pkg, quantity]);
+  const total = useMemo(() => unitPrice(pkg, level) * quantity, [pkg, level, quantity]);
 
   // Save to Supabase
   useEffect(() => {
