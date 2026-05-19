@@ -88,7 +88,7 @@ type Props = {
 };
 
 const FEATURES_A = [
-  { icon: Camera, text: "Impresión combinada 9×12 cm." },
+  { icon: Layers, text: "Estola lisa" },
   { icon: Shirt, text: "Renta de toga, birrete y borla del año." },
   { icon: Truck, text: "Entrega y recolección coordinadas." },
 ];
@@ -153,9 +153,9 @@ const FEATURES_B_PRI: Record<"pri_a" | "pri_b" | "pri_c", { icon: typeof Camera;
 };
 
 const FEATURES_UNI_A = [
+  { icon: Layers, text: "Estola lisa" },
   { icon: Shirt, text: "Renta de toga premium" },
   { icon: GraduationCap, text: "Birrete con borla institucional" },
-  { icon: Layers, text: "Estola lisa satinada (color beige)" },
   { icon: Truck, text: "Entrega y recolección coordinadas" },
 ];
 
@@ -377,7 +377,7 @@ export function StepConfig({
                       id: "uni_a",
                       code: "A",
                       title: "Opción A — Impresión",
-                      desc: "Estola personalizada por impresión (DTF o sublimación)",
+                      desc: "Estola Lisa",
                       price: PRICES.UNI_A,
                       payload: { kind: "A" } as const,
                       isActive: pkg?.kind === "A"
@@ -513,7 +513,7 @@ export function StepConfig({
                           </span>
                           <div className="min-w-0">
                             <p className="text-sm font-medium text-foreground">Básico</p>
-                            <p className="text-xs text-muted-foreground truncate font-sans">9×12 cm en ambos lados</p>
+                            <p className="text-xs text-muted-foreground truncate font-sans">Estola Lisa</p>
                           </div>
                         </div>
                         <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
