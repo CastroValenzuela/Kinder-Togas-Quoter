@@ -16,10 +16,16 @@ import {
   ChevronUp, 
   Lock, 
   Eye, 
+  EyeOff,
   Calendar,
   LogOut,
-  RefreshCw
+  RefreshCw,
+  ArrowRight,
+  GraduationCap,
+  BarChart3,
+  ShieldCheck
 } from "lucide-react";
+import adminHeroImg from "@/assets/brand/admin-hero.png";
 import {
   ResponsiveContainer,
   PieChart,
@@ -33,7 +39,7 @@ import {
   Legend
 } from "recharts";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "Panel de Administración — Kinder Togas" },
@@ -79,6 +85,7 @@ function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [password, setPassword] = useState<string>("");
   const [authError, setAuthError] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const [quotes, setQuotes] = useState<QuoteRecord[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -311,52 +318,194 @@ function AdminDashboard() {
   // Login Screen
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center items-center px-4 py-12 font-sans">
-        <div className="max-w-md w-full bg-white rounded-2xl border border-hairline p-8 shadow-xl text-center space-y-6">
-          <div className="flex justify-center">
-            <div className="h-16 w-16 bg-cream rounded-full flex items-center justify-center text-navy shadow-inner">
-              <Lock className="h-8 w-8 text-navy" />
+      <div className="min-h-screen flex font-sans">
+        {/* Left Panel — Hero Image */}
+        <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden">
+          {/* Hero Image */}
+          <img
+            src={adminHeroImg}
+            alt="Graduación"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          {/* Navy Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1E2346]/90 via-[#1E2346]/75 to-[#1E2346]/60" />
+          
+          {/* Content over image */}
+          <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+            {/* Logo / Brand */}
+            <div className="flex items-center gap-3">
+              <div className="h-11 w-11 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center font-display font-black text-lg text-[#C5A85A] border border-white/15">
+                KT
+              </div>
+              <div>
+                <h2 className="font-display text-lg font-bold text-white tracking-tight">Kinder Togas</h2>
+                <p className="text-[9px] uppercase tracking-[0.25em] text-white/40 font-bold">Panel Administrativo</p>
+              </div>
+            </div>
+
+            {/* Center messaging */}
+            <div className="space-y-6 max-w-md">
+              <h1 className="font-display text-4xl xl:text-5xl font-bold text-white leading-[1.1] tracking-tight">
+                Gestiona tu negocio con <span className="text-[#C5A85A]">inteligencia</span>
+              </h1>
+              <p className="text-white/60 text-base leading-relaxed">
+                Visualiza métricas en tiempo real, da seguimiento a tus prospectos y toma decisiones respaldadas por datos.
+              </p>
+
+              {/* Feature Pills */}
+              <div className="flex flex-wrap gap-3 pt-2">
+                <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
+                  <BarChart3 className="h-4 w-4 text-[#C5A85A]" />
+                  <span className="text-xs text-white/80 font-medium">Métricas en vivo</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
+                  <Users className="h-4 w-4 text-[#C5A85A]" />
+                  <span className="text-xs text-white/80 font-medium">Gestión de prospectos</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
+                  <Download className="h-4 w-4 text-[#C5A85A]" />
+                  <span className="text-xs text-white/80 font-medium">Exportar a Excel</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom stats */}
+            <div className="flex items-center gap-8">
+              <div>
+                <p className="text-2xl font-bold text-white font-display tabular-nums">24/7</p>
+                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Acceso total</p>
+              </div>
+              <div className="h-10 w-px bg-white/10" />
+              <div>
+                <p className="text-2xl font-bold text-white font-display tabular-nums">100%</p>
+                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Tiempo real</p>
+              </div>
+              <div className="h-10 w-px bg-white/10" />
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck className="h-5 w-5 text-emerald-400" />
+                  <p className="text-2xl font-bold text-white font-display">Seguro</p>
+                </div>
+                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Acceso protegido</p>
+              </div>
             </div>
           </div>
-          <div className="space-y-2">
-            <h1 className="font-display text-2xl text-navy font-bold tracking-tight">Acceso Privado</h1>
-            <p className="text-sm text-muted-foreground">
-              Ingresa la contraseña administrativa para ver métricas e información confidencial.
+        </div>
+
+        {/* Right Panel — Login Form */}
+        <div className="w-full lg:w-[45%] bg-[#FAFBFC] flex flex-col relative">
+          {/* Mobile-only background */}
+          <div className="lg:hidden absolute inset-0">
+            <img
+              src={adminHeroImg}
+              alt="Graduación"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1E2346]/80 via-[#1E2346]/60 to-[#0F1225]/95" />
+          </div>
+
+          <div className="relative z-10 flex-1 flex flex-col justify-center items-center px-6 sm:px-12 lg:px-16 py-12">
+            {/* Mobile brand header */}
+            <div className="lg:hidden flex items-center gap-3 mb-10">
+              <div className="h-11 w-11 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center font-display font-black text-lg text-[#C5A85A] border border-white/15">
+                KT
+              </div>
+              <div>
+                <h2 className="font-display text-lg font-bold text-white tracking-tight">Kinder Togas</h2>
+                <p className="text-[9px] uppercase tracking-[0.25em] text-white/40 font-bold">Admin</p>
+              </div>
+            </div>
+
+            <div className="w-full max-w-[380px] space-y-8">
+              {/* Header */}
+              <div className="space-y-3 text-center lg:text-left">
+                <div className="inline-flex items-center justify-center lg:justify-start w-full">
+                  <div className="h-14 w-14 bg-[#1E2346] rounded-2xl flex items-center justify-center shadow-lg shadow-navy/20 lg:shadow-navy/10">
+                    <GraduationCap className="h-7 w-7 text-[#C5A85A]" />
+                  </div>
+                </div>
+                <div className="pt-2">
+                  <h1 className="font-display text-2xl lg:text-3xl font-bold tracking-tight text-white lg:text-[#1E2346]">
+                    Bienvenido de vuelta
+                  </h1>
+                  <p className="text-sm text-white/60 lg:text-[#64748B] mt-1.5 leading-relaxed">
+                    Ingresa tu contraseña administrativa para acceder al panel de métricas y gestión.
+                  </p>
+                </div>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleLogin} className="space-y-5">
+                <div className="space-y-2">
+                  <label className="text-xs uppercase tracking-wider font-semibold text-white/50 lg:text-[#94A3B8]">
+                    Contraseña de acceso
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Escribe tu contraseña"
+                      autoFocus
+                      className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                        bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0] 
+                        text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                        focus:ring-[#C5A85A] focus:border-transparent
+                        backdrop-blur-sm lg:backdrop-blur-0"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B] transition-colors cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {authError && (
+                  <div className="flex items-center gap-2 text-xs bg-red-500/10 lg:bg-red-50 text-red-300 lg:text-red-600 py-3 px-4 rounded-xl border border-red-500/20 lg:border-red-200 font-medium">
+                    <div className="h-1.5 w-1.5 bg-red-400 rounded-full shrink-0" />
+                    {authError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-4 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
+                >
+                  Acceder al Panel
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </button>
+              </form>
+
+              {/* Divider */}
+              <div className="flex items-center gap-4">
+                <div className="flex-1 h-px bg-white/10 lg:bg-[#E2E8F0]" />
+                <span className="text-[10px] uppercase tracking-wider font-semibold text-white/25 lg:text-[#CBD5E1]">o bien</span>
+                <div className="flex-1 h-px bg-white/10 lg:bg-[#E2E8F0]" />
+              </div>
+
+              {/* Back to Quoter */}
+              <button
+                onClick={() => window.location.href = "/"}
+                className="w-full py-3 rounded-xl text-sm font-medium tracking-wide transition-all cursor-pointer flex items-center justify-center gap-2
+                  text-white/50 hover:text-white/70 lg:text-[#64748B] lg:hover:text-[#1E2346]
+                  border border-white/10 lg:border-[#E2E8F0] hover:border-white/20 lg:hover:border-[#CBD5E1]
+                  bg-white/5 lg:bg-white hover:bg-white/10 lg:hover:bg-[#F8FAFC]"
+              >
+                Regresar al Cotizador
+              </button>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="relative z-10 text-center pb-6 px-6">
+            <p className="text-[10px] text-white/20 lg:text-[#CBD5E1] tracking-wide">
+              © {new Date().getFullYear()} Kinder Togas · Todos los derechos reservados
             </p>
           </div>
-          
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-1 text-left">
-              <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Contraseña</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full rounded-xl border border-hairline px-4 py-3 bg-cream/40 focus:outline-none focus:ring-2 focus:ring-navy focus:border-transparent text-center font-mono"
-              />
-            </div>
-            
-            {authError && (
-              <p className="text-xs text-destructive bg-destructive/5 py-2 px-3 rounded-lg border border-destructive/20 font-medium">
-                {authError}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              className="w-full bg-navy text-white hover:bg-navy/90 py-3.5 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-md active:scale-[0.98] cursor-pointer"
-            >
-              Iniciar Sesión
-            </button>
-          </form>
-          
-          <button
-            onClick={() => window.location.href = "/"}
-            className="text-xs text-muted-foreground hover:text-navy underline cursor-pointer"
-          >
-            Regresar al Cotizador
-          </button>
         </div>
       </div>
     );
