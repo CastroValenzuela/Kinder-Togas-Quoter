@@ -29,6 +29,7 @@ import {
   Phone
 } from "lucide-react";
 import adminHeroImg from "@/assets/brand/admin-hero.png";
+import logoImg from "@/assets/logo.png";
 import {
   ResponsiveContainer,
   PieChart,
@@ -464,8 +465,8 @@ function AdminDashboard() {
           <div className="relative z-10 flex-1 flex flex-col justify-center items-center px-6 sm:px-12 lg:px-16 py-12">
             {/* Mobile brand header */}
             <div className="lg:hidden flex items-center gap-3 mb-10">
-              <div className="h-11 w-11 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center font-display font-black text-lg text-[#C5A85A] border border-white/15">
-                KT
+              <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center shadow-md p-1">
+                <img src={logoImg} alt="Kinder Togas Logo" className="h-full w-full object-contain" />
               </div>
               <div>
                 <h2 className="font-display text-lg font-bold text-white tracking-tight">Kinder Togas</h2>
@@ -477,8 +478,8 @@ function AdminDashboard() {
               {/* Header Icon */}
               <div className="text-center lg:text-left">
                 <div className="inline-flex items-center justify-center lg:justify-start w-full">
-                  <div className="h-14 w-14 bg-[#1E2346] rounded-2xl flex items-center justify-center shadow-lg shadow-navy/20 lg:shadow-navy/10">
-                    <GraduationCap className="h-7 w-7 text-[#C5A85A]" />
+                  <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-navy/10 border border-slate-100 p-1">
+                    <img src={logoImg} alt="Kinder Togas" className="h-full w-full object-contain" />
                   </div>
                 </div>
               </div>
@@ -806,8 +807,8 @@ function AdminDashboard() {
       <header className="bg-navy text-white py-5 px-4 sm:px-8 shadow-md sticky top-0 z-30">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-white/10 rounded-xl flex items-center justify-center font-display font-black text-xl text-gold border border-white/20">
-              KT
+            <div className="h-11 w-11 bg-white rounded-xl flex items-center justify-center p-1 shadow-inner border border-white/10">
+              <img src={logoImg} alt="Kinder Togas Logo" className="h-full w-full object-contain" />
             </div>
             <div>
               <h1 className="font-display text-xl font-bold tracking-tight">Kinder Togas</h1>
