@@ -26,7 +26,8 @@ import {
   ShieldCheck,
   User,
   Mail,
-  Phone
+  Phone,
+  Truck
 } from "lucide-react";
 import adminHeroImg from "@/assets/brand/admin-hero.png";
 import logoImg from "@/assets/logo.png";
@@ -416,6 +417,10 @@ function AdminDashboard() {
                   <GraduationCap className="h-4 w-4 text-[#C5A85A]" />
                   <span className="text-xs text-white/80 font-medium">Personaliza tu paquete</span>
                 </div>
+                <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
+                  <Truck className="h-4 w-4 text-[#C5A85A]" />
+                  <span className="text-xs text-white/80 font-medium">Envíos a todo México 🇲🇽</span>
+                </div>
               </div>
             </div>
 
@@ -457,7 +462,7 @@ function AdminDashboard() {
           <div className="relative z-10 flex-1 flex flex-col justify-center items-center px-6 sm:px-12 lg:px-16 py-12">
             <div className="w-full max-w-[380px] space-y-6">
               {/* Brand Header */}
-              <div className="flex flex-col items-center lg:items-start w-full">
+              <div className="flex flex-col items-center justify-center w-full">
                 <div className="flex items-center gap-3.5">
                   <div className="h-14 w-14 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-navy/10 border border-slate-100 lg:border-slate-200/60 p-1">
                     <img src={logoImg} alt="Kinder Togas" className="h-full w-full object-contain" />
@@ -498,11 +503,24 @@ function AdminDashboard() {
               </div>
 
               {/* Subtitle */}
-              <p className="text-sm text-white/50 lg:text-[#64748B] leading-relaxed text-center lg:text-left">
+              <p className="text-sm text-white/50 lg:text-[#64748B] leading-relaxed text-center">
                 {authMode === 'login'
-                  ? 'Accede a tu cuenta para gestionar tus cotizaciones y realizar pagos en línea.'
-                  : 'Crea tu cuenta gratis para cotizar, personalizar y pagar tu graduación en línea.'}
+                  ? 'Accede a tu cuenta para gestionar tus cotizaciones, compras y realizar pagos en línea.'
+                  : 'Crea tu cuenta gratis para cotizar, comprar y personalizar tu graduación.'}
               </p>
+
+              {/* Shipping and Sale badges */}
+              <div className="flex items-center justify-center gap-3 py-2.5 px-4 bg-white/5 lg:bg-slate-50 border border-white/5 lg:border-slate-100 rounded-xl">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[11px] font-bold text-white/80 lg:text-slate-700 tracking-wide">Renta y Venta</span>
+                </div>
+                <div className="h-3 w-px bg-white/10 lg:bg-slate-200" />
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#C5A85A]" />
+                  <span className="text-[11px] font-bold text-white/80 lg:text-slate-700 tracking-wide">Envíos a todo México 🇲🇽</span>
+                </div>
+              </div>
 
               {/* SLIDING FORM CONTAINER */}
               <div className="w-full overflow-hidden relative px-1 py-1">
