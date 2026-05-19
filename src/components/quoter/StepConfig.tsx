@@ -376,7 +376,12 @@ export function StepConfig({
                       <button
                         key={c.id}
                         type="button"
-                        onClick={() => onCity(c.id)}
+                        onClick={() => {
+                          onCity(c.id);
+                          if (!pkg) {
+                            onPkg({ kind: "A" });
+                          }
+                        }}
                         className={cn(
                           "px-5 py-2 rounded-full border text-sm transition-all cursor-pointer",
                           "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
