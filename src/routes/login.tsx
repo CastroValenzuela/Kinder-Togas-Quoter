@@ -22,7 +22,7 @@ import {
   RefreshCw,
   ArrowRight,
   GraduationCap,
-  BarChart3,
+  CreditCard,
   ShieldCheck
 } from "lucide-react";
 import adminHeroImg from "@/assets/brand/admin-hero.png";
@@ -339,32 +339,32 @@ function AdminDashboard() {
               </div>
               <div>
                 <h2 className="font-display text-lg font-bold text-white tracking-tight">Kinder Togas</h2>
-                <p className="text-[9px] uppercase tracking-[0.25em] text-white/40 font-bold">Panel Administrativo</p>
+                <p className="text-[9px] uppercase tracking-[0.25em] text-white/40 font-bold">Graduaciones</p>
               </div>
             </div>
 
             {/* Center messaging */}
             <div className="space-y-6 max-w-md">
               <h1 className="font-display text-4xl xl:text-5xl font-bold text-white leading-[1.1] tracking-tight">
-                Gestiona tu negocio con <span className="text-[#C5A85A]">inteligencia</span>
+                Tu graduación, a un <span className="text-[#C5A85A]">clic</span> de distancia
               </h1>
               <p className="text-white/60 text-base leading-relaxed">
-                Visualiza métricas en tiempo real, da seguimiento a tus prospectos y toma decisiones respaldadas por datos.
+                Cotiza, personaliza y paga en línea de forma segura. Todo lo que necesitas para tu ceremonia de graduación en un solo lugar.
               </p>
 
               {/* Feature Pills */}
               <div className="flex flex-wrap gap-3 pt-2">
                 <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
-                  <BarChart3 className="h-4 w-4 text-[#C5A85A]" />
-                  <span className="text-xs text-white/80 font-medium">Métricas en vivo</span>
+                  <CreditCard className="h-4 w-4 text-[#C5A85A]" />
+                  <span className="text-xs text-white/80 font-medium">Pagos en línea seguros</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
-                  <Users className="h-4 w-4 text-[#C5A85A]" />
-                  <span className="text-xs text-white/80 font-medium">Gestión de prospectos</span>
+                  <FileText className="h-4 w-4 text-[#C5A85A]" />
+                  <span className="text-xs text-white/80 font-medium">Cotizaciones al instante</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
-                  <Download className="h-4 w-4 text-[#C5A85A]" />
-                  <span className="text-xs text-white/80 font-medium">Exportar a Excel</span>
+                  <GraduationCap className="h-4 w-4 text-[#C5A85A]" />
+                  <span className="text-xs text-white/80 font-medium">Personaliza tu paquete</span>
                 </div>
               </div>
             </div>
@@ -372,13 +372,13 @@ function AdminDashboard() {
             {/* Bottom stats */}
             <div className="flex items-center gap-8">
               <div>
-                <p className="text-2xl font-bold text-white font-display tabular-nums">24/7</p>
-                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Acceso total</p>
+                <p className="text-2xl font-bold text-white font-display tabular-nums">5+</p>
+                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Niveles escolares</p>
               </div>
               <div className="h-10 w-px bg-white/10" />
               <div>
-                <p className="text-2xl font-bold text-white font-display tabular-nums">100%</p>
-                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Tiempo real</p>
+                <p className="text-2xl font-bold text-white font-display tabular-nums">2</p>
+                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Sedes en BC</p>
               </div>
               <div className="h-10 w-px bg-white/10" />
               <div>
@@ -386,7 +386,7 @@ function AdminDashboard() {
                   <ShieldCheck className="h-5 w-5 text-emerald-400" />
                   <p className="text-2xl font-bold text-white font-display">Seguro</p>
                 </div>
-                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Acceso protegido</p>
+                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Pago protegido</p>
               </div>
             </div>
           </div>
@@ -412,7 +412,7 @@ function AdminDashboard() {
               </div>
               <div>
                 <h2 className="font-display text-lg font-bold text-white tracking-tight">Kinder Togas</h2>
-                <p className="text-[9px] uppercase tracking-[0.25em] text-white/40 font-bold">Admin</p>
+                <p className="text-[9px] uppercase tracking-[0.25em] text-white/40 font-bold">Graduaciones</p>
               </div>
             </div>
 
@@ -426,10 +426,10 @@ function AdminDashboard() {
                 </div>
                 <div className="pt-2">
                   <h1 className="font-display text-2xl lg:text-3xl font-bold tracking-tight text-white lg:text-[#1E2346]">
-                    Bienvenido de vuelta
+                    Inicia sesión
                   </h1>
                   <p className="text-sm text-white/60 lg:text-[#64748B] mt-1.5 leading-relaxed">
-                    Ingresa tu contraseña administrativa para acceder al panel de métricas y gestión.
+                    Accede a tu cuenta para gestionar tus cotizaciones y realizar pagos en línea de forma segura.
                   </p>
                 </div>
               </div>
@@ -475,7 +475,7 @@ function AdminDashboard() {
                   type="submit"
                   className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-4 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
                 >
-                  Acceder al Panel
+                  Iniciar Sesión
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </button>
               </form>
