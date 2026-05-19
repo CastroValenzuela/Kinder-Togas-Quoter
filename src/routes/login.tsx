@@ -94,6 +94,7 @@ function AdminDashboard() {
   const [regEmail, setRegEmail] = useState<string>("");
   const [regPhone, setRegPhone] = useState<string>("");
   const [regPassword, setRegPassword] = useState<string>("");
+  const [regConfirmPassword, setRegConfirmPassword] = useState<string>("");
   const [regSuccess, setRegSuccess] = useState<boolean>(false);
 
   const [quotes, setQuotes] = useState<QuoteRecord[]>([]);
@@ -523,8 +524,12 @@ function AdminDashboard() {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    if (!regName.trim() || !regEmail.trim() || !regPhone.trim() || !regPassword.trim()) {
+                    if (!regName.trim() || !regEmail.trim() || !regPhone.trim() || !regPassword.trim() || !regConfirmPassword.trim()) {
                       setAuthError('Por favor completa todos los campos.');
+                      return;
+                    }
+                    if (regPassword !== regConfirmPassword) {
+                      setAuthError('Las contraseñas no coinciden.');
                       return;
                     }
                     setAuthError('');
@@ -623,6 +628,22 @@ function AdminDashboard() {
                         >
                           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
+                      </div>
+
+                      {/* Confirm Password */}
+                      <div className="relative">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={regConfirmPassword}
+                          onChange={(e) => setRegConfirmPassword(e.target.value)}
+                          placeholder="Confirma tu contraseña"
+                          className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                            bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                            text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                            focus:ring-[#C5A85A] focus:border-transparent
+                            backdrop-blur-sm lg:backdrop-blur-0"
+                        />
                       </div>
 
                       {authError && (
