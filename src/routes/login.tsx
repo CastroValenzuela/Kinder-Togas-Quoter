@@ -417,10 +417,6 @@ function AdminDashboard() {
                   <GraduationCap className="h-4 w-4 text-[#C5A85A]" />
                   <span className="text-xs text-white/80 font-medium">Personaliza tu paquete</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
-                  <Truck className="h-4 w-4 text-[#C5A85A]" />
-                  <span className="text-xs text-white/80 font-medium">Envíos a todo México 🇲🇽</span>
-                </div>
               </div>
             </div>
 
