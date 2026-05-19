@@ -377,7 +377,7 @@ function AdminDashboard() {
   // Login Screen
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex font-sans">
+      <div className="h-screen flex font-sans overflow-hidden">
         {/* Left Panel — Hero Image */}
         <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden">
           {/* Hero Image */}
@@ -448,7 +448,7 @@ function AdminDashboard() {
         </div>
 
         {/* Right Panel — Login Form */}
-        <div className="w-full lg:w-[45%] bg-[#FAFBFC] flex flex-col relative">
+        <div className="w-full lg:w-[45%] bg-[#FAFBFC] flex flex-col relative h-full lg:overflow-y-auto">
           {/* Mobile-only background */}
           <div className="lg:hidden absolute inset-0">
             <img
@@ -459,8 +459,8 @@ function AdminDashboard() {
             <div className="absolute inset-0 bg-gradient-to-b from-[#1E2346]/80 via-[#1E2346]/60 to-[#0F1225]/95" />
           </div>
 
-          <div className="relative z-10 flex-1 flex flex-col justify-center items-center px-6 sm:px-12 lg:px-16 py-12">
-            <div className="w-full max-w-[380px] space-y-6">
+          <div className="relative z-10 flex-1 flex flex-col justify-center items-center px-6 sm:px-12 lg:px-16 py-4 lg:py-6">
+            <div className="w-full max-w-[380px] space-y-4">
               {/* Brand Header */}
               <div className="flex flex-col items-center justify-center w-full">
                 <div className="flex items-center gap-3.5">
@@ -531,7 +531,7 @@ function AdminDashboard() {
                             onChange={(e) => setLoginEmail(e.target.value)}
                             placeholder="ejemplo@correo.com"
                             autoFocus
-                            className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                            className="w-full rounded-xl border px-11 py-3 text-sm focus:outline-none focus:ring-2 transition-all
                               bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
                               text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
                               focus:ring-[#C5A85A] focus:border-transparent
@@ -551,7 +551,7 @@ function AdminDashboard() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Escribe tu contraseña"
-                            className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                            className="w-full rounded-xl border px-11 py-3 text-sm focus:outline-none focus:ring-2 transition-all
                               bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
                               text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
                               focus:ring-[#C5A85A] focus:border-transparent
@@ -576,7 +576,7 @@ function AdminDashboard() {
 
                       <button
                         type="submit"
-                        className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-4 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
+                        className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-3 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
                       >
                         Iniciar Sesión
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -632,7 +632,7 @@ function AdminDashboard() {
                               value={regName}
                               onChange={(e) => setRegName(e.target.value)}
                               placeholder="Nombre completo"
-                              className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                              className="w-full rounded-xl border px-11 py-3 text-sm focus:outline-none focus:ring-2 transition-all
                                 bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
                                 text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
                                 focus:ring-[#C5A85A] focus:border-transparent
@@ -648,7 +648,7 @@ function AdminDashboard() {
                               value={regEmail}
                               onChange={(e) => setRegEmail(e.target.value)}
                               placeholder="Correo electrónico"
-                              className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                              className="w-full rounded-xl border px-11 py-3 text-sm focus:outline-none focus:ring-2 transition-all
                                 bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
                                 text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
                                 focus:ring-[#C5A85A] focus:border-transparent
@@ -664,7 +664,7 @@ function AdminDashboard() {
                               value={regPhone}
                               onChange={(e) => setRegPhone(e.target.value)}
                               placeholder="Teléfono (10 dígitos)"
-                              className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                              className="w-full rounded-xl border px-11 py-3 text-sm focus:outline-none focus:ring-2 transition-all
                                 bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
                                 text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
                                 focus:ring-[#C5A85A] focus:border-transparent
@@ -680,7 +680,7 @@ function AdminDashboard() {
                               value={regPassword}
                               onChange={(e) => setRegPassword(e.target.value)}
                               placeholder="Crea una contraseña"
-                              className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                              className="w-full rounded-xl border px-11 py-3 text-sm focus:outline-none focus:ring-2 transition-all
                                 bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
                                 text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
                                 focus:ring-[#C5A85A] focus:border-transparent
@@ -703,7 +703,7 @@ function AdminDashboard() {
                               value={regConfirmPassword}
                               onChange={(e) => setRegConfirmPassword(e.target.value)}
                               placeholder="Confirma tu contraseña"
-                              className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                              className="w-full rounded-xl border px-11 py-3 text-sm focus:outline-none focus:ring-2 transition-all
                                 bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
                                 text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
                                 focus:ring-[#C5A85A] focus:border-transparent
@@ -720,7 +720,7 @@ function AdminDashboard() {
 
                           <button
                             type="submit"
-                            className="w-full bg-[#C5A85A] hover:bg-[#b8993f] text-white py-4 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-[#C5A85A]/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group mt-1"
+                            className="w-full bg-[#C5A85A] hover:bg-[#b8993f] text-white py-3 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-[#C5A85A]/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group mt-1"
                           >
                             Crear mi Cuenta
                             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
