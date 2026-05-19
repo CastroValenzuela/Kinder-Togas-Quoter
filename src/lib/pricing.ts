@@ -70,12 +70,14 @@ export function stolaLabel(stola?: string): string {
   return dict[stola.toLowerCase()] || stola;
 }
 
+import { supabase } from "@/lib/supabase";
+
 export const CITIES: { id: City; label: string }[] = [
   { id: "tijuana", label: "Tijuana" },
   { id: "ensenada", label: "Ensenada" },
 ];
 
-// Precios editables (MXN, por alumno)
+// Precios editables (MXN, por alumno) — Objeto mutable de base para compatibilidad hacia atrás
 export const PRICES = {
   A: 350,
   B_BALANCE: 480,  // B.2 Balance
@@ -92,7 +94,7 @@ export const PRICES = {
   PREP_B: 500,     // Preparatoria Diseño B (Discreto)
   PREP_C1: 600,    // Preparatoria Diseño C1 (Bordado Sencillo)
   PREP_C2: 720,    // Preparatoria Diseño C2 (Bordado Premium)
-} as const;
+};
 
 export const B_VARIANTS: {
   id: PackageBVariant;
@@ -115,6 +117,57 @@ export const B_VARIANTS: {
   { id: "uni_b", code: "U.B", title: "Opción B - Bordado Sencillo", desc: "Estola personalizada con bordado clásico", price: PRICES.UNI_B },
   { id: "uni_c", code: "U.C", title: "Opción C - Bordado Premium", desc: "Estola premium con bordado detallado de alta definición", price: PRICES.UNI_C },
 ];
+
+/**
+ * Carga los precios reales configurados en Supabase.
+ * Actualiza el objeto PRICES y el array B_VARIANTS en caliente.
+ */
+export async function loadDynamicPrices(): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from("pricing")
+      .select("key, price");
+
+    if (error) {
+      console.warn("No se pudieron cargar precios de Supabase, usando valores locales:", error.message);
+      return false;
+    }
+
+    if (data && data.length > 0) {
+      // 1. Actualizar las propiedades de PRICES en caliente
+      data.forEach((row: { key: string; price: number | string }) => {
+        const valKey = row.key as keyof typeof PRICES;
+        if (valKey in PRICES) {
+          PRICES[valKey] = Number(row.price);
+        }
+      });
+
+      // 2. Sincronizar los precios dentro de B_VARIANTS para que las opciones del cotizador se enteren de la tarifa real
+      B_VARIANTS.forEach((variant) => {
+        if (variant.id === "hybrid") variant.price = PRICES.B_BALANCE;
+        if (variant.id === "max") variant.price = PRICES.B_PREMIUM;
+        if (variant.id === "sec_b") variant.price = PRICES.SEC_B;
+        if (variant.id === "sec_a") variant.price = PRICES.SEC_A;
+        if (variant.id === "prep_b") variant.price = PRICES.PREP_B;
+        if (variant.id === "prep_a") variant.price = PRICES.PREP_A;
+        if (variant.id === "prep_c1") variant.price = PRICES.PREP_C1;
+        if (variant.id === "prep_c2") variant.price = PRICES.PREP_C2;
+        if (variant.id === "pri_c") variant.price = PRICES.PRI_C;
+        if (variant.id === "pri_b") variant.price = PRICES.PRI_B;
+        if (variant.id === "pri_a") variant.price = PRICES.PRI_A;
+        if (variant.id === "uni_b") variant.price = PRICES.UNI_B;
+        if (variant.id === "uni_c") variant.price = PRICES.UNI_C;
+      });
+
+      console.log("Tarifas cargadas y aplicadas desde Supabase correctamente.");
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.error("Fallo inesperado al sincronizar precios:", err);
+    return false;
+  }
+}
 
 export function unitPrice(pkg?: PackageChoice, level?: Level): number {
   if (!pkg) return 0;

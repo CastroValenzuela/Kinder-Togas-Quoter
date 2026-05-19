@@ -16,6 +16,7 @@ import {
   colorLabel,
   stolaLabel,
   formatMXN,
+  loadDynamicPrices,
   type Level,
   type ServiceType,
   type City,
@@ -54,6 +55,14 @@ export function Quoter() {
   const [startTime] = useState(() => Date.now());
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [pricesLoaded, setPricesLoaded] = useState(false);
+
+  // Load dynamic pricing rules on mount
+  useEffect(() => {
+    loadDynamicPrices().then(() => {
+      setPricesLoaded(true);
+    });
+  }, []);
 
   // Persistence
   useEffect(() => {
@@ -78,7 +87,7 @@ export function Quoter() {
     else localStorage.removeItem("kt-quote-number");
   }, [step, level, service, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, togaColor, stolaColor]);
 
-  const total = useMemo(() => unitPrice(pkg, level) * quantity, [pkg, level, quantity]);
+  const total = useMemo(() => unitPrice(pkg, level) * quantity, [pkg, level, quantity, pricesLoaded]);
 
   // Save to Supabase
   useEffect(() => {
