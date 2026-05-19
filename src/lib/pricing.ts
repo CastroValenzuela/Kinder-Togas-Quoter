@@ -76,7 +76,7 @@ export const CITIES: { id: City; label: string }[] = [
 
 // Precios editables (MXN, por alumno)
 export const PRICES = {
-  A: 450,
+  A: 350,
   B_BALANCE: 480,  // B.2 Balance
   B_PREMIUM: 510,  // B.3 Premium
   SEC_A: 550,      // Secundaria Diseño A (Mixto)
