@@ -477,13 +477,13 @@ function AdminDashboard() {
               </p>
 
               {/* SLIDING FORM CONTAINER */}
-              <div className="w-full overflow-hidden relative">
+              <div className="w-full overflow-hidden relative px-1 py-1">
                 <div 
                   className="flex w-[200%] transition-transform duration-500 ease-in-out"
                   style={{ transform: authMode === 'login' ? 'translateX(0%)' : 'translateX(-50%)' }}
                 >
                   {/* PANEL 1: LOGIN FORM */}
-                  <div className="w-1/2 shrink-0 pr-4 transition-opacity duration-300" style={{ opacity: authMode === 'login' ? 1 : 0 }}>
+                  <div className="w-1/2 shrink-0 px-2 transition-opacity duration-300" style={{ opacity: authMode === 'login' ? 1 : 0 }}>
                     <form onSubmit={handleLogin} className="space-y-4">
                       {/* Email */}
                       <div className="space-y-1.5">
@@ -552,7 +552,7 @@ function AdminDashboard() {
                   </div>
 
                   {/* PANEL 2: REGISTER FORM */}
-                  <div className="w-1/2 shrink-0 pl-4 transition-opacity duration-300" style={{ opacity: authMode === 'register' ? 1 : 0 }}>
+                  <div className="w-1/2 shrink-0 px-2 transition-opacity duration-300" style={{ opacity: authMode === 'register' ? 1 : 0 }}>
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
