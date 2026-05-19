@@ -23,7 +23,10 @@ import {
   ArrowRight,
   GraduationCap,
   CreditCard,
-  ShieldCheck
+  ShieldCheck,
+  User,
+  Mail,
+  Phone
 } from "lucide-react";
 import adminHeroImg from "@/assets/brand/admin-hero.png";
 import {
@@ -86,6 +89,12 @@ function AdminDashboard() {
   const [password, setPassword] = useState<string>("");
   const [authError, setAuthError] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [regName, setRegName] = useState<string>("");
+  const [regEmail, setRegEmail] = useState<string>("");
+  const [regPhone, setRegPhone] = useState<string>("");
+  const [regPassword, setRegPassword] = useState<string>("");
+  const [regSuccess, setRegSuccess] = useState<boolean>(false);
 
   const [quotes, setQuotes] = useState<QuoteRecord[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -416,69 +425,224 @@ function AdminDashboard() {
               </div>
             </div>
 
-            <div className="w-full max-w-[380px] space-y-8">
-              {/* Header */}
-              <div className="space-y-3 text-center lg:text-left">
+            <div className="w-full max-w-[380px] space-y-6">
+              {/* Header Icon */}
+              <div className="text-center lg:text-left">
                 <div className="inline-flex items-center justify-center lg:justify-start w-full">
                   <div className="h-14 w-14 bg-[#1E2346] rounded-2xl flex items-center justify-center shadow-lg shadow-navy/20 lg:shadow-navy/10">
                     <GraduationCap className="h-7 w-7 text-[#C5A85A]" />
                   </div>
                 </div>
-                <div className="pt-2">
-                  <h1 className="font-display text-2xl lg:text-3xl font-bold tracking-tight text-white lg:text-[#1E2346]">
-                    Inicia sesión
-                  </h1>
-                  <p className="text-sm text-white/60 lg:text-[#64748B] mt-1.5 leading-relaxed">
-                    Accede a tu cuenta para gestionar tus cotizaciones y realizar pagos en línea de forma segura.
-                  </p>
-                </div>
               </div>
 
-              {/* Form */}
-              <form onSubmit={handleLogin} className="space-y-5">
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-wider font-semibold text-white/50 lg:text-[#94A3B8]">
-                    Contraseña de acceso
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Escribe tu contraseña"
-                      autoFocus
-                      className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
-                        bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0] 
-                        text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
-                        focus:ring-[#C5A85A] focus:border-transparent
-                        backdrop-blur-sm lg:backdrop-blur-0"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B] transition-colors cursor-pointer"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                {authError && (
-                  <div className="flex items-center gap-2 text-xs bg-red-500/10 lg:bg-red-50 text-red-300 lg:text-red-600 py-3 px-4 rounded-xl border border-red-500/20 lg:border-red-200 font-medium">
-                    <div className="h-1.5 w-1.5 bg-red-400 rounded-full shrink-0" />
-                    {authError}
-                  </div>
-                )}
-
+              {/* Mode Toggle Tabs */}
+              <div className="flex rounded-xl p-1 bg-white/8 lg:bg-[#F1F5F9] border border-white/10 lg:border-[#E2E8F0]">
                 <button
-                  type="submit"
-                  className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-4 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
+                  type="button"
+                  onClick={() => { setAuthMode('login'); setAuthError(''); setRegSuccess(false); }}
+                  className={cn(
+                    "flex-1 py-2.5 rounded-lg text-sm font-semibold tracking-wide transition-all cursor-pointer",
+                    authMode === 'login'
+                      ? "bg-white/15 lg:bg-white text-white lg:text-[#1E2346] shadow-sm"
+                      : "text-white/40 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B]"
+                  )}
                 >
                   Iniciar Sesión
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </button>
-              </form>
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('register'); setAuthError(''); }}
+                  className={cn(
+                    "flex-1 py-2.5 rounded-lg text-sm font-semibold tracking-wide transition-all cursor-pointer",
+                    authMode === 'register'
+                      ? "bg-white/15 lg:bg-white text-white lg:text-[#1E2346] shadow-sm"
+                      : "text-white/40 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B]"
+                  )}
+                >
+                  Crear Cuenta
+                </button>
+              </div>
+
+              {/* Subtitle */}
+              <p className="text-sm text-white/50 lg:text-[#64748B] leading-relaxed text-center lg:text-left">
+                {authMode === 'login'
+                  ? 'Accede a tu cuenta para gestionar tus cotizaciones y realizar pagos en línea.'
+                  : 'Crea tu cuenta gratis para cotizar, personalizar y pagar tu graduación en línea.'}
+              </p>
+
+              {/* LOGIN FORM */}
+              {authMode === 'login' && (
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs uppercase tracking-wider font-semibold text-white/50 lg:text-[#94A3B8]">
+                      Contraseña de acceso
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Escribe tu contraseña"
+                        autoFocus
+                        className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                          bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                          text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                          focus:ring-[#C5A85A] focus:border-transparent
+                          backdrop-blur-sm lg:backdrop-blur-0"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B] transition-colors cursor-pointer"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {authError && (
+                    <div className="flex items-center gap-2 text-xs bg-red-500/10 lg:bg-red-50 text-red-300 lg:text-red-600 py-3 px-4 rounded-xl border border-red-500/20 lg:border-red-200 font-medium">
+                      <div className="h-1.5 w-1.5 bg-red-400 rounded-full shrink-0" />
+                      {authError}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-4 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
+                  >
+                    Iniciar Sesión
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  </button>
+                </form>
+              )}
+
+              {/* REGISTER FORM */}
+              {authMode === 'register' && (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!regName.trim() || !regEmail.trim() || !regPhone.trim() || !regPassword.trim()) {
+                      setAuthError('Por favor completa todos los campos.');
+                      return;
+                    }
+                    setAuthError('');
+                    setRegSuccess(true);
+                  }}
+                  className="space-y-3"
+                >
+                  {regSuccess ? (
+                    <div className="text-center space-y-4 py-4">
+                      <div className="h-14 w-14 bg-emerald-500/10 lg:bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto">
+                        <ShieldCheck className="h-7 w-7 text-emerald-500" />
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="font-display text-lg font-bold text-white lg:text-[#1E2346]">¡Registro exitoso!</h3>
+                        <p className="text-xs text-white/50 lg:text-[#64748B] leading-relaxed">
+                          Tu cuenta ha sido creada. Pronto recibirás un correo de confirmación. Ya puedes iniciar sesión.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setAuthMode('login'); setRegSuccess(false); }}
+                        className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-3.5 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
+                      >
+                        Ir a Iniciar Sesión
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Name */}
+                      <div className="relative">
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                        <input
+                          type="text"
+                          value={regName}
+                          onChange={(e) => setRegName(e.target.value)}
+                          placeholder="Nombre completo"
+                          className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                            bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                            text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                            focus:ring-[#C5A85A] focus:border-transparent
+                            backdrop-blur-sm lg:backdrop-blur-0"
+                        />
+                      </div>
+
+                      {/* Email */}
+                      <div className="relative">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                        <input
+                          type="email"
+                          value={regEmail}
+                          onChange={(e) => setRegEmail(e.target.value)}
+                          placeholder="Correo electrónico"
+                          className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                            bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                            text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                            focus:ring-[#C5A85A] focus:border-transparent
+                            backdrop-blur-sm lg:backdrop-blur-0"
+                        />
+                      </div>
+
+                      {/* Phone */}
+                      <div className="relative">
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                        <input
+                          type="tel"
+                          value={regPhone}
+                          onChange={(e) => setRegPhone(e.target.value)}
+                          placeholder="Teléfono (10 dígitos)"
+                          className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                            bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                            text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                            focus:ring-[#C5A85A] focus:border-transparent
+                            backdrop-blur-sm lg:backdrop-blur-0"
+                        />
+                      </div>
+
+                      {/* Password */}
+                      <div className="relative">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 lg:text-[#94A3B8]" />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={regPassword}
+                          onChange={(e) => setRegPassword(e.target.value)}
+                          placeholder="Crea una contraseña"
+                          className="w-full rounded-xl border px-11 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all
+                            bg-white/10 lg:bg-white border-white/15 lg:border-[#E2E8F0]
+                            text-white lg:text-[#0F172A] placeholder:text-white/30 lg:placeholder:text-[#94A3B8]
+                            focus:ring-[#C5A85A] focus:border-transparent
+                            backdrop-blur-sm lg:backdrop-blur-0"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B] transition-colors cursor-pointer"
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+
+                      {authError && (
+                        <div className="flex items-center gap-2 text-xs bg-red-500/10 lg:bg-red-50 text-red-300 lg:text-red-600 py-3 px-4 rounded-xl border border-red-500/20 lg:border-red-200 font-medium">
+                          <div className="h-1.5 w-1.5 bg-red-400 rounded-full shrink-0" />
+                          {authError}
+                        </div>
+                      )}
+
+                      <button
+                        type="submit"
+                        className="w-full bg-[#C5A85A] hover:bg-[#b8993f] text-white py-4 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-[#C5A85A]/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group mt-1"
+                      >
+                        Crear mi Cuenta
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                      </button>
+                    </>
+                  )}
+                </form>
+              )}
 
               {/* Divider */}
               <div className="flex items-center gap-4">
@@ -491,9 +655,9 @@ function AdminDashboard() {
               <button
                 onClick={() => window.location.href = "/"}
                 className="w-full py-3 rounded-xl text-sm font-medium tracking-wide transition-all cursor-pointer flex items-center justify-center gap-2
-                  text-white/50 hover:text-white/70 lg:text-[#64748B] lg:hover:text-[#1E2346]
-                  border border-white/10 lg:border-[#E2E8F0] hover:border-white/20 lg:hover:border-[#CBD5E1]
-                  bg-white/5 lg:bg-white hover:bg-white/10 lg:hover:bg-[#F8FAFC]"
+                  text-white/40 hover:text-white/60 lg:text-[#94A3B8] lg:hover:text-[#64748B]
+                  border border-white/8 lg:border-[#E2E8F0] hover:border-white/15 lg:hover:border-[#CBD5E1]
+                  bg-transparent lg:bg-transparent hover:bg-white/5 lg:hover:bg-[#F8FAFC]"
               >
                 Regresar al Cotizador
               </button>
