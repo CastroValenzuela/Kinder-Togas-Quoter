@@ -390,16 +390,8 @@ function AdminDashboard() {
           
           {/* Content over image */}
           <div className="relative z-10 flex flex-col justify-between p-12 w-full">
-            {/* Logo / Brand */}
-            <div className="flex items-center gap-3">
-              <div className="h-11 w-11 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center font-display font-black text-lg text-[#C5A85A] border border-white/15">
-                KT
-              </div>
-              <div>
-                <h2 className="font-display text-lg font-bold text-white tracking-tight">Kinder Togas</h2>
-                <p className="text-[9px] uppercase tracking-[0.25em] text-white/40 font-bold">Graduaciones</p>
-              </div>
-            </div>
+            {/* Spacer to align main messaging */}
+            <div />
 
             {/* Center messaging */}
             <div className="space-y-6 max-w-md">
@@ -463,23 +455,16 @@ function AdminDashboard() {
           </div>
 
           <div className="relative z-10 flex-1 flex flex-col justify-center items-center px-6 sm:px-12 lg:px-16 py-12">
-            {/* Mobile brand header */}
-            <div className="lg:hidden flex items-center gap-3 mb-10">
-              <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center shadow-md p-1">
-                <img src={logoImg} alt="Kinder Togas Logo" className="h-full w-full object-contain" />
-              </div>
-              <div>
-                <h2 className="font-display text-lg font-bold text-white tracking-tight">Kinder Togas</h2>
-                <p className="text-[9px] uppercase tracking-[0.25em] text-white/40 font-bold">Graduaciones</p>
-              </div>
-            </div>
-
             <div className="w-full max-w-[380px] space-y-6">
-              {/* Header Icon */}
-              <div className="text-center lg:text-left">
-                <div className="inline-flex items-center justify-center lg:justify-start w-full">
-                  <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-navy/10 border border-slate-100 p-1">
+              {/* Brand Header */}
+              <div className="flex flex-col items-center lg:items-start w-full">
+                <div className="flex items-center gap-3.5">
+                  <div className="h-14 w-14 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-navy/10 border border-slate-100 lg:border-slate-200/60 p-1">
                     <img src={logoImg} alt="Kinder Togas" className="h-full w-full object-contain" />
+                  </div>
+                  <div className="text-left">
+                    <h2 className="font-display text-xl lg:text-2xl font-bold text-white lg:text-[#1E2346] tracking-tight">Kinder Togas</h2>
+                    <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.25em] text-white/40 lg:text-[#94A3B8] font-bold">Graduaciones</p>
                   </div>
                 </div>
               </div>
