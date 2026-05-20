@@ -123,6 +123,10 @@ function AdminDashboard() {
   const [forgotSuccess, setForgotSuccess] = useState<boolean>(false);
   const [resetSuccessState, setResetSuccessState] = useState<boolean>(false);
 
+  // Security Inactivity Warning States
+  const [showInactivityModal, setShowInactivityModal] = useState<boolean>(false);
+  const [inactivityCountdown, setInactivityCountdown] = useState<number>(60);
+
   const [quotes, setQuotes] = useState<QuoteRecord[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -494,39 +498,60 @@ function AdminDashboard() {
     setPassword("");
   };
 
-  // 15-minute Auto-Logout System (Security Timeout)
+  // 1. Inactivity Warning Timer (14 minutes of absolute inactivity triggers warning modal)
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || showInactivityModal) return;
 
     let timeoutId: NodeJS.Timeout;
 
-    const resetTimer = () => {
+    const startInactivityTimer = () => {
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
-        handleLogout();
-        alert("Tu sesión ha expirado por inactividad. Por favor, inicia sesión de nuevo por seguridad.");
-      }, 15 * 60 * 1000); // 15 minutes in milliseconds
+        setInactivityCountdown(60);
+        setShowInactivityModal(true);
+      }, 14 * 60 * 1000); // 14 minutes in milliseconds
     };
 
-    // Event listeners to detect user activity
     const activityEvents = ["mousedown", "keydown", "scroll", "touchstart", "mousemove"];
     
     // Initialize timer
-    resetTimer();
+    startInactivityTimer();
 
-    // Attach listeners to reset the timer on activity
+    // Reset timer on user activity
+    const handleUserActivity = () => {
+      startInactivityTimer();
+    };
+
     activityEvents.forEach((event) => {
-      window.addEventListener(event, resetTimer);
+      window.addEventListener(event, handleUserActivity);
     });
 
-    // Cleanup listeners and timer
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
       activityEvents.forEach((event) => {
-        window.removeEventListener(event, resetTimer);
+        window.removeEventListener(event, handleUserActivity);
       });
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, showInactivityModal]);
+
+  // 2. Countdown Timer when Warning Modal is Active (60 seconds)
+  useEffect(() => {
+    if (!showInactivityModal) return;
+
+    const intervalId = setInterval(() => {
+      setInactivityCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalId);
+          handleLogout();
+          setShowInactivityModal(false);
+          return 60;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [showInactivityModal]);
 
   // Helper Labels
   const levelLabel = (l: string) => {
@@ -3056,6 +3081,77 @@ function AdminDashboard() {
             </div>
           );
         })()}
+      </div>
+    )}
+
+    {/* Inactivity Warning Modal (Premium Design) */}
+    {showInactivityModal && (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        {/* Backdrop Blur overlay */}
+        <div className="absolute inset-0 bg-[#0F1225]/60 backdrop-blur-md transition-opacity duration-300" />
+        
+        {/* Modal Content Card */}
+        <div className="relative w-full max-w-md bg-white border border-[#E2E8F0] rounded-3xl p-8 shadow-2xl shadow-navy/20 animate-scaleIn space-y-6 text-center">
+          {/* Warning Icon Container */}
+          <div className="h-16 w-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto border border-amber-100 shadow-inner">
+            <Clock className="h-8 w-8 text-[#C5A85A] animate-pulse" />
+          </div>
+          
+          {/* Text Details */}
+          <div className="space-y-2">
+            <h3 className="font-display text-xl font-bold text-navy">¿Sigues ahí?</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed px-4">
+              Tu sesión de administrador está a punto de expirar por inactividad. Te desconectaremos automáticamente por seguridad en:
+            </p>
+          </div>
+          
+          {/* Countdown Clock Display */}
+          <div className="flex flex-col items-center justify-center py-2">
+            <div className="text-4xl font-extrabold font-display text-navy tracking-tight tabular-nums flex items-center justify-center gap-1.5">
+              <span>00</span>
+              <span className="animate-pulse">:</span>
+              <span className={cn(
+                inactivityCountdown <= 10 ? "text-red-500 font-black animate-bounce" : "text-[#C5A85A]"
+              )}>
+                {String(inactivityCountdown).padStart(2, "0")}
+              </span>
+            </div>
+            {/* Visual Progress Bar */}
+            <div className="w-full max-w-[200px] h-1.5 bg-slate-100 rounded-full mt-3 overflow-hidden">
+              <div 
+                className={cn(
+                  "h-full rounded-full transition-all duration-1000 ease-linear",
+                  inactivityCountdown <= 10 ? "bg-red-500" : "bg-[#C5A85A]"
+                )}
+                style={{ width: `${(inactivityCountdown / 60) * 100}%` }}
+              />
+            </div>
+          </div>
+          
+          {/* Buttons Row */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                handleLogout();
+                setShowInactivityModal(false);
+              }}
+              className="flex-1 border border-[#E2E8F0] hover:bg-slate-50 text-[#64748B] hover:text-[#1E2346] font-bold text-xs py-3.5 rounded-full transition-all cursor-pointer uppercase tracking-wider"
+            >
+              Cerrar Sesión
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowInactivityModal(false);
+                setInactivityCountdown(60);
+              }}
+              className="flex-1 bg-[#1E2346] hover:bg-[#2a305c] text-white font-bold text-xs py-3.5 rounded-full shadow-lg shadow-navy/10 active:scale-[0.98] transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-2"
+            >
+              <span>✨</span> Continuar Sesión
+            </button>
+          </div>
+        </div>
       </div>
     )}
 
