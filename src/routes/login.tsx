@@ -494,6 +494,40 @@ function AdminDashboard() {
     setPassword("");
   };
 
+  // 15-minute Auto-Logout System (Security Timeout)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let timeoutId: NodeJS.Timeout;
+
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        handleLogout();
+        alert("Tu sesión ha expirado por inactividad. Por favor, inicia sesión de nuevo por seguridad.");
+      }, 15 * 60 * 1000); // 15 minutes in milliseconds
+    };
+
+    // Event listeners to detect user activity
+    const activityEvents = ["mousedown", "keydown", "scroll", "touchstart", "mousemove"];
+    
+    // Initialize timer
+    resetTimer();
+
+    // Attach listeners to reset the timer on activity
+    activityEvents.forEach((event) => {
+      window.addEventListener(event, resetTimer);
+    });
+
+    // Cleanup listeners and timer
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      activityEvents.forEach((event) => {
+        window.removeEventListener(event, resetTimer);
+      });
+    };
+  }, [isAuthenticated]);
+
   // Helper Labels
   const levelLabel = (l: string) => {
     const m: Record<string, string> = {
