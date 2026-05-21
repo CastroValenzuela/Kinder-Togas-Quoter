@@ -37,6 +37,7 @@ export function buildSummaryText(q: QuoteData): string {
   const total = unit * q.quantity;
   const selectedToga = (q.level !== "preescolar" || q.pkg?.kind === "A") ? colorLabel(q.togaColor) : "Negro";
   const stolaVal = stolaLabel(q.stolaColor);
+  const cityText = q.city === "tijuana" ? "Tijuana" : (q.city === "ensenada" ? "Ensenada" : cityLabel(q.city));
 
   return [
     `Cotización Kinder Togas - Folio: ${q.quoteNumber || 'N/A'}`,
@@ -46,7 +47,7 @@ export function buildSummaryText(q: QuoteData): string {
     `Solicitante: ${q.contact}`,
     `Teléfono: ${q.phone}`,
     `Fecha evento: ${q.date ? formatDate(q.date) : 'N/A'}`,
-    `Ciudad: ${cityLabel(q.city)}`,
+    `Sede / Ciudad: ${cityText}`,
     `Paquete: ${packageLabel(q.pkg, q.level)}`,
     `Color Toga: ${selectedToga}`,
     `Estola: ${stolaVal}`,
@@ -133,6 +134,14 @@ export function generateQuotePDF(q: QuoteData): void {
     doc.text("Fecha Evento:", detailsX + 250, currentY + 45);
     doc.setFont("helvetica", "normal");
     doc.text(formatDate(q.date), detailsX + 330, currentY + 45);
+  }
+
+  if (q.city) {
+    const cityText = q.city === "tijuana" ? "Tijuana" : (q.city === "ensenada" ? "Ensenada" : cityLabel(q.city));
+    doc.setFont("helvetica", "bold");
+    doc.text("Sede / Ciudad:", detailsX + 250, currentY + 90);
+    doc.setFont("helvetica", "normal");
+    doc.text(cityText, detailsX + 330, currentY + 90);
   }
 
   if (q.level) {

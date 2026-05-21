@@ -46,7 +46,7 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
     { label: "Solicitante", value: contact, step: 4 },
     { label: "Nivel escolar", value: levelLabel(level), step: 1 },
     { label: "Servicio", value: service === "renta" ? "Renta" : "Venta", step: 2 },
-    { label: "Ciudad", value: cityLabel(city), step: 3 },
+    { label: "Sede / Ciudad", value: city === "tijuana" ? "Tijuana" : (city === "ensenada" ? "Ensenada" : cityLabel(city)), step: 3 },
     { label: "Paquete", value: packageLabel(pkg, level), step: 3 },
     ...(discountPercent > 0 ? [
       { label: "Precio de Lista (Unitario)", value: formatMXN(originalUnit), step: 3 },
