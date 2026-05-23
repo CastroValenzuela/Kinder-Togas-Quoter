@@ -356,6 +356,8 @@ export function Quoter() {
                 value={level}
                 onChange={(l) => {
                   setLevel(l);
+                  setCity("tijuana");
+                  setPkg({ kind: "A" });
                   if (l === "primaria") {
                     setTogaColor("negro");
                     setStolaColor("dorada");
