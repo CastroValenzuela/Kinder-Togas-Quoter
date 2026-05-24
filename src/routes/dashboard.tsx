@@ -1648,7 +1648,7 @@ export function AdminDashboard() {
                 : "border-transparent text-muted-foreground hover:text-navy/70"
             )}
           >
-            <span>📋</span> CRM de Cotizaciones
+            <span>📋</span> Lista de Cotizaciones
           </button>
           <button
             onClick={() => setActiveTab('stats')}
