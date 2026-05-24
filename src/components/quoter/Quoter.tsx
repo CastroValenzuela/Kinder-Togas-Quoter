@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, Plus } from "lucide-react";
+import { Turnstile } from "@marsidev/react-turnstile";
 import { Button } from "@/components/ui/button";
 import { StepperBar, StepperLabel } from "./Stepper";
 import { StepLevel } from "./StepLevel";
@@ -76,6 +77,7 @@ export function Quoter() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [pricesLoaded, setPricesLoaded] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   // Load dynamic pricing rules on mount
   useEffect(() => {
@@ -112,7 +114,7 @@ export function Quoter() {
   // Save to Supabase
   useEffect(() => {
     async function save() {
-      if (step === 5 && !isSaved && !isSaving && school && contact && phone) {
+      if (step === 5 && !isSaved && !isSaving && school && contact && phone && turnstileToken) {
         setIsSaving(true);
         
         let qNum = quoteNumber;
@@ -135,7 +137,7 @@ export function Quoter() {
         }
         
         try {
-          const { error } = await supabase.from('quotes').insert({
+          const payload = {
             quote_number: qNum,
             institution_name: school,
             contact_name: contact,
@@ -154,14 +156,21 @@ export function Quoter() {
             stola_color: stolaColor,
             discount_percent: getDiscountPercent(pkg, level),
             original_unit_price: unitOriginalPrice(pkg, level),
+          };
+          
+          const res = await fetch('https://qqfqwvxmhiacoyqwobjd.supabase.co/functions/v1/submit-quote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ turnstileToken, quoteData: payload })
           });
 
-          if (!error) {
-            setQuoteNumber(qNum);
-            setIsSaved(true);
-          } else {
-            console.error("Error saving quote:", error);
+          if (!res.ok) {
+            const errData = await res.json();
+            throw new Error(errData.error || 'Server error');
           }
+
+          setQuoteNumber(qNum);
+          setIsSaved(true);
         } catch (e) {
           console.error("Exception saving quote:", e);
         } finally {
@@ -170,7 +179,7 @@ export function Quoter() {
       }
     }
     save();
-  }, [step, quoteNumber, isSaved, isSaving, school, contact, phone, email, level, city, pkg, quantity, date, total, service, honeypot, startTime, togaColor, stolaColor]);
+  }, [step, quoteNumber, isSaved, isSaving, school, contact, phone, email, level, city, pkg, quantity, date, total, service, honeypot, startTime, togaColor, stolaColor, turnstileToken]);
   void total;
 
   const canNext: Record<Step, boolean> = {
@@ -230,6 +239,10 @@ export function Quoter() {
       {/* Header — centered logo, full-width progress bar, label */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-6 pb-4 flex items-center justify-center relative">
+          <Turnstile
+            siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || ""}
+            onSuccess={(token) => setTurnstileToken(token)}
+          />
           {step > 1 && (
             <div className="absolute left-4 sm:left-6">
               <Button
