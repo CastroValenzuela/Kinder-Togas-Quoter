@@ -2792,71 +2792,59 @@ function AdminDashboard() {
               {/* Left Column: Grid Calendar */}
               <div className="lg:col-span-8 bg-white rounded-2xl border border-hairline shadow-sm overflow-hidden p-6 space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-hairline/80 pb-5">
-                  <div className="space-y-1">
-                    <h2 className="font-display text-2xl font-bold text-navy flex items-center gap-2.5">
-                      <span>📅</span> Agenda Mensual de Entregas
-                    </h2>
-                    <p className="text-xs text-muted-foreground font-medium">
-                      Monitorea las ceremonias de graduación programadas para coordinar togas y estolas.
-                    </p>
-                  </div>
-                  
-                  {/* Calendar Navigation */}
-                  <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4 select-none self-end sm:self-center">
-                    <div className="flex bg-slate-100/80 p-1.5 rounded-xl border border-slate-200/50">
-                      {(['month', 'week', 'day'] as const).map(view => (
-                        <button
-                          key={view}
-                          onClick={() => setCalendarView(view)}
-                          className={cn(
-                            "px-4 py-1.5 text-[11px] font-extrabold rounded-lg transition-all capitalize uppercase tracking-wider",
-                            calendarView === view ? "bg-white text-navy shadow-sm border border-slate-200/50" : "text-muted-foreground hover:text-navy hover:bg-slate-200/30"
-                          )}
-                        >
-                          {view === 'month' ? 'Mes' : view === 'week' ? 'Semana' : 'Día'}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const t = new Date();
+                        setCurrentCalendarDate(t);
+                        setSelectedCalendarDay(t);
+                        if (calendarView === 'month') setCalendarView('month');
+                      }}
+                      className="px-4 py-2 border border-hairline hover:bg-slate-50 text-navy text-sm font-semibold rounded-lg transition-all cursor-pointer bg-white shadow-sm"
+                      title="Ir a Hoy"
+                    >
+                      Hoy
+                    </button>
+                    
+                    <div className="flex items-center gap-1">
                       <button
                         type="button"
                         onClick={() => navigateCalendar(-1)}
-                        className="p-2 border border-hairline hover:bg-cream/20 text-navy rounded-xl transition-all cursor-pointer bg-white shadow-sm"
+                        className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all cursor-pointer"
                         title="Anterior"
                       >
-                        <ChevronLeft className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const t = new Date();
-                          setCurrentCalendarDate(t);
-                          setSelectedCalendarDay(t);
-                          if (calendarView === 'month') setCalendarView('month');
-                        }}
-                        className="px-3 py-1.5 border border-hairline hover:bg-cream/20 text-navy text-xs font-bold rounded-xl transition-all cursor-pointer bg-white shadow-sm"
-                        title="Ir a Hoy"
-                      >
-                        Hoy
+                        <ChevronLeft className="h-5 w-5" />
                       </button>
                       <button
                         type="button"
                         onClick={() => navigateCalendar(1)}
-                        className="p-2 border border-hairline hover:bg-cream/20 text-navy rounded-xl transition-all cursor-pointer bg-white shadow-sm"
+                        className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all cursor-pointer"
                         title="Siguiente"
                       >
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="h-5 w-5" />
                       </button>
-                      <div className="ml-2 font-display text-base font-extrabold text-navy min-w-[140px] text-center flex flex-col leading-tight">
-                        <span>{monthNames[month]} {year}</span>
-                        {calendarView !== 'month' && (
-                          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                            {calendarView === 'week' ? 'Vista por Semana' : 'Vista por Día'}
-                          </span>
-                        )}
-                      </div>
                     </div>
+
+                    <h2 className="font-display text-2xl font-normal text-slate-800 min-w-[200px] capitalize">
+                      {monthNames[month]} {year}
+                    </h2>
+                  </div>
+                  
+                  {/* Calendar View Toggle */}
+                  <div className="flex bg-slate-100/80 p-1 rounded-lg border border-slate-200/50">
+                    {(['month', 'week', 'day'] as const).map(view => (
+                      <button
+                        key={view}
+                        onClick={() => setCalendarView(view)}
+                        className={cn(
+                          "px-4 py-1.5 text-xs font-semibold rounded-md transition-all capitalize",
+                          calendarView === view ? "bg-white text-navy shadow-sm border border-slate-200/50" : "text-slate-500 hover:text-navy hover:bg-slate-200/50"
+                        )}
+                      >
+                        {view === 'month' ? 'Mes' : view === 'week' ? 'Semana' : 'Día'}
+                      </button>
+                    ))}
                   </div>
                 </div>
                 
@@ -2879,13 +2867,12 @@ function AdminDashboard() {
                   </div>
                 </div>
                 
-                {/* Calendar Grid */}
-                <div className="space-y-2.5">
+                <div className="space-y-0 text-[#e8eaed]">
                   {/* Days of Week Row */}
                   {calendarView !== 'day' && (
-                    <div className="grid grid-cols-7 gap-1 text-center select-none">
-                      {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(d => (
-                        <div key={d} className="text-[10px] uppercase tracking-wider text-muted-foreground font-extrabold py-2">
+                    <div className="grid grid-cols-7 text-center select-none bg-[#202124]">
+                      {["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"].map((d, i) => (
+                        <div key={d} className="text-[11px] font-medium text-[#9aa0a6] py-2 flex flex-col border-r border-[#3c4043] last:border-r-0">
                           {d}
                         </div>
                       ))}
@@ -2894,7 +2881,7 @@ function AdminDashboard() {
                   
                   {/* Grid */}
                   <div className={cn(
-                    "grid gap-1.5",
+                    "grid bg-[#3c4043] gap-px border border-[#3c4043] rounded-b-lg overflow-hidden",
                     calendarView === 'day' ? "grid-cols-1" : "grid-cols-7"
                   )}>
                     {displayCells.map((cell) => {
@@ -2908,123 +2895,96 @@ function AdminDashboard() {
                         return q.estimated_date.split("T")[0] === cellDateStr;
                       });
                       
-                      const hasContracted = cellQuotes.some(q => q.status === "contracted");
-                      const hasContacted = cellQuotes.some(q => q.status === "contacted");
-                      const hasPending = cellQuotes.some(q => q.status === "pending");
-                      
-                      // Calculate total gowns for this specific day
-                      const cellGowns = cellQuotes.reduce((sum, q) => sum + q.student_count, 0);
-                      const contractedCellGowns = cellQuotes
-                        .filter(q => q.status === "contracted")
-                        .reduce((sum, q) => sum + q.student_count, 0);
-                      
                       return (
                         <button
                           key={cell.key}
                           type="button"
                           onClick={() => setSelectedCalendarDay(cell.date)}
                           className={cn(
-                            "border rounded-2xl p-2.5 flex flex-col justify-start transition-all text-left relative group cursor-pointer active:scale-[0.98] select-none gap-2",
-                            calendarView === 'month' ? "min-h-[110px]" : calendarView === 'week' ? "min-h-[160px]" : "min-h-[300px]",
+                            "flex flex-col justify-start text-left relative cursor-pointer select-none",
+                            calendarView === 'month' ? "min-h-[140px]" : "min-h-[200px]",
                             cell.isCurrentMonth || calendarView !== 'month'
-                              ? "bg-white border-hairline/80 text-foreground" 
-                              : "bg-[#F8FAFC] border-hairline/40 text-muted-foreground/60",
-                            isToday && "ring-2 ring-navy/15 bg-blue-50/15 border-blue-200",
-                            isSelected 
-                              ? "ring-2 ring-[#C5A85A] border-transparent shadow-md bg-cream/5" 
-                              : "hover:bg-cream/10 hover:border-[#C5A85A]/40"
+                              ? "bg-[#202124]" 
+                              : "bg-[#202124]/50",
+                            isSelected && "bg-[#3c4043]/30"
                           )}
                         >
-                          {/* Date Number and Today Highlight */}
-                          <div className="flex justify-between items-center w-full pb-1 border-b border-hairline/30">
-                            <div className="flex items-center gap-2">
-                              <span className={cn(
-                                "text-sm font-bold flex items-center justify-center h-6 w-6 rounded-full",
-                                isToday ? "bg-navy text-white font-extrabold" : "",
-                                !isToday && cell.isCurrentMonth && "text-foreground",
-                                !isToday && !cell.isCurrentMonth && "text-muted-foreground/60"
-                              )}>
-                                {cell.date.getDate()}
-                              </span>
-                              {calendarView === 'day' && (
-                                <span className="text-sm font-bold text-navy capitalize">
-                                  {cell.date.toLocaleDateString("es-MX", { weekday: "long" })}
-                                </span>
-                              )}
-                            </div>
-                            
-                            {/* Short indicators of ceremony counts */}
-                            {cellQuotes.length > 0 && (
-                              <span className="text-[10px] font-extrabold text-[#C5A85A] bg-[#C5A85A]/10 px-2 py-0.5 rounded-full">
-                                {cellQuotes.length} eventos
-                              </span>
-                            )}
+                          {/* Date Number */}
+                          <div className="flex justify-center w-full mt-2 mb-1">
+                            <span className={cn(
+                              "text-[12px] font-medium flex items-center justify-center h-6 w-6 rounded-full leading-none",
+                              isToday ? "bg-[#8ab4f8] text-[#202124]" : "",
+                              !isToday && cell.isCurrentMonth && "text-[#e8eaed]",
+                              !isToday && !cell.isCurrentMonth && "text-[#5f6368]"
+                            )}>
+                              {cell.date.getDate()}
+                            </span>
                           </div>
                           
-                          {/* Detailed List for Day/Week view, Summary for Month view */}
+                          {/* Minimal Event Chips */}
                           {calendarView === 'month' ? (
-                            <div className="w-full space-y-1.5 mt-1 flex-1">
+                            <div className="w-full space-y-0.5 flex-1 px-1">
                               {['contracted', 'contacted', 'pending', 'archived'].map(status => {
                                 const statusQuotes = cellQuotes.filter(q => (q.status || 'pending') === status);
                                 if (statusQuotes.length === 0) return null;
                                 const statusTogas = statusQuotes.reduce((sum, q) => sum + q.student_count, 0);
                                 
                                 const styleMap: Record<string, string> = {
-                                  contracted: "bg-emerald-50 text-emerald-700 border-emerald-200/60 shadow-sm",
-                                  contacted: "bg-blue-50 text-blue-700 border-blue-200/60 shadow-sm",
-                                  pending: "bg-amber-50 text-amber-700 border-amber-200/60 shadow-sm",
-                                  archived: "bg-slate-50 text-slate-600 border-slate-200/60 shadow-sm",
+                                  contracted: "text-[#e8eaed]", // Normal text color
+                                  contacted: "text-[#e8eaed]",
+                                  pending: "bg-[#424242] text-[#e8eaed] rounded px-1.5 py-0.5 mb-0.5", // Box for pending/task
+                                  archived: "text-[#9aa0a6]",
                                 };
-                                const labelMap: Record<string, string> = {
-                                  contracted: "🟢",
-                                  contacted: "🔵",
-                                  pending: "🟡",
-                                  archived: "⚫",
+                                
+                                const dotColor: Record<string, string> = {
+                                  contracted: "bg-[#8ab4f8]", // Blue dot
+                                  contacted: "bg-[#8ab4f8]",
+                                  pending: "bg-[#f28b82]", // Red/Orange dot
+                                  archived: "bg-[#5f6368]",
+                                };
+                                
+                                const statusLabel: Record<string, string> = {
+                                  contracted: "Contratos",
+                                  contacted: "Contactos",
+                                  pending: "Pendientes",
+                                  archived: "Archivos"
                                 };
                                 
                                 return (
-                                  <div key={status} className={cn("text-[9px] font-bold px-1.5 py-1 rounded border flex items-center justify-between", styleMap[status])}>
-                                    <span className="capitalize flex items-center gap-1">
-                                      <span className="text-[8px]">{labelMap[status]}</span>
-                                      {status === 'contracted' ? 'Contratados' : status === 'contacted' ? 'Contactados' : status === 'pending' ? 'Pendientes' : 'Archivados'}
-                                    </span>
-                                    <span className="bg-white/60 px-1 rounded-sm">{statusTogas} togas</span>
+                                  <div key={status} className={cn("text-[11px] flex items-center gap-1.5 truncate", styleMap[status])}>
+                                    <span className={cn("h-2 w-2 rounded-full flex-shrink-0", dotColor[status])} />
+                                    <span className="truncate">{statusTogas} {statusLabel[status]}</span>
                                   </div>
                                 );
                               })}
                             </div>
                           ) : (
-                            <div className="w-full space-y-2 mt-1 overflow-y-auto max-h-[400px] flex-1">
+                            <div className="w-full space-y-1 overflow-y-auto max-h-[600px] flex-1 px-1">
                               {cellQuotes.length === 0 && (
-                                <div className="text-xs text-muted-foreground italic p-2 text-center mt-4">
-                                  Libre — Sin entregas agendadas.
+                                <div className="text-[10px] text-[#5f6368] text-center mt-2">
+                                  Sin eventos
                                 </div>
                               )}
                               {cellQuotes.map(q => {
                                 const curStatus = q.status || "pending";
                                 const styleMap: Record<string, string> = {
-                                  contracted: "bg-emerald-50 border-emerald-200/60 text-emerald-900 shadow-sm",
-                                  contacted: "bg-blue-50 border-blue-200/60 text-blue-900 shadow-sm",
-                                  pending: "bg-amber-50 border-amber-200/60 text-amber-900 shadow-sm",
-                                  archived: "bg-slate-50 border-slate-200/60 text-slate-900 shadow-sm",
+                                  contracted: "text-[#e8eaed]",
+                                  contacted: "text-[#e8eaed]",
+                                  pending: "bg-[#424242] text-[#e8eaed] rounded px-1.5 py-0.5",
+                                  archived: "text-[#9aa0a6]",
                                 };
-                                const labelMap: Record<string, string> = {
-                                  contracted: "🟢",
-                                  contacted: "🔵",
-                                  pending: "🟡",
-                                  archived: "⚫",
+                                const dotColor: Record<string, string> = {
+                                  contracted: "bg-[#8ab4f8]",
+                                  contacted: "bg-[#8ab4f8]",
+                                  pending: "bg-[#f28b82]",
+                                  archived: "bg-[#5f6368]",
                                 };
                                 return (
-                                  <div key={q.id} className={cn("text-[11px] p-2.5 rounded-xl border flex flex-col gap-1.5 text-left transition-all hover:brightness-95", styleMap[curStatus])}>
-                                    <div className="flex justify-between items-start gap-2">
-                                      <span className="font-extrabold leading-tight">{q.institution_name}</span>
-                                      <span className="text-[10px] bg-white/70 px-1.5 py-0.5 rounded-md font-bold whitespace-nowrap border border-black/5 flex-shrink-0 flex items-center gap-1">
-                                        {labelMap[curStatus]} {q.student_count} <span className="hidden xl:inline">togas</span>
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-[9px] font-semibold opacity-80 uppercase tracking-wider">
-                                      <span className="truncate pr-2">#{q.quote_number} • {levelLabel(q.school_level)}</span>
-                                      <span className="bg-black/5 px-1.5 py-0.5 rounded-sm">{q.city === 'tijuana' ? 'TIJ' : 'ENS'}</span>
+                                  <div key={q.id} className={cn("text-[11px] flex items-start gap-1.5", styleMap[curStatus])}>
+                                    <span className={cn("h-2 w-2 rounded-full flex-shrink-0 mt-1", dotColor[curStatus])} />
+                                    <div className="flex flex-col overflow-hidden">
+                                      <span className="truncate font-medium">{q.institution_name}</span>
+                                      <span className="text-[10px] opacity-70 truncate">{q.student_count} togas • {q.city.substring(0,3).toUpperCase()}</span>
                                     </div>
                                   </div>
                                 );
