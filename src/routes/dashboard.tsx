@@ -147,6 +147,7 @@ export function AdminDashboard() {
   const [serviceFilter, setServiceFilter] = useState<string>("all");
   const [cityFilter, setCityFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [monthFilter, setMonthFilter] = useState<string>("all");
 
   // CRM vs Pricing Tabs
   const [activeTab, setActiveTab] = useState<'crm' | 'stats' | 'pricing' | 'calendar'>('crm');
@@ -178,7 +179,7 @@ export function AdminDashboard() {
   // Reset page when filters change to avoid showing empty pages
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, levelFilter, serviceFilter, cityFilter, statusFilter]);
+  }, [search, levelFilter, serviceFilter, cityFilter, statusFilter, monthFilter]);
 
   // Detect password recovery email link redirection on mount
   useEffect(() => {
@@ -624,7 +625,13 @@ export function AdminDashboard() {
       const qStatus = q.status || "pending";
       const matchesStatus = statusFilter === "all" || qStatus === statusFilter;
 
-      return matchesSearch && matchesLevel && matchesService && matchesCity && matchesStatus;
+      let matchesMonth = true;
+      if (monthFilter !== "all") {
+        const quoteMonth = new Date(q.created_at).getMonth().toString();
+        matchesMonth = quoteMonth === monthFilter;
+      }
+
+      return matchesSearch && matchesLevel && matchesService && matchesCity && matchesStatus && matchesMonth;
     });
 
     // Apply sorting dynamically
@@ -908,19 +915,17 @@ export function AdminDashboard() {
       q.status === "contracted" ? "Contratado" : q.status === "contacted" ? "Contactado" : q.status === "archived" ? "Archivado" : "Pendiente"
     ]);
 
-    const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(","))
-    ].join("\n");
-
-    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    // Add UTF-8 BOM so Excel opens it with correct encoding (accents, ñ, etc)
+    const csvContent = "\uFEFF" + headers.map(h => `"${h}"`).join(",") + "\n" + rows.map((e) => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `cotizaciones_kinder_togas_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.href = url;
+    link.download = `cotizaciones_export_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // WhatsApp Follow Up Link
@@ -1705,7 +1710,7 @@ export function AdminDashboard() {
             </div>
 
             {/* Inputs Panel */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 pt-2">
               {/* Search Bar */}
               <div className="relative">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
@@ -1758,6 +1763,29 @@ export function AdminDashboard() {
                   <option value="all">Todas las Sedes</option>
                   <option value="tijuana">Tijuana</option>
                   <option value="ensenada">Ensenada</option>
+                </select>
+              </div>
+
+              {/* Month Selector */}
+              <div className="relative">
+                <select
+                  value={monthFilter}
+                  onChange={(e) => setMonthFilter(e.target.value)}
+                  className="w-full bg-white border border-hairline rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer appearance-none"
+                >
+                  <option value="all">Todos los Meses</option>
+                  <option value="0">Enero</option>
+                  <option value="1">Febrero</option>
+                  <option value="2">Marzo</option>
+                  <option value="3">Abril</option>
+                  <option value="4">Mayo</option>
+                  <option value="5">Junio</option>
+                  <option value="6">Julio</option>
+                  <option value="7">Agosto</option>
+                  <option value="8">Septiembre</option>
+                  <option value="9">Octubre</option>
+                  <option value="10">Noviembre</option>
+                  <option value="11">Diciembre</option>
                 </select>
               </div>
 
