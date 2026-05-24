@@ -58,7 +58,7 @@ export function Quoter() {
   });
   const [level, setLevel] = useState<Level | undefined>(() => (ls("kt-quote-level") as Level) || undefined);
   const [service, setService] = useState<ServiceType | undefined>(() => (ls("kt-quote-service") as ServiceType) || undefined);
-  const [city, setCity] = useState<City | undefined>(() => (ls("kt-quote-city") as City) || undefined);
+  const [city, setCity] = useState<City | undefined>(() => (ls("kt-quote-city") as City) || "ensenada");
   const [pkg, setPkg] = useState<PackageChoice | undefined>(() => {
     const saved = ls("kt-quote-pkg");
     return saved ? JSON.parse(saved) : undefined;

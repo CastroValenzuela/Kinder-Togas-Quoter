@@ -73,8 +73,8 @@ export function stolaLabel(stola?: string): string {
 import { supabase } from "@/lib/supabase";
 
 export const CITIES: { id: City; label: string }[] = [
-  { id: "tijuana", label: "Tijuana" },
   { id: "ensenada", label: "Ensenada" },
+  { id: "tijuana", label: "Tijuana" },
 ];
 
 // Precios editables (MXN, por alumno) — Objeto mutable de base para compatibilidad hacia atrás
