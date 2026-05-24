@@ -107,7 +107,7 @@ const FEATURES_B: Record<"esencial" | "hybrid" | "max", { icon: typeof Camera; t
   hybrid: [
     { icon: Camera, text: "Impresión combinada 9×12 cm + 9×35 cm panorámica." },
     { icon: Shirt, text: "Toga premium, birrete, borla del año y estola." },
-    { icon: Layers, text: "Formato híbrido: retrato + panorámica del grupo." },
+    { icon: Truck, text: "Entrega y recolección coordinadas." },
   ],
   max: [
     { icon: Camera, text: "Impresión 9×35 cm panorámica en ambos lados." },
