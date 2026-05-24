@@ -369,22 +369,22 @@ export function StepConfig({
                   <img
                     src={showcaseMedia.src}
                     alt="Toga de graduación premium"
-                    className={`w-full h-full ${level === "universidad" ? "object-fill" : "object-cover"}`}
+                    className={`w-full h-full ${level === "universidad" ? "object-fill" : "object-contain"}`}
                   />
                   {showcaseMedia.mask && (() => {
                     const activeStola = STOLA_COLORS.find((c) => c.id === stolaColor);
                     const stolaBg = (activeStola as any)?.gradient || activeStola?.hex || "transparent";
                     return (
                       <div 
-                        className={`absolute inset-0 mix-blend-multiply ${level === "universidad" ? "[mask-size:100%_100%]" : "[mask-size:cover]"}`}
+                        className={`absolute inset-0 mix-blend-multiply ${level === "universidad" ? "[mask-size:100%_100%]" : "[mask-size:contain]"}`}
                         style={{
                           background: stolaBg,
                           WebkitMaskImage: `url(${showcaseMedia.mask})`,
-                          WebkitMaskSize: level === "universidad" ? "100% 100%" : "cover",
+                          WebkitMaskSize: level === "universidad" ? "100% 100%" : "contain",
                           WebkitMaskPosition: "center",
                           WebkitMaskRepeat: "no-repeat",
                           maskImage: `url(${showcaseMedia.mask})`,
-                          maskSize: level === "universidad" ? "100% 100%" : "cover",
+                          maskSize: level === "universidad" ? "100% 100%" : "contain",
                           maskPosition: "center",
                           maskRepeat: "no-repeat"
                         }}
