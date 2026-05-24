@@ -50,7 +50,7 @@ import {
   Legend
 } from "recharts";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
       { title: "Panel de Administración — Kinder Togas" },
@@ -61,7 +61,7 @@ export const Route = createFileRoute("/login")({
 });
 
 interface QuoteRecord {
-  id: number;
+  id: string;
   quote_number: string;
   institution_name: string;
   contact_name: string;
@@ -251,7 +251,7 @@ function AdminDashboard() {
   };
 
   // Update Quote Status (CRM)
-  const handleUpdateStatus = async (quoteId: number, newStatus: string) => {
+  const handleUpdateStatus = async (quoteId: string, newStatus: string) => {
     setUpdatingStatusId(quoteId);
     try {
       const { error: updateErr } = await supabase
@@ -1579,7 +1579,7 @@ function AdminDashboard() {
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans">
       {/* Top Navbar */}
       <header className="bg-navy text-white py-5 px-4 sm:px-8 shadow-md sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="w-full max-w-full px-4 sm:px-8 mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 bg-white rounded-xl flex items-center justify-center p-1 shadow-inner border border-white/10">
               <img src={logoImg} alt="Kinder Togas Logo" className="h-full w-full object-contain" />
@@ -1611,7 +1611,7 @@ function AdminDashboard() {
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-8">
+      <main className="flex-1 w-full max-w-full px-4 sm:px-8 mx-auto py-4 sm:py-8 space-y-8">
         
         {/* Navigation Tabs */}
         <div className="flex border-b border-hairline/80 gap-6">
@@ -2867,12 +2867,12 @@ function AdminDashboard() {
                   </div>
                 </div>
                 
-                <div className="space-y-0 text-[#e8eaed]">
+                <div className="space-y-0 text-slate-800">
                   {/* Days of Week Row */}
                   {calendarView !== 'day' && (
-                    <div className="grid grid-cols-7 text-center select-none bg-[#202124]">
+                    <div className="grid grid-cols-7 text-center select-none bg-slate-100 border-b border-slate-200">
                       {["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"].map((d, i) => (
-                        <div key={d} className="text-[11px] font-medium text-[#9aa0a6] py-2 flex flex-col border-r border-[#3c4043] last:border-r-0">
+                        <div key={d} className="text-[11px] font-semibold text-slate-600 py-2 flex flex-col border-r border-slate-200 last:border-r-0">
                           {d}
                         </div>
                       ))}
@@ -2881,7 +2881,7 @@ function AdminDashboard() {
                   
                   {/* Grid */}
                   <div className={cn(
-                    "grid bg-[#3c4043] gap-px border border-[#3c4043] rounded-b-lg overflow-hidden",
+                    "grid bg-slate-200 gap-px border border-slate-200 rounded-b-lg overflow-hidden",
                     calendarView === 'day' ? "grid-cols-1" : "grid-cols-7"
                   )}>
                     {displayCells.map((cell) => {
@@ -2904,18 +2904,18 @@ function AdminDashboard() {
                             "flex flex-col justify-start text-left relative cursor-pointer select-none",
                             calendarView === 'month' ? "min-h-[140px]" : "min-h-[200px]",
                             cell.isCurrentMonth || calendarView !== 'month'
-                              ? "bg-[#202124]" 
-                              : "bg-[#202124]/50",
-                            isSelected && "bg-[#3c4043]/30"
+                              ? "bg-white" 
+                              : "bg-slate-50",
+                            isSelected && "bg-blue-50/50"
                           )}
                         >
                           {/* Date Number */}
                           <div className="flex justify-center w-full mt-2 mb-1">
                             <span className={cn(
                               "text-[12px] font-medium flex items-center justify-center h-6 w-6 rounded-full leading-none",
-                              isToday ? "bg-[#8ab4f8] text-[#202124]" : "",
-                              !isToday && cell.isCurrentMonth && "text-[#e8eaed]",
-                              !isToday && !cell.isCurrentMonth && "text-[#5f6368]"
+                              isToday ? "bg-blue-600 text-white" : "",
+                              !isToday && cell.isCurrentMonth && "text-slate-800",
+                              !isToday && !cell.isCurrentMonth && "text-slate-400"
                             )}>
                               {cell.date.getDate()}
                             </span>
@@ -2930,17 +2930,17 @@ function AdminDashboard() {
                                 const statusTogas = statusQuotes.reduce((sum, q) => sum + q.student_count, 0);
                                 
                                 const styleMap: Record<string, string> = {
-                                  contracted: "text-[#e8eaed]", // Normal text color
-                                  contacted: "text-[#e8eaed]",
-                                  pending: "bg-[#424242] text-[#e8eaed] rounded px-1.5 py-0.5 mb-0.5", // Box for pending/task
-                                  archived: "text-[#9aa0a6]",
+                                  contracted: "text-slate-700 font-medium",
+                                  contacted: "text-slate-700 font-medium",
+                                  pending: "bg-amber-100/50 text-slate-700 font-medium rounded px-1.5 py-0.5 mb-0.5 border border-amber-200/50",
+                                  archived: "text-slate-500",
                                 };
                                 
                                 const dotColor: Record<string, string> = {
-                                  contracted: "bg-[#8ab4f8]", // Blue dot
-                                  contacted: "bg-[#8ab4f8]",
-                                  pending: "bg-[#f28b82]", // Red/Orange dot
-                                  archived: "bg-[#5f6368]",
+                                  contracted: "bg-emerald-500",
+                                  contacted: "bg-blue-500",
+                                  pending: "bg-amber-500",
+                                  archived: "bg-slate-400",
                                 };
                                 
                                 const statusLabel: Record<string, string> = {
@@ -2951,7 +2951,7 @@ function AdminDashboard() {
                                 };
                                 
                                 return (
-                                  <div key={status} className={cn("text-[11px] flex items-center gap-1.5 truncate", styleMap[status])}>
+                                  <div key={status} className={cn("text-[11px] flex items-center gap-1.5 truncate hover:bg-slate-100 rounded px-1 cursor-pointer transition-colors", styleMap[status])}>
                                     <span className={cn("h-2 w-2 rounded-full flex-shrink-0", dotColor[status])} />
                                     <span className="truncate">{statusTogas} {statusLabel[status]}</span>
                                   </div>
@@ -2961,30 +2961,30 @@ function AdminDashboard() {
                           ) : (
                             <div className="w-full space-y-1 overflow-y-auto max-h-[600px] flex-1 px-1">
                               {cellQuotes.length === 0 && (
-                                <div className="text-[10px] text-[#5f6368] text-center mt-2">
+                                <div className="text-[10px] text-slate-400 text-center mt-2">
                                   Sin eventos
                                 </div>
                               )}
                               {cellQuotes.map(q => {
                                 const curStatus = q.status || "pending";
                                 const styleMap: Record<string, string> = {
-                                  contracted: "text-[#e8eaed]",
-                                  contacted: "text-[#e8eaed]",
-                                  pending: "bg-[#424242] text-[#e8eaed] rounded px-1.5 py-0.5",
-                                  archived: "text-[#9aa0a6]",
+                                  contracted: "text-slate-700 bg-white border border-slate-200 rounded px-1.5 py-1",
+                                  contacted: "text-slate-700 bg-white border border-slate-200 rounded px-1.5 py-1",
+                                  pending: "bg-amber-50 border border-amber-200 text-slate-800 rounded px-1.5 py-1",
+                                  archived: "text-slate-500 bg-slate-50 border border-slate-200 rounded px-1.5 py-1",
                                 };
                                 const dotColor: Record<string, string> = {
-                                  contracted: "bg-[#8ab4f8]",
-                                  contacted: "bg-[#8ab4f8]",
-                                  pending: "bg-[#f28b82]",
-                                  archived: "bg-[#5f6368]",
+                                  contracted: "bg-emerald-500",
+                                  contacted: "bg-blue-500",
+                                  pending: "bg-amber-500",
+                                  archived: "bg-slate-400",
                                 };
                                 return (
-                                  <div key={q.id} className={cn("text-[11px] flex items-start gap-1.5", styleMap[curStatus])}>
+                                  <div key={q.id} className={cn("text-[11px] flex items-start gap-1.5 hover:shadow-sm transition-shadow cursor-pointer", styleMap[curStatus])}>
                                     <span className={cn("h-2 w-2 rounded-full flex-shrink-0 mt-1", dotColor[curStatus])} />
                                     <div className="flex flex-col overflow-hidden">
-                                      <span className="truncate font-medium">{q.institution_name}</span>
-                                      <span className="text-[10px] opacity-70 truncate">{q.student_count} togas • {q.city.substring(0,3).toUpperCase()}</span>
+                                      <span className="truncate font-semibold">{q.institution_name}</span>
+                                      <span className="text-[10px] opacity-80 truncate">{q.student_count} togas • {q.city?.substring(0,3).toUpperCase()}</span>
                                     </div>
                                   </div>
                                 );
