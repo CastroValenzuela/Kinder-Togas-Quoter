@@ -40,7 +40,8 @@ const preescolarVerde = preescolarVerdeDorado;
 const preescolarRojo = preescolarRojoDorado;
 
 import primariaPaqueteANegroDorado from "@/assets/Primaria/Paquete A/negro-dorado.jpg";
-import primariaB1 from "@/assets/Primaria/B1.jpg";
+import primariaB1Base from "@/assets/Primaria/B1/B1-Base.jpg";
+import primariaB1Mask from "@/assets/Primaria/B1/B1-estola-base.png";
 import primariaB2 from "@/assets/Primaria/B2.jpg";
 import primariaB3 from "@/assets/Primaria/B3.jpg";
 
@@ -250,90 +251,94 @@ export function StepConfig({
   const total = unitPrice(pkg, level) * quantity;
 
   // Get dynamic image showcase based on level and selected configuration
-  const showcaseImage = useMemo(() => {
+  const showcaseMedia = useMemo(() => {
+    let result: string | { src: string; mask?: string } = gownImg;
+    
     if (level === "preescolar") {
       if (pkg?.kind === "A") {
         if (togaColor === "azul") {
-          if (stolaColor === "dorada") return preescolarAzulDorado;
-          if (stolaColor === "plateada") return preescolarAzulPlata;
-          if (stolaColor === "azul") return preescolarAzulAzul;
-          if (stolaColor === "roja") return preescolarAzulRojo;
-          return preescolarAzul;
+          if (stolaColor === "dorada") result = preescolarAzulDorado;
+          else if (stolaColor === "plateada") result = preescolarAzulPlata;
+          else if (stolaColor === "azul") result = preescolarAzulAzul;
+          else if (stolaColor === "roja") result = preescolarAzulRojo;
+          else result = preescolarAzul;
         }
-        if (togaColor === "magenta") {
-          if (stolaColor === "dorada") return preescolarTurquesaDorado;
-          if (stolaColor === "plateada") return preescolarTurquesaPlata;
-          if (stolaColor === "azul") return preescolarTurquesaAzul;
-          if (stolaColor === "roja") return preescolarTurquesaRojo;
-          return preescolarMagenta;
+        else if (togaColor === "magenta") {
+          if (stolaColor === "dorada") result = preescolarTurquesaDorado;
+          else if (stolaColor === "plateada") result = preescolarTurquesaPlata;
+          else if (stolaColor === "azul") result = preescolarTurquesaAzul;
+          else if (stolaColor === "roja") result = preescolarTurquesaRojo;
+          else result = preescolarMagenta;
         }
-        if (togaColor === "rojo") {
-          if (stolaColor === "dorada") return preescolarRojoDorado;
-          if (stolaColor === "plateada") return preescolarRojoPlata;
-          if (stolaColor === "azul") return preescolarRojoAzul;
-          if (stolaColor === "roja") return preescolarRojoRojo;
-          return preescolarRojo;
+        else if (togaColor === "rojo") {
+          if (stolaColor === "dorada") result = preescolarRojoDorado;
+          else if (stolaColor === "plateada") result = preescolarRojoPlata;
+          else if (stolaColor === "azul") result = preescolarRojoAzul;
+          else if (stolaColor === "roja") result = preescolarRojoRojo;
+          else result = preescolarRojo;
         }
-        if (togaColor === "verde") {
-          if (stolaColor === "dorada") return preescolarVerdeDorado;
-          if (stolaColor === "plateada") return preescolarVerdePlata;
-          if (stolaColor === "azul") return preescolarVerdeAzul;
-          if (stolaColor === "roja") return preescolarVerdeRojo;
-          return preescolarVerde;
+        else if (togaColor === "verde") {
+          if (stolaColor === "dorada") result = preescolarVerdeDorado;
+          else if (stolaColor === "plateada") result = preescolarVerdePlata;
+          else if (stolaColor === "azul") result = preescolarVerdeAzul;
+          else if (stolaColor === "roja") result = preescolarVerdeRojo;
+          else result = preescolarVerde;
         }
-        
-        // stolaColor specific check for black toga
-        if (stolaColor === "dorada") return preescolarNegroDorado;
-        if (stolaColor === "plateada") return preescolarNegroPlata;
-        if (stolaColor === "azul") return preescolarNegroAzul;
-        if (stolaColor === "roja") return preescolarNegroRojo;
-        
-        return preescolarNegro;
+        else {
+          // stolaColor specific check for black toga
+          if (stolaColor === "dorada") result = preescolarNegroDorado;
+          else if (stolaColor === "plateada") result = preescolarNegroPlata;
+          else if (stolaColor === "azul") result = preescolarNegroAzul;
+          else if (stolaColor === "roja") result = preescolarNegroRojo;
+          else result = preescolarNegro;
+        }
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "esencial") return preescolarEsencial;
-        if (pkg.variant === "hybrid") return preescolarBalance;
-        if (pkg.variant === "max") return preescolarPremium;
-        return preescolarNegro; // fallback
+        if (pkg.variant === "esencial") result = preescolarEsencial;
+        else if (pkg.variant === "hybrid") result = preescolarBalance;
+        else if (pkg.variant === "max") result = preescolarPremium;
+        else result = preescolarNegro; // fallback
       }
     } else if (level === "primaria") {
       if (pkg?.kind === "A") {
-        return primariaPaqueteANegroDorado;
+        result = primariaPaqueteANegroDorado;
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "pri_c") return primariaB1;
-        if (pkg.variant === "pri_b") return primariaB2;
-        if (pkg.variant === "pri_a") return primariaB3;
-        return primariaB1; // fallback for other variants
+        if (pkg.variant === "pri_c") result = { src: primariaB1Base, mask: primariaB1Mask };
+        else if (pkg.variant === "pri_b") result = primariaB2;
+        else if (pkg.variant === "pri_a") result = primariaB3;
+        else result = { src: primariaB1Base, mask: primariaB1Mask }; // fallback for other variants
       }
     } else if (level === "secundaria") {
       if (pkg?.kind === "A") {
-        return secundariaPaqueteANegroDorado;
+        result = secundariaPaqueteANegroDorado;
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "sec_b") return secundariaB1;
-        if (pkg.variant === "sec_a") return secundariaB2;
-        return secundariaB1; // fallback
+        if (pkg.variant === "sec_b") result = secundariaB1;
+        else if (pkg.variant === "sec_a") result = secundariaB2;
+        else result = secundariaB1; // fallback
       }
     } else if (level === "preparatoria") {
       if (pkg?.kind === "A") {
-        return preparatoriaPaqueteANegroDorado;
+        result = preparatoriaPaqueteANegroDorado;
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "prep_b") return preparatoriaB1;
-        if (pkg.variant === "prep_a") return preparatoriaB2;
-        return preparatoriaB1; // fallback
+        if (pkg.variant === "prep_b") result = preparatoriaB1;
+        else if (pkg.variant === "prep_a") result = preparatoriaB2;
+        else result = preparatoriaB1; // fallback
       } else if (pkg?.kind === "C") {
-        if (pkg.variant === "prep_c1") return preparatoriaC1;
-        if (pkg.variant === "prep_c2") return preparatoriaC2;
-        return preparatoriaC1; // fallback
+        if (pkg.variant === "prep_c1") result = preparatoriaC1;
+        else if (pkg.variant === "prep_c2") result = preparatoriaC2;
+        else result = preparatoriaC1; // fallback
       }
     } else if (level === "universidad") {
       if (pkg?.kind === "A") {
-        return uniA;
+        result = uniA;
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "uni_b") return uniB;
-        if (pkg.variant === "uni_c") return uniC;
-        return uniB; // fallback
+        if (pkg.variant === "uni_b") result = uniB;
+        else if (pkg.variant === "uni_c") result = uniC;
+        else result = uniB; // fallback
       }
     }
-    return gownImg; // default generic fallback for other levels
+    
+    // Normalize return type
+    return typeof result === "string" ? { src: result } : result;
   }, [level, pkg, togaColor, stolaColor]);
 
   return (
@@ -353,18 +358,40 @@ export function StepConfig({
           <div className="relative bg-cream/60 lg:sticky lg:top-0 lg:self-start">
             <div className="aspect-[4/5] lg:aspect-auto lg:h-[680px] w-full overflow-hidden relative flex items-center justify-center p-0">
               <AnimatePresence mode="wait">
-                <motion.img
-                  key={showcaseImage}
-                  src={showcaseImage}
-                  alt="Toga de graduación premium con estola"
-                  width={896}
-                  height={1152}
+                <motion.div
+                  key={showcaseMedia.src + (showcaseMedia.mask ? stolaColor : "")}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25 }}
-                  className={`w-full h-full ${level === "universidad" ? "object-fill" : "object-cover"}`}
-                />
+                  className="absolute inset-0 w-full h-full"
+                >
+                  <img
+                    src={showcaseMedia.src}
+                    alt="Toga de graduación premium"
+                    className={`w-full h-full ${level === "universidad" ? "object-fill" : "object-cover"}`}
+                  />
+                  {showcaseMedia.mask && (() => {
+                    const activeStola = STOLA_COLORS.find((c) => c.id === stolaColor);
+                    const stolaBg = (activeStola as any)?.gradient || activeStola?.hex || "transparent";
+                    return (
+                      <div 
+                        className={`absolute inset-0 mix-blend-multiply ${level === "universidad" ? "[mask-size:100%_100%]" : "[mask-size:cover]"}`}
+                        style={{
+                          background: stolaBg,
+                          WebkitMaskImage: `url(${showcaseMedia.mask})`,
+                          WebkitMaskSize: level === "universidad" ? "100% 100%" : "cover",
+                          WebkitMaskPosition: "center",
+                          WebkitMaskRepeat: "no-repeat",
+                          maskImage: `url(${showcaseMedia.mask})`,
+                          maskSize: level === "universidad" ? "100% 100%" : "cover",
+                          maskPosition: "center",
+                          maskRepeat: "no-repeat"
+                        }}
+                      />
+                    );
+                  })()}
+                </motion.div>
               </AnimatePresence>
             </div>
           </div>
