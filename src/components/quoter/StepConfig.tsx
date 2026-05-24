@@ -700,7 +700,7 @@ export function StepConfig({
                   Color de Estola
                 </p>
                 <div className="flex flex-wrap gap-2.5">
-                  {STOLA_COLORS.filter((s) => level === "preescolar" || s.id === "dorada").map((s) => {
+                  {STOLA_COLORS.filter((s) => level === "preescolar" || pkg?.kind === "B" || pkg?.kind === "C" || s.id === "dorada").map((s) => {
                     const active = stolaColor === s.id;
                     return (
                       <button
