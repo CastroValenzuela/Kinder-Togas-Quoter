@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useLocation } from "@tanstack/react-router";
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
@@ -103,6 +103,9 @@ const ADMIN_EMAILS = [
 ];
 
 export function AdminDashboard() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loginEmail, setLoginEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -232,6 +235,13 @@ export function AdminDashboard() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Redirect /login to /dashboard when authenticated
+  useEffect(() => {
+    if (isAuthenticated && location.pathname === "/login") {
+      navigate({ to: "/dashboard", replace: true });
+    }
+  }, [isAuthenticated, location.pathname, navigate]);
 
   // Fetch quotes
   const fetchQuotes = async (showRefreshed = false) => {
