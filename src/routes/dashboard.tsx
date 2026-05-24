@@ -2779,7 +2779,7 @@ export function AdminDashboard() {
           const selectedDayStr = selectedCalendarDay ? formatDayStr(selectedCalendarDay) : "";
           const dayDeliveries = quotes.filter(q => {
             if (!q.estimated_date) return false;
-            const qDateStr = q.estimated_date.split("T")[0];
+            const qDateStr = formatDayStr(new Date(q.estimated_date));
             return qDateStr === selectedDayStr;
           });
           
@@ -2915,7 +2915,7 @@ export function AdminDashboard() {
                       // Filter quotes for this day cell
                       const cellQuotes = quotes.filter(q => {
                         if (!q.estimated_date) return false;
-                        return q.estimated_date.split("T")[0] === cellDateStr;
+                        return formatDayStr(new Date(q.estimated_date)) === cellDateStr;
                       });
                       
                       return (
