@@ -374,19 +374,37 @@ export function StepConfig({
                   {showcaseMedia.mask && (() => {
                     const activeStola = STOLA_COLORS.find((c) => c.id === stolaColor);
                     const stolaBg = (activeStola as any)?.gradient || activeStola?.hex || "transparent";
+                    const isBlackStola = stolaColor === "negro";
+
+                    const maskStyles = {
+                      WebkitMaskImage: `url(${showcaseMedia.mask})`,
+                      WebkitMaskSize: level === "universidad" ? "100% 100%" : "contain",
+                      WebkitMaskPosition: "center",
+                      WebkitMaskRepeat: "no-repeat",
+                      maskImage: `url(${showcaseMedia.mask})`,
+                      maskSize: level === "universidad" ? "100% 100%" : "contain",
+                      maskPosition: "center",
+                      maskRepeat: "no-repeat"
+                    };
+
+                    if (isBlackStola) {
+                      return (
+                        <div className="absolute inset-0" style={maskStyles}>
+                          <img
+                            src={showcaseMedia.src}
+                            alt="Estola negra con logos blancos"
+                            className={`w-full h-full ${level === "universidad" ? "object-fill" : "object-contain"} invert grayscale brightness-110 contrast-125`}
+                          />
+                        </div>
+                      );
+                    }
+
                     return (
                       <div 
-                        className={`absolute inset-0 mix-blend-multiply ${level === "universidad" ? "[mask-size:100%_100%]" : "[mask-size:contain]"}`}
+                        className={`absolute inset-0 mix-blend-multiply`}
                         style={{
                           background: stolaBg,
-                          WebkitMaskImage: `url(${showcaseMedia.mask})`,
-                          WebkitMaskSize: level === "universidad" ? "100% 100%" : "contain",
-                          WebkitMaskPosition: "center",
-                          WebkitMaskRepeat: "no-repeat",
-                          maskImage: `url(${showcaseMedia.mask})`,
-                          maskSize: level === "universidad" ? "100% 100%" : "contain",
-                          maskPosition: "center",
-                          maskRepeat: "no-repeat"
+                          ...maskStyles
                         }}
                       />
                     );
