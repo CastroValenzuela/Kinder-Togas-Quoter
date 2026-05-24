@@ -35,10 +35,8 @@ async function generateSequentialFolio(service: ServiceType | undefined, city: C
   const currentYear = new Date().getFullYear();
   let seq = 1;
   try {
-    const { count, error } = await supabase
-      .from('quotes')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', `${currentYear}-01-01T00:00:00Z`);
+    const { data: count, error } = await supabase
+      .rpc('get_quote_count_for_year', { year_param: currentYear });
     if (!error) {
       seq = (count || 0) + 1;
     }
