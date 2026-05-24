@@ -29,6 +29,26 @@ import { supabase } from "@/lib/supabase";
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
+async function generateSequentialFolio(service: ServiceType | undefined, city: City | undefined): Promise<string> {
+  const typePrefix = service === 'renta' ? 'R' : 'V';
+  const cityPrefix = service === 'renta' ? (city === 'tijuana' ? 'TJ' : 'EN') : 'MX';
+  const currentYear = new Date().getFullYear();
+  let seq = 1;
+  try {
+    const { count, error } = await supabase
+      .from('quotes')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', `${currentYear}-01-01T00:00:00Z`);
+    if (!error) {
+      seq = (count || 0) + 1;
+    }
+  } catch (err) {
+    console.error("Error fetching count:", err);
+    seq = Math.floor(1000 + Math.random() * 9000);
+  }
+  return `KT-${typePrefix}-${cityPrefix}-${currentYear}-${seq}`;
+}
+
 export function Quoter() {
   // SSR-safe localStorage helper
   const ls = (key: string) => typeof window !== "undefined" ? localStorage.getItem(key) : null;
@@ -99,11 +119,7 @@ export function Quoter() {
         
         let qNum = quoteNumber;
         if (!qNum) {
-          const typePrefix = service === 'renta' ? 'R' : 'V';
-          const cityPrefix = service === 'renta' 
-            ? (city === 'tijuana' ? 'TJ' : 'EN')
-            : 'MX';
-          qNum = `KT-${typePrefix}-${cityPrefix}-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+          qNum = await generateSequentialFolio(service, city);
         }
 
         // Anti-spam checks:
@@ -174,15 +190,12 @@ export function Quoter() {
     5: true,
   };
 
-  const goNext = () => {
+  const goNext = async () => {
     if (!canNext[step]) return;
     
     if (step === 4) {
       // Generate Folio early to open WhatsApp with it
-      const typePrefix = service === 'renta' ? 'R' : 'V';
-      const cityPrefix = service === 'renta' ? (city === 'tijuana' ? 'TJ' : 'EN') : 'MX';
-      const qNum = `KT-${typePrefix}-${cityPrefix}-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      
+      const qNum = quoteNumber || await generateSequentialFolio(service, city);
       setQuoteNumber(qNum);
       setStep(5);
     } else if (step < 5) {
