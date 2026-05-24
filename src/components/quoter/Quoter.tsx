@@ -61,7 +61,7 @@ export function Quoter() {
   const [city, setCity] = useState<City | undefined>(() => (ls("kt-quote-city") as City) || "ensenada");
   const [pkg, setPkg] = useState<PackageChoice | undefined>(() => {
     const saved = ls("kt-quote-pkg");
-    return saved ? JSON.parse(saved) : undefined;
+    return saved ? JSON.parse(saved) : { kind: "A" };
   });
   const [quantity, setQuantity] = useState(() => Number(ls("kt-quote-qty")) || 1);
   const [school, setSchool] = useState(() => ls("kt-quote-school") || "");
