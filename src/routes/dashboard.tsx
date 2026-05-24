@@ -102,7 +102,7 @@ const ADMIN_EMAILS = [
   "crm_admin@kindertogas.com"
 ];
 
-function AdminDashboard() {
+export function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loginEmail, setLoginEmail] = useState<string>(() => localStorage.getItem("kt_remember_email") || "");
   const [password, setPassword] = useState<string>("");
@@ -1614,7 +1614,7 @@ function AdminDashboard() {
       <main className="flex-1 w-full max-w-full px-4 sm:px-8 mx-auto py-4 sm:py-8 space-y-8">
         
         {/* Navigation Tabs */}
-        <div className="flex border-b border-hairline/80 gap-6">
+        <div className="flex border-b border-hairline/80 gap-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
           <button
             onClick={() => setActiveTab('crm')}
             className={cn(
@@ -2867,10 +2867,27 @@ function AdminDashboard() {
                   </div>
                 </div>
                 
-                <div className="space-y-0 text-slate-800">
-                  {/* Days of Week Row */}
-                  {calendarView !== 'day' && (
-                    <div className="grid grid-cols-7 text-center select-none bg-slate-100 border-b border-slate-200">
+                {/* Color Legend */}
+                <div className="flex flex-wrap items-center gap-4 px-2 py-1 mb-2">
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Contratos Cerrados
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                    <span className="h-2.5 w-2.5 rounded-full bg-blue-500"></span> Contactados
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Pendientes (Sin Contactar)
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                    <span className="h-2.5 w-2.5 rounded-full bg-slate-400"></span> Archivados / Perdidos
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto pb-4">
+                  <div className="space-y-0 text-slate-800 min-w-[700px]">
+                    {/* Days of Week Row */}
+                    {calendarView !== 'day' && (
+                      <div className="grid grid-cols-7 text-center select-none bg-slate-100 border-b border-slate-200">
                       {["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"].map((d, i) => (
                         <div key={d} className="text-[11px] font-semibold text-slate-600 py-2 flex flex-col border-r border-slate-200 last:border-r-0">
                           {d}
@@ -2995,6 +3012,7 @@ function AdminDashboard() {
                       );
                     })}
                   </div>
+                </div>
                 </div>
               </div>
               
