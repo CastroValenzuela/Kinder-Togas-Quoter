@@ -389,24 +389,36 @@ export function StepConfig({
 
                     if (isBlackStola) {
                       return (
-                        <div className="absolute inset-0" style={maskStyles}>
-                          <img
-                            src={showcaseMedia.src}
-                            alt="Estola negra con logos blancos"
-                            className={`w-full h-full ${level === "universidad" ? "object-fill" : "object-contain"} invert grayscale brightness-110 contrast-125`}
-                          />
+                        <div 
+                          className="absolute inset-0" 
+                          style={{ filter: `drop-shadow(0 0 1px #1A1A1A) drop-shadow(0 0 2px #1A1A1A)` }}
+                        >
+                          <div className="w-full h-full" style={maskStyles}>
+                            <img
+                              src={showcaseMedia.src}
+                              alt="Estola negra con logos blancos"
+                              className={`w-full h-full ${level === "universidad" ? "object-fill" : "object-contain"} invert grayscale brightness-110 contrast-125`}
+                            />
+                          </div>
                         </div>
                       );
                     }
 
+                    const stolaSolidHex = activeStola?.hex || "transparent";
+
                     return (
                       <div 
-                        className={`absolute inset-0 mix-blend-multiply`}
-                        style={{
-                          background: stolaBg,
-                          ...maskStyles
-                        }}
-                      />
+                        className="absolute inset-0 mix-blend-multiply"
+                        style={{ filter: `drop-shadow(0 0 1px ${stolaSolidHex}) drop-shadow(0 0 1.5px ${stolaSolidHex})` }}
+                      >
+                        <div 
+                          className="w-full h-full"
+                          style={{
+                            background: stolaBg,
+                            ...maskStyles
+                          }}
+                        />
+                      </div>
                     );
                   })()}
                 </motion.div>
