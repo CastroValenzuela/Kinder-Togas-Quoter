@@ -721,7 +721,7 @@ export function StepConfig({
                       >
                         <span
                           className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
-                          style={{ backgroundColor: s.hex }}
+                          style={{ background: (s as any).gradient || s.hex }}
                         />
                         <span>{s.label}</span>
                       </button>

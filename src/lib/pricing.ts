@@ -50,8 +50,8 @@ export function colorLabel(color?: string): string {
 }
 
 export const STOLA_COLORS = [
-  { id: "dorada", label: "Dorado", hex: "#EAB308", isBasic: true },
-  { id: "plateada", label: "Plateada", hex: "#94A3B8", isBasic: true },
+  { id: "dorada", label: "Dorado", hex: "#EAB308", isBasic: true, gradient: "linear-gradient(135deg, #fef08a 0%, #eab308 50%, #ca8a04 100%)" },
+  { id: "plateada", label: "Plateada", hex: "#94A3B8", isBasic: true, gradient: "linear-gradient(135deg, #e2e8f0 0%, #94a3b8 50%, #64748b 100%)" },
   { id: "azul", label: "Azul Rey", hex: "#1D4ED8", isBasic: true },
   { id: "roja", label: "Rojo", hex: "#DC2626", isBasic: true },
   { id: "verde_esmeralda", label: "Verde Esmeralda", hex: "#10B981" },
