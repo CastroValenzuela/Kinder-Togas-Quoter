@@ -145,6 +145,7 @@ function AdminDashboard() {
   // Calendar states
   const [currentCalendarDate, setCurrentCalendarDate] = useState<Date>(new Date());
   const [selectedCalendarDay, setSelectedCalendarDay] = useState<Date | null>(new Date());
+  const [calendarView, setCalendarView] = useState<'month' | 'week' | 'day'>('month');
   
   // Pricing states
   const [pricingList, setPricingList] = useState<{ key: string; price: number; discount_percent: number }[]>([]);
@@ -2674,6 +2675,20 @@ function AdminDashboard() {
           const year = currentCalendarDate.getFullYear();
           const month = currentCalendarDate.getMonth();
           
+          const navigateCalendar = (dir: number) => {
+            if (calendarView === 'month') {
+              setCurrentCalendarDate(new Date(year, month + dir, 1));
+            } else if (calendarView === 'week') {
+              const newDate = new Date(currentCalendarDate);
+              newDate.setDate(newDate.getDate() + (dir * 7));
+              setCurrentCalendarDate(newDate);
+            } else if (calendarView === 'day') {
+              const newDate = new Date(currentCalendarDate);
+              newDate.setDate(newDate.getDate() + dir);
+              setCurrentCalendarDate(newDate);
+            }
+          };
+          
           // First day of the month
           const firstDayOfMonth = new Date(year, month, 1);
           // Days in month
@@ -2734,6 +2749,26 @@ function AdminDashboard() {
             return `${y}-${m}-${day}`;
           };
           
+          const getDisplayCells = () => {
+            if (calendarView === 'month') return calendarCells;
+            const currDateStr = formatDayStr(currentCalendarDate);
+            
+            if (calendarView === 'week') {
+              const idx = calendarCells.findIndex(c => formatDayStr(c.date) === currDateStr);
+              if (idx !== -1) {
+                const weekStartIdx = Math.floor(idx / 7) * 7;
+                return calendarCells.slice(weekStartIdx, weekStartIdx + 7);
+              }
+              return calendarCells.slice(0, 7);
+            }
+            if (calendarView === 'day') {
+              const cell = calendarCells.find(c => formatDayStr(c.date) === currDateStr);
+              return cell ? [cell] : [];
+            }
+            return calendarCells;
+          };
+          const displayCells = getDisplayCells();
+          
           // Deliveries for selected calendar day
           const selectedDayStr = selectedCalendarDay ? formatDayStr(selectedCalendarDay) : "";
           const dayDeliveries = quotes.filter(q => {
@@ -2767,37 +2802,60 @@ function AdminDashboard() {
                   </div>
                   
                   {/* Calendar Navigation */}
-                  <div className="flex items-center gap-2 select-none self-end sm:self-center">
-                    <button
-                      type="button"
-                      onClick={() => setCurrentCalendarDate(new Date(year, month - 1, 1))}
-                      className="p-2 border border-hairline hover:bg-cream/20 text-navy rounded-xl transition-all cursor-pointer"
-                      title="Mes Anterior"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const t = new Date();
-                        setCurrentCalendarDate(t);
-                        setSelectedCalendarDay(t);
-                      }}
-                      className="px-3 py-1.5 border border-hairline hover:bg-cream/20 text-navy text-xs font-bold rounded-xl transition-all cursor-pointer"
-                      title="Ir a Hoy"
-                    >
-                      Hoy
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentCalendarDate(new Date(year, month + 1, 1))}
-                      className="p-2 border border-hairline hover:bg-cream/20 text-navy rounded-xl transition-all cursor-pointer"
-                      title="Siguiente Mes"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
-                    <div className="ml-2 font-display text-base font-extrabold text-navy min-w-[120px] text-center">
-                      {monthNames[month]} {year}
+                  <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4 select-none self-end sm:self-center">
+                    <div className="flex bg-slate-100/80 p-1.5 rounded-xl border border-slate-200/50">
+                      {(['month', 'week', 'day'] as const).map(view => (
+                        <button
+                          key={view}
+                          onClick={() => setCalendarView(view)}
+                          className={cn(
+                            "px-4 py-1.5 text-[11px] font-extrabold rounded-lg transition-all capitalize uppercase tracking-wider",
+                            calendarView === view ? "bg-white text-navy shadow-sm border border-slate-200/50" : "text-muted-foreground hover:text-navy hover:bg-slate-200/30"
+                          )}
+                        >
+                          {view === 'month' ? 'Mes' : view === 'week' ? 'Semana' : 'Día'}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => navigateCalendar(-1)}
+                        className="p-2 border border-hairline hover:bg-cream/20 text-navy rounded-xl transition-all cursor-pointer bg-white shadow-sm"
+                        title="Anterior"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const t = new Date();
+                          setCurrentCalendarDate(t);
+                          setSelectedCalendarDay(t);
+                          if (calendarView === 'month') setCalendarView('month');
+                        }}
+                        className="px-3 py-1.5 border border-hairline hover:bg-cream/20 text-navy text-xs font-bold rounded-xl transition-all cursor-pointer bg-white shadow-sm"
+                        title="Ir a Hoy"
+                      >
+                        Hoy
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => navigateCalendar(1)}
+                        className="p-2 border border-hairline hover:bg-cream/20 text-navy rounded-xl transition-all cursor-pointer bg-white shadow-sm"
+                        title="Siguiente"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                      <div className="ml-2 font-display text-base font-extrabold text-navy min-w-[140px] text-center flex flex-col leading-tight">
+                        <span>{monthNames[month]} {year}</span>
+                        {calendarView !== 'month' && (
+                          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                            {calendarView === 'week' ? 'Vista por Semana' : 'Vista por Día'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2824,17 +2882,22 @@ function AdminDashboard() {
                 {/* Calendar Grid */}
                 <div className="space-y-2.5">
                   {/* Days of Week Row */}
-                  <div className="grid grid-cols-7 gap-1 text-center select-none">
-                    {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(d => (
-                      <div key={d} className="text-[10px] uppercase tracking-wider text-muted-foreground font-extrabold py-2">
-                        {d}
-                      </div>
-                    ))}
-                  </div>
+                  {calendarView !== 'day' && (
+                    <div className="grid grid-cols-7 gap-1 text-center select-none">
+                      {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(d => (
+                        <div key={d} className="text-[10px] uppercase tracking-wider text-muted-foreground font-extrabold py-2">
+                          {d}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   
-                  {/* 42 Cells Grid */}
-                  <div className="grid grid-cols-7 gap-1.5">
-                    {calendarCells.map((cell) => {
+                  {/* Grid */}
+                  <div className={cn(
+                    "grid gap-1.5",
+                    calendarView === 'day' ? "grid-cols-1" : "grid-cols-7"
+                  )}>
+                    {displayCells.map((cell) => {
                       const cellDateStr = formatDayStr(cell.date);
                       const isToday = formatDayStr(new Date()) === cellDateStr;
                       const isSelected = selectedCalendarDay && formatDayStr(selectedCalendarDay) === cellDateStr;
@@ -2861,8 +2924,9 @@ function AdminDashboard() {
                           type="button"
                           onClick={() => setSelectedCalendarDay(cell.date)}
                           className={cn(
-                            "min-h-[75px] border rounded-2xl p-2.5 flex flex-col justify-between transition-all text-left relative group cursor-pointer active:scale-[0.98] select-none",
-                            cell.isCurrentMonth 
+                            "border rounded-2xl p-2.5 flex flex-col justify-start transition-all text-left relative group cursor-pointer active:scale-[0.98] select-none gap-2",
+                            calendarView === 'month' ? "min-h-[110px]" : calendarView === 'week' ? "min-h-[160px]" : "min-h-[300px]",
+                            cell.isCurrentMonth || calendarView !== 'month'
                               ? "bg-white border-hairline/80 text-foreground" 
                               : "bg-[#F8FAFC] border-hairline/40 text-muted-foreground/60",
                             isToday && "ring-2 ring-navy/15 bg-blue-50/15 border-blue-200",
@@ -2872,46 +2936,101 @@ function AdminDashboard() {
                           )}
                         >
                           {/* Date Number and Today Highlight */}
-                          <div className="flex justify-between items-center w-full">
-                            <span className={cn(
-                              "text-xs font-bold",
-                              isToday && "text-navy font-extrabold bg-blue-100 px-1.5 py-0.5 rounded-md",
-                              cell.isCurrentMonth && !isToday && "text-foreground",
-                              !cell.isCurrentMonth && "text-muted-foreground/60"
-                            )}>
-                              {cell.date.getDate()}
-                            </span>
+                          <div className="flex justify-between items-center w-full pb-1 border-b border-hairline/30">
+                            <div className="flex items-center gap-2">
+                              <span className={cn(
+                                "text-sm font-bold flex items-center justify-center h-6 w-6 rounded-full",
+                                isToday ? "bg-navy text-white font-extrabold" : "",
+                                !isToday && cell.isCurrentMonth && "text-foreground",
+                                !isToday && !cell.isCurrentMonth && "text-muted-foreground/60"
+                              )}>
+                                {cell.date.getDate()}
+                              </span>
+                              {calendarView === 'day' && (
+                                <span className="text-sm font-bold text-navy capitalize">
+                                  {cell.date.toLocaleDateString("es-MX", { weekday: "long" })}
+                                </span>
+                              )}
+                            </div>
                             
                             {/* Short indicators of ceremony counts */}
                             {cellQuotes.length > 0 && (
-                              <span className="text-[9px] font-extrabold text-[#C5A85A] bg-[#C5A85A]/10 px-1 py-0.2 rounded-md scale-90">
-                                {cellQuotes.length}
+                              <span className="text-[10px] font-extrabold text-[#C5A85A] bg-[#C5A85A]/10 px-2 py-0.5 rounded-full">
+                                {cellQuotes.length} eventos
                               </span>
                             )}
                           </div>
                           
-                          {/* Logistics / Events Dots */}
-                          <div className="w-full space-y-1">
-                            {/* Color indicators based on quote statuses */}
-                            {cellQuotes.length > 0 && (
-                              <div className="flex flex-wrap gap-1">
-                                {hasContracted && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" title="Contratado" />}
-                                {hasContacted && <span className="h-1.5 w-1.5 rounded-full bg-blue-500" title="Contactado" />}
-                                {hasPending && <span className="h-1.5 w-1.5 rounded-full bg-amber-500" title="Pendiente" />}
-                              </div>
-                            )}
-                            
-                            {/* Compact student gown count projection */}
-                            {contractedCellGowns > 0 ? (
-                              <div className="text-[8px] font-extrabold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded leading-none truncate max-w-full">
-                                {contractedCellGowns} togas
-                              </div>
-                            ) : cellGowns > 0 ? (
-                              <div className="text-[8px] font-bold text-muted-foreground bg-slate-100 px-1 py-0.5 rounded leading-none truncate max-w-full">
-                                {cellGowns} togas
-                              </div>
-                            ) : null}
-                          </div>
+                          {/* Detailed List for Day/Week view, Summary for Month view */}
+                          {calendarView === 'month' ? (
+                            <div className="w-full space-y-1.5 mt-1 flex-1">
+                              {['contracted', 'contacted', 'pending', 'archived'].map(status => {
+                                const statusQuotes = cellQuotes.filter(q => (q.status || 'pending') === status);
+                                if (statusQuotes.length === 0) return null;
+                                const statusTogas = statusQuotes.reduce((sum, q) => sum + q.student_count, 0);
+                                
+                                const styleMap: Record<string, string> = {
+                                  contracted: "bg-emerald-50 text-emerald-700 border-emerald-200/60 shadow-sm",
+                                  contacted: "bg-blue-50 text-blue-700 border-blue-200/60 shadow-sm",
+                                  pending: "bg-amber-50 text-amber-700 border-amber-200/60 shadow-sm",
+                                  archived: "bg-slate-50 text-slate-600 border-slate-200/60 shadow-sm",
+                                };
+                                const labelMap: Record<string, string> = {
+                                  contracted: "🟢",
+                                  contacted: "🔵",
+                                  pending: "🟡",
+                                  archived: "⚫",
+                                };
+                                
+                                return (
+                                  <div key={status} className={cn("text-[9px] font-bold px-1.5 py-1 rounded border flex items-center justify-between", styleMap[status])}>
+                                    <span className="capitalize flex items-center gap-1">
+                                      <span className="text-[8px]">{labelMap[status]}</span>
+                                      {status === 'contracted' ? 'Contratados' : status === 'contacted' ? 'Contactados' : status === 'pending' ? 'Pendientes' : 'Archivados'}
+                                    </span>
+                                    <span className="bg-white/60 px-1 rounded-sm">{statusTogas} togas</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div className="w-full space-y-2 mt-1 overflow-y-auto max-h-[400px] flex-1">
+                              {cellQuotes.length === 0 && (
+                                <div className="text-xs text-muted-foreground italic p-2 text-center mt-4">
+                                  Libre — Sin entregas agendadas.
+                                </div>
+                              )}
+                              {cellQuotes.map(q => {
+                                const curStatus = q.status || "pending";
+                                const styleMap: Record<string, string> = {
+                                  contracted: "bg-emerald-50 border-emerald-200/60 text-emerald-900 shadow-sm",
+                                  contacted: "bg-blue-50 border-blue-200/60 text-blue-900 shadow-sm",
+                                  pending: "bg-amber-50 border-amber-200/60 text-amber-900 shadow-sm",
+                                  archived: "bg-slate-50 border-slate-200/60 text-slate-900 shadow-sm",
+                                };
+                                const labelMap: Record<string, string> = {
+                                  contracted: "🟢",
+                                  contacted: "🔵",
+                                  pending: "🟡",
+                                  archived: "⚫",
+                                };
+                                return (
+                                  <div key={q.id} className={cn("text-[11px] p-2.5 rounded-xl border flex flex-col gap-1.5 text-left transition-all hover:brightness-95", styleMap[curStatus])}>
+                                    <div className="flex justify-between items-start gap-2">
+                                      <span className="font-extrabold leading-tight">{q.institution_name}</span>
+                                      <span className="text-[10px] bg-white/70 px-1.5 py-0.5 rounded-md font-bold whitespace-nowrap border border-black/5 flex-shrink-0 flex items-center gap-1">
+                                        {labelMap[curStatus]} {q.student_count} <span className="hidden xl:inline">togas</span>
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[9px] font-semibold opacity-80 uppercase tracking-wider">
+                                      <span className="truncate pr-2">#{q.quote_number} • {levelLabel(q.school_level)}</span>
+                                      <span className="bg-black/5 px-1.5 py-0.5 rounded-sm">{q.city === 'tijuana' ? 'TIJ' : 'ENS'}</span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </button>
                       );
                     })}
