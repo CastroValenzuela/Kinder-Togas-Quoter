@@ -9,7 +9,7 @@ export type Level =
 
 export type ServiceType = "renta" | "venta";
 export type City = "tijuana" | "ensenada";
-export type PackageBVariant = "hybrid" | "max" | "sec_a" | "sec_b" | "pri_a" | "pri_b" | "pri_c" | "prep_a" | "prep_b" | "prep_c1" | "prep_c2" | "uni_b" | "uni_c";
+export type PackageBVariant = "esencial" | "hybrid" | "max" | "sec_a" | "sec_b" | "pri_a" | "pri_b" | "pri_c" | "prep_a" | "prep_b" | "prep_c1" | "prep_c2" | "uni_b" | "uni_c";
 export type PackageChoice =
   | { kind: "A" }
   | { kind: "B"; variant?: PackageBVariant }
@@ -81,6 +81,7 @@ export const CITIES: { id: City; label: string }[] = [
 export const PRICES = {
   // Preescolar (desacoplado)
   A_PREESCOLAR: 350,
+  B_ESENCIAL_PREESCOLAR: 450,
   B_BALANCE_PREESCOLAR: 480,
   B_PREMIUM_PREESCOLAR: 510,
 
@@ -113,6 +114,7 @@ export const PRICES = {
 // Descuentos editables (% de descuento) — Objeto mutable
 export const DISCOUNTS = {
   A_PREESCOLAR: 0,
+  B_ESENCIAL_PREESCOLAR: 0,
   B_BALANCE_PREESCOLAR: 0,
   B_PREMIUM_PREESCOLAR: 0,
 
@@ -145,6 +147,7 @@ export const B_VARIANTS: {
   desc: string;
   price: number;
 }[] = [
+  { id: "esencial", code: "B.1", title: "Esencial", desc: "Diseño elegante y discreto", price: PRICES.B_ESENCIAL_PREESCOLAR },
   { id: "hybrid", code: "B.2", title: "Balance", desc: "9×12 cm + 9×35 cm", price: PRICES.B_BALANCE_PRIMARIA },
   { id: "max", code: "B.3", title: "Premium", desc: "9×35 cm en ambos lados", price: PRICES.B_PREMIUM_PRIMARIA },
   { id: "sec_b", code: "B.1", title: "Diseño B1", desc: "Impresión discreta en ambos lados", price: PRICES.SEC_B },
@@ -189,6 +192,7 @@ export async function loadDynamicPrices(): Promise<boolean> {
 
       // 2. Sincronizar los precios dentro de B_VARIANTS para que las opciones del cotizador se enteren de la tarifa real
       B_VARIANTS.forEach((variant) => {
+        if (variant.id === "esencial") variant.price = PRICES.B_ESENCIAL_PREESCOLAR;
         if (variant.id === "hybrid") variant.price = PRICES.B_BALANCE_PRIMARIA;
         if (variant.id === "max") variant.price = PRICES.B_PREMIUM_PRIMARIA;
         if (variant.id === "sec_b") variant.price = PRICES.SEC_B;
@@ -227,6 +231,11 @@ export function getPriceKey(pkg?: PackageChoice, level?: Level): keyof typeof PR
     if (level === "preparatoria") return "A_PREPARATORIA";
     if (level === "universidad") return "UNI_A";
     return "A_PRIMARIA"; // fallback seguro
+  }
+  
+  if (pkg.variant === "esencial") {
+    if (level === "preescolar") return "B_ESENCIAL_PREESCOLAR";
+    return "B_ESENCIAL_PREESCOLAR"; // fallback seguro
   }
   
   if (pkg.variant === "hybrid") {

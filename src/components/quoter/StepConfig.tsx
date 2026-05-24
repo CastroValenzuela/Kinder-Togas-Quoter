@@ -4,6 +4,7 @@ import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, Gradua
 import gownImg from "@/assets/gown-showcase.jpg";
 
 import preescolarBalance from "@/assets/Preescolar/balance.jpg";
+import preescolarEsencial from "@/assets/Preescolar/esencial.jpg";
 
 import preescolarNegroAzul from "@/assets/Preescolar/Paquete A/negro-azul.jpg";
 import preescolarNegroDorado from "@/assets/Preescolar/Paquete A/negro-dorado.jpg";
@@ -97,7 +98,12 @@ const FEATURES_A = [
   { icon: Truck, text: "Entrega y recolección coordinadas." },
 ];
 
-const FEATURES_B: Record<"hybrid" | "max", { icon: typeof Camera; text: string }[]> = {
+const FEATURES_B: Record<"esencial" | "hybrid" | "max", { icon: typeof Camera; text: string }[]> = {
+  esencial: [
+    { icon: Camera, text: "Diseño compacto 9x12 cm en ambos lados." },
+    { icon: Shirt, text: "Incluye toga premium, birrete, borla del año y estola." },
+    { icon: Truck, text: "Entrega y recolección coordinadas." },
+  ],
   hybrid: [
     { icon: Camera, text: "Impresión combinada 9×12 cm + 9×35 cm panorámica." },
     { icon: Shirt, text: "Toga premium, birrete, borla del año y estola." },
@@ -237,7 +243,7 @@ export function StepConfig({
         features = FEATURES_B_PREP[pkg.variant as "prep_a" | "prep_b"] || FEATURES_A;
       }
     } else {
-      features = FEATURES_B[pkg.variant as "hybrid" | "max"] || FEATURES_A;
+      features = FEATURES_B[pkg.variant as "esencial" | "hybrid" | "max"] || FEATURES_A;
     }
   }
 
@@ -284,6 +290,7 @@ export function StepConfig({
         
         return preescolarNegro;
       } else if (pkg?.kind === "B") {
+        if (pkg.variant === "esencial") return preescolarEsencial;
         if (pkg.variant === "hybrid") return preescolarBalance;
         if (pkg.variant === "max") return preescolarPremium;
         return preescolarNegro; // fallback
@@ -342,7 +349,6 @@ export function StepConfig({
 
       <div className="rounded-2xl border border-hairline bg-card overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.04),0_20px_50px_-30px_rgba(17,34,68,0.18)]">
         <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr]">
-          {/* LEFT — Visual showcase */}
           {/* LEFT — Visual showcase */}
           <div className="relative bg-cream/60 lg:sticky lg:top-0 lg:self-start">
             <div className="aspect-[4/5] lg:aspect-auto lg:h-[680px] w-full overflow-hidden relative flex items-center justify-center p-0">
@@ -505,13 +511,13 @@ export function StepConfig({
                               onPkg({ kind: "C", variant });
                             } else if (k === "B") {
                               let defaultVariant: PackageBVariant | undefined = undefined;
-                              if (level === "preescolar") defaultVariant = "hybrid";
+                              if (level === "preescolar") defaultVariant = "esencial";
                               else if (level === "primaria") defaultVariant = "pri_c";
                               else if (level === "secundaria") defaultVariant = "sec_b";
                               else if (level === "preparatoria") defaultVariant = "prep_b";
 
                               const hasValidBVariant = pkg?.kind === "B" && pkg?.variant && (
-                                (level === "preescolar" && (pkg.variant === "hybrid" || pkg.variant === "max")) ||
+                                (level === "preescolar" && (pkg.variant === "esencial" || pkg.variant === "hybrid" || pkg.variant === "max")) ||
                                 (level === "primaria" && (pkg.variant === "pri_c" || pkg.variant === "pri_b" || pkg.variant === "pri_a")) ||
                                 (level === "secundaria" && (pkg.variant === "sec_b" || pkg.variant === "sec_a")) ||
                                 (level === "preparatoria" && (pkg.variant === "prep_b" || pkg.variant === "prep_a"))

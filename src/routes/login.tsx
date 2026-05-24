@@ -289,6 +289,7 @@ function AdminDashboard() {
       // Static fallback list to merge and keep consistent if any keys are missing in DB
       const staticKeys = [
         { key: "A_PREESCOLAR", price: 350, discount_percent: 0 },
+        { key: "B_ESENCIAL_PREESCOLAR", price: 450, discount_percent: 0 },
         { key: "B_BALANCE_PREESCOLAR", price: 480, discount_percent: 0 },
         { key: "B_PREMIUM_PREESCOLAR", price: 510, discount_percent: 0 },
         { key: "A_PRIMARIA", price: 350, discount_percent: 0 },
@@ -571,6 +572,7 @@ function AdminDashboard() {
       return "Paquete A — Básico";
     }
     const labels: Record<string, string> = {
+      esencial: "Paquete B — B.1 Esencial",
       hybrid: "Paquete B — B.2 Balance",
       max: "Paquete B — B.3 Premium",
       sec_b: "Paquete B — B.1 Diseño B1",
@@ -2493,6 +2495,7 @@ function AdminDashboard() {
                 const pricingMeta = [
                   // Preescolar (desacoplado)
                   { key: "A_PREESCOLAR", title: "Paquete A — Básico (Preescolar)", desc: "Toga y Estola Lisa estándar para ceremonias tradicionales de Preescolar.", levels: ["preescolar"] },
+                  { key: "B_ESENCIAL_PREESCOLAR", title: "Paquete B — Esencial (Preescolar)", desc: "Estola con diseño compacto 9x12 cm en ambos lados (B.1) para Preescolar.", levels: ["preescolar"] },
                   { key: "B_BALANCE_PREESCOLAR", title: "Paquete B — Balance (Preescolar)", desc: "Estola con logo e impresión mixta mediana (B.2) para Preescolar.", levels: ["preescolar"] },
                   { key: "B_PREMIUM_PREESCOLAR", title: "Paquete B — Premium (Preescolar)", desc: "Estola con logo e impresión gigante completa (B.3) para Preescolar.", levels: ["preescolar"] },
 
