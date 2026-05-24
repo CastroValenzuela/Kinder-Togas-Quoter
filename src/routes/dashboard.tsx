@@ -104,7 +104,7 @@ const ADMIN_EMAILS = [
 
 export function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [loginEmail, setLoginEmail] = useState<string>(() => localStorage.getItem("kt_remember_email") || "");
+  const [loginEmail, setLoginEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [authError, setAuthError] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -115,7 +115,13 @@ export function AdminDashboard() {
   const [regPassword, setRegPassword] = useState<string>("");
   const [regConfirmPassword, setRegConfirmPassword] = useState<string>("");
   const [regSuccess, setRegSuccess] = useState<boolean>(false);
-  const [rememberMe, setRememberMe] = useState<boolean>(() => localStorage.getItem("kt_remember_me") !== "false");
+  const [rememberMe, setRememberMe] = useState<boolean>(true);
+
+  // Hydrate localStorage values on client side
+  useEffect(() => {
+    setLoginEmail(localStorage.getItem("kt_remember_email") || "");
+    setRememberMe(localStorage.getItem("kt_remember_me") !== "false");
+  }, []);
   
   // Password Recovery / Reset States
   const [resetPassword, setResetPassword] = useState<string>("");
