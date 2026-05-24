@@ -1,3 +1,4 @@
+import ReactGoogleAutocomplete from "react-google-autocomplete";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, CalendarIcon } from "lucide-react";
@@ -9,12 +10,14 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   school: string;
+  schoolAddress: string;
   contact: string;
   phone: string;
   date: string;
   email: string;
   honeypot: string;
   onSchool: (s: string) => void;
+  onSchoolAddress: (s: string) => void;
   onContact: (c: string) => void;
   onPhone: (p: string) => void;
   onDate: (d: string) => void;
@@ -25,12 +28,14 @@ type Props = {
 
 export function StepDetails({
   school,
+  schoolAddress,
   contact,
   phone,
   date,
   email,
   honeypot,
   onSchool,
+  onSchoolAddress,
   onContact,
   onPhone,
   onDate,
@@ -74,16 +79,39 @@ export function StepDetails({
 
         <div className="space-y-2">
           <Label htmlFor="school">Institución o Escuela</Label>
-          <Input
+          <ReactGoogleAutocomplete
             id="school"
+            apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""}
+            options={{
+              types: ["establishment"],
+              componentRestrictions: { country: "mx" },
+            }}
+            onPlaceSelected={(place: any) => {
+              const name = place?.name || place?.formatted_address || "";
+              const address = place?.formatted_address || "";
+              onSchool(name);
+              onSchoolAddress(address);
+            }}
+            defaultValue={school}
+            onChange={(e: any) => {
+              onSchool(e.target.value);
+              if (e.target.value !== school) {
+                onSchoolAddress(""); // clear address if they start typing something else
+              }
+            }}
             placeholder="Ej. Primaria Benito Juárez"
-            value={school}
-            onChange={(e) => onSchool(e.target.value)}
-            className="h-12 text-base"
+            className="flex h-12 w-full rounded-md border border-input bg-transparent px-3 py-1 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 text-base"
           />
-          <p className="text-[10px] text-muted-foreground mt-1.5 ml-1">
-            Mínimo 3 caracteres
-          </p>
+          {schoolAddress && (
+            <p className="text-[10px] text-emerald-600 mt-1.5 ml-1 font-semibold flex items-center gap-1">
+              ✓ Ubicación encontrada: {schoolAddress}
+            </p>
+          )}
+          {!schoolAddress && (
+            <p className="text-[10px] text-muted-foreground mt-1.5 ml-1">
+              Escribe al menos 3 letras y selecciona tu escuela de la lista.
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">

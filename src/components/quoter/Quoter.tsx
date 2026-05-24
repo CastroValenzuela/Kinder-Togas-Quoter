@@ -65,6 +65,7 @@ export function Quoter() {
   });
   const [quantity, setQuantity] = useState(() => Number(ls("kt-quote-qty")) || 1);
   const [school, setSchool] = useState(() => ls("kt-quote-school") || "");
+  const [schoolAddress, setSchoolAddress] = useState(() => ls("kt-quote-school-address") || "");
   const [contact, setContact] = useState(() => ls("kt-quote-contact") || "");
   const [phone, setPhone] = useState(() => ls("kt-quote-phone") || "");
   const [date, setDate] = useState(() => ls("kt-quote-date") || "");
@@ -99,6 +100,7 @@ export function Quoter() {
     else localStorage.removeItem("kt-quote-pkg");
     localStorage.setItem("kt-quote-qty", String(quantity));
     localStorage.setItem("kt-quote-school", school);
+    localStorage.setItem("kt-quote-school-address", schoolAddress);
     localStorage.setItem("kt-quote-contact", contact);
     localStorage.setItem("kt-quote-phone", phone);
     localStorage.setItem("kt-quote-date", date);
@@ -107,7 +109,7 @@ export function Quoter() {
     localStorage.setItem("kt-quote-stola-color", stolaColor);
     if (quoteNumber) localStorage.setItem("kt-quote-number", quoteNumber);
     else localStorage.removeItem("kt-quote-number");
-  }, [step, level, service, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, togaColor, stolaColor]);
+  }, [step, level, service, city, pkg, quantity, school, schoolAddress, contact, phone, date, email, quoteNumber, togaColor, stolaColor]);
 
   const total = useMemo(() => unitPrice(pkg, level) * quantity, [pkg, level, quantity, pricesLoaded]);
 
@@ -140,6 +142,7 @@ export function Quoter() {
           const payload = {
             quote_number: qNum,
             institution_name: school,
+            institution_address: schoolAddress || null,
             contact_name: contact,
             contact_phone: phone,
             contact_email: email || null,
@@ -420,12 +423,14 @@ export function Quoter() {
             {step === 4 && (
               <StepDetails
                 school={school}
+                schoolAddress={schoolAddress}
                 contact={contact}
                 phone={phone}
                 date={date}
                 email={email}
                 honeypot={honeypot}
                 onSchool={setSchool}
+                onSchoolAddress={setSchoolAddress}
                 onContact={setContact}
                 onPhone={setPhone}
                 onDate={setDate}

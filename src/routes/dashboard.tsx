@@ -64,6 +64,7 @@ interface QuoteRecord {
   id: string;
   quote_number: string;
   institution_name: string;
+  institution_address?: string | null;
   contact_name: string;
   contact_phone: string;
   contact_email: string | null;
@@ -875,6 +876,7 @@ export function AdminDashboard() {
       "Folio",
       "Fecha Creacion",
       "Institucion",
+      "Direccion",
       "Contacto",
       "Telefono",
       "Email",
@@ -897,6 +899,7 @@ export function AdminDashboard() {
       q.quote_number,
       new Date(q.created_at).toLocaleDateString("es-MX"),
       q.institution_name,
+      q.institution_address || "N/A",
       q.contact_name,
       `="${q.contact_phone}"`, // Prevent truncation of leading zeros or formatting in Excel
       q.contact_email || "",
@@ -1930,6 +1933,11 @@ export function AdminDashboard() {
                           {/* Escuela / Solicitante */}
                           <td className="py-4.5 px-6">
                             <div className="font-semibold text-foreground truncate max-w-[220px]">{q.institution_name}</div>
+                            {q.institution_address && (
+                              <div className="text-[10px] text-muted-foreground truncate max-w-[220px] mb-1">
+                                📍 {q.institution_address}
+                              </div>
+                            )}
                             <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-[220px] font-medium">
                               👤 {q.contact_name}
                             </div>
