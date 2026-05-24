@@ -3023,7 +3023,7 @@ export function AdminDashboard() {
               </div>
               
               {/* Right Column: Selected Day Detail list */}
-              <div className="lg:col-span-4 space-y-6">
+              <div className="lg:col-span-4 space-y-6 sticky top-24 self-start max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
                 <div className="bg-white rounded-2xl border border-hairline shadow-sm overflow-hidden p-6 space-y-6">
                   {/* Agenda Title */}
                   <div className="border-b border-hairline pb-4.5">
