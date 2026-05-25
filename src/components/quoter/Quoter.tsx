@@ -87,6 +87,18 @@ export function Quoter() {
     });
   }, []);
 
+  // Force correct toga/stola color locks when level or package changes
+  useEffect(() => {
+    if (level && level !== "preescolar") {
+      if (togaColor !== "negro") {
+        setTogaColor("negro");
+      }
+      if (pkg?.kind === "A" && stolaColor !== "dorada") {
+        setStolaColor("dorada");
+      }
+    }
+  }, [level, pkg, togaColor, stolaColor]);
+
   // Persistence
   useEffect(() => {
     localStorage.setItem("kt-quote-step", String(step));
@@ -383,9 +395,9 @@ export function Quoter() {
                 value={level}
                 onChange={(l) => {
                   setLevel(l);
-                  setCity("tijuana");
+                  setCity("ensenada");
                   setPkg({ kind: "A" });
-                  if (l === "primaria") {
+                  if (l !== "preescolar") {
                     setTogaColor("negro");
                     setStolaColor("dorada");
                   }

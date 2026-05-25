@@ -325,7 +325,7 @@ export function AdminDashboard() {
         { key: "PREP_A", price: 550, discount_percent: 0 },
         { key: "PREP_C1", price: 600, discount_percent: 0 },
         { key: "PREP_C2", price: 720, discount_percent: 0 },
-        { key: "UNI_A", price: 550, discount_percent: 0 },
+        { key: "UNI_A", price: 350, discount_percent: 0 },
         { key: "UNI_B", price: 600, discount_percent: 0 },
         { key: "UNI_C", price: 720, discount_percent: 0 }
       ];

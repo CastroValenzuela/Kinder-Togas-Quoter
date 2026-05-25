@@ -132,7 +132,7 @@ export const PRICES = {
   PREP_C2: 720,
 
   // Universidad / Posgrado
-  UNI_A: 550,
+  UNI_A: 350,
   UNI_B: 600,
   UNI_C: 720,
 };
@@ -185,8 +185,8 @@ export const B_VARIANTS: {
   { id: "pri_c", code: "B.1", title: "Básico Funcional", desc: "Impresión sencilla en ambos lados (9 x 12 cm)", price: PRICES.PRI_C },
   { id: "pri_b", code: "B.2", title: "Clásico Equilibrado", desc: "Impresión grande en un lado (9 x 28 cm) y chica en el otro (9 x 12 cm).", price: PRICES.PRI_B },
   { id: "pri_a", code: "B.3", title: "Clásico Destacado", desc: "Impresión grande en ambos lados 9 x 28 cm", price: PRICES.PRI_A },
-  { id: "uni_b", code: "U.B", title: "Opción B - Bordado Sencillo", desc: "Estola personalizada con bordado clásico", price: PRICES.UNI_B },
-  { id: "uni_c", code: "U.C", title: "Opción C - Bordado Premium", desc: "Estola premium con bordado detallado de alta definición", price: PRICES.UNI_C },
+  { id: "uni_b", code: "U.B", title: "Opción B — Impresión de Alta Calidad", desc: "Estola personalizada con impresión digital de alta calidad", price: PRICES.UNI_B },
+  { id: "uni_c", code: "U.C", title: "Opción C — Bordado de Alta Calidad", desc: "Estola personalizada con bordado de alta resolución", price: PRICES.UNI_C },
 ];
 
 /**
@@ -329,7 +329,7 @@ export function unitPrice(pkg?: PackageChoice, level?: Level): number {
 export function packageLabel(pkg?: PackageChoice, level?: Level): string {
   if (!pkg) return "—";
   if (pkg.kind === "A") {
-    if (level === "universidad") return "Opción A — Impresión";
+    if (level === "universidad") return "Opción A — Estola Lisa";
     return "Paquete A — Básico";
   }
   if (level === "universidad") {

@@ -42,12 +42,16 @@ const preescolarRojo = preescolarRojoDorado;
 import primariaPaqueteANegroDorado from "@/assets/Primaria/Paquete A/negro-dorado.jpg";
 import primariaB1Base from "@/assets/Primaria/B1/B1-Base.jpg";
 import primariaB1Mask from "@/assets/Primaria/B1/B1-estola-base.png";
-import primariaB2 from "@/assets/Primaria/B2.jpg";
-import primariaB3 from "@/assets/Primaria/B3.jpg";
+import primariaB2Base from "@/assets/Primaria/B2/B2.jpg";
+import primariaB2Mask from "@/assets/Primaria/B2/B2-estola-base.png";
+import primariaB3Base from "@/assets/Primaria/B3/B3.jpg";
+import primariaB3Mask from "@/assets/Primaria/B3/B3-estola-base.png";
 
 import secundariaPaqueteANegroDorado from "@/assets/Secundaria/Paquete A/negro-dorado.jpg";
-import secundariaB1 from "@/assets/Secundaria/B1.jpg";
-import secundariaB2 from "@/assets/Secundaria/B2.jpg";
+import secundariaB1Base from "@/assets/Secundaria/B1/B1.jpg";
+import secundariaB1Mask from "@/assets/Secundaria/B1/B1-estola-base.png";
+import secundariaB2Base from "@/assets/Secundaria/B2/B2.jpg";
+import secundariaB2Mask from "@/assets/Secundaria/B2/B2-base-estola.png";
 
 import preparatoriaPaqueteANegroDorado from "@/assets/Preparatoria/Paquete A/negro-dorado.jpg";
 import preparatoriaB1 from "@/assets/Preparatoria/B.1.jpg";
@@ -188,7 +192,7 @@ const FEATURES_UNI_A = [
 const FEATURES_UNI_B = [
   { icon: Shirt, text: "Renta de toga premium" },
   { icon: GraduationCap, text: "Birrete con borla institucional" },
-  { icon: Layers, text: "Estola satinada diseño bicolor en ambos lados (12x9 cm)" },
+  { icon: Layers, text: "Estola satinada con impresión de alta calidad a color en ambos lados" },
   { icon: Truck, text: "Entrega y recolección coordinadas" },
   { icon: Users, text: "Atención personalizada y asesoría" },
 ];
@@ -196,7 +200,7 @@ const FEATURES_UNI_B = [
 const FEATURES_UNI_C = [
   { icon: Shirt, text: "Renta de toga premium" },
   { icon: GraduationCap, text: "Birrete con borla institucional" },
-  { icon: Layers, text: "Estola satinada diseño bicolor bordado en ambos lados (12x9 cm)" },
+  { icon: Layers, text: "Estola satinada con bordado de alta calidad en ambos lados" },
   { icon: Truck, text: "Entrega y recolección coordinadas" },
   { icon: Users, text: "Atención personalizada y asesoría" },
 ];
@@ -303,17 +307,17 @@ export function StepConfig({
         result = primariaPaqueteANegroDorado;
       } else if (pkg?.kind === "B") {
         if (pkg.variant === "pri_c") result = { src: primariaB1Base, mask: primariaB1Mask };
-        else if (pkg.variant === "pri_b") result = primariaB2;
-        else if (pkg.variant === "pri_a") result = primariaB3;
+        else if (pkg.variant === "pri_b") result = { src: primariaB2Base, mask: primariaB2Mask };
+        else if (pkg.variant === "pri_a") result = { src: primariaB3Base, mask: primariaB3Mask };
         else result = { src: primariaB1Base, mask: primariaB1Mask }; // fallback for other variants
       }
     } else if (level === "secundaria") {
       if (pkg?.kind === "A") {
         result = secundariaPaqueteANegroDorado;
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "sec_b") result = secundariaB1;
-        else if (pkg.variant === "sec_a") result = secundariaB2;
-        else result = secundariaB1; // fallback
+        if (pkg.variant === "sec_b") result = { src: secundariaB1Base, mask: secundariaB1Mask };
+        else if (pkg.variant === "sec_a") result = { src: secundariaB2Base, mask: secundariaB2Mask };
+        else result = { src: secundariaB1Base, mask: secundariaB1Mask }; // fallback
       }
     } else if (level === "preparatoria") {
       if (pkg?.kind === "A") {
@@ -364,40 +368,65 @@ export function StepConfig({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25 }}
-                  className="absolute inset-0 w-full h-full"
+                  className="relative max-h-full aspect-[816/1118] flex items-center justify-center"
                 >
                   <img
                     src={showcaseMedia.src}
                     alt="Toga de graduación premium"
-                    className={`w-full h-full ${level === "universidad" ? "object-fill" : "object-contain"}`}
+                    className="w-full h-full object-contain"
                   />
-                  {showcaseMedia.mask && (() => {
-                    const activeStola = STOLA_COLORS.find((c) => c.id === stolaColor);
-                    const stolaBg = (activeStola as any)?.gradient || activeStola?.hex || "transparent";
-                    const isBlackStola = stolaColor === "negro";
+                  {showcaseMedia.mask && stolaColor !== "blanco" && (() => {
+                     const activeStola = STOLA_COLORS.find((c) => c.id === stolaColor);
+                     const stolaBg = (activeStola as any)?.gradient || activeStola?.hex || "transparent";
+                     const isBlackStola = stolaColor === "negro";
 
                     const maskStyles = {
                       WebkitMaskImage: `url(${showcaseMedia.mask})`,
-                      WebkitMaskSize: level === "universidad" ? "100% 100%" : "contain",
+                      WebkitMaskSize: "100% 100%",
                       WebkitMaskPosition: "center",
                       WebkitMaskRepeat: "no-repeat",
                       maskImage: `url(${showcaseMedia.mask})`,
-                      maskSize: level === "universidad" ? "100% 100%" : "contain",
+                      maskSize: "100% 100%",
                       maskPosition: "center",
                       maskRepeat: "no-repeat"
                     };
 
                     if (isBlackStola) {
                       return (
-                        <div 
-                          className="absolute inset-0" 
-                          style={{ filter: `drop-shadow(0 0 1px #1A1A1A) drop-shadow(0 0 2px #1A1A1A)` }}
-                        >
-                          <div className="w-full h-full" style={maskStyles}>
+                        <div className="absolute inset-0">
+                          {/* Layer 1: Perfect black stola exactly like the other colors (using mix-blend-multiply) */}
+                          <div 
+                            className="absolute inset-0 mix-blend-multiply"
+                            style={{ 
+                              filter: "drop-shadow(1px 0 0 #1A1A1A) drop-shadow(-1px 0 0 #1A1A1A) drop-shadow(0 1px 0 #1A1A1A) drop-shadow(0 -1px 0 #1A1A1A) drop-shadow(0 0 1px #1A1A1A)" 
+                            }}
+                          >
+                            <div 
+                              className="w-full h-full"
+                              style={{
+                                background: "#1A1A1A",
+                                ...maskStyles
+                              }}
+                            />
+                          </div>
+
+                          {/* Layer 2: White logos rendered on top using screen blend mode, masked to lower half */}
+                          <div 
+                            className="absolute inset-0 mix-blend-screen pointer-events-none"
+                            style={maskStyles}
+                          >
                             <img
                               src={showcaseMedia.src}
-                              alt="Estola negra con logos blancos"
-                              className={`w-full h-full ${level === "universidad" ? "object-fill" : "object-contain"} invert grayscale brightness-110 contrast-125`}
+                              alt="Logos blancos"
+                              className="w-full h-full object-contain"
+                              style={{
+                                filter: "invert(1) grayscale(1) brightness(0.7) contrast(1.2)",
+                                opacity: 0.8,
+                                WebkitMaskImage: "linear-gradient(to bottom, transparent 48%, black 58%)",
+                                maskImage: "linear-gradient(to bottom, transparent 48%, black 58%)",
+                                WebkitMaskSize: "100% 100%",
+                                maskSize: "100% 100%"
+                              }}
                             />
                           </div>
                         </div>
@@ -409,7 +438,9 @@ export function StepConfig({
                     return (
                       <div 
                         className="absolute inset-0 mix-blend-multiply"
-                        style={{ filter: `drop-shadow(0 0 1px ${stolaSolidHex}) drop-shadow(0 0 1.5px ${stolaSolidHex})` }}
+                        style={{ 
+                          filter: `drop-shadow(1px 0 0 ${stolaSolidHex}) drop-shadow(-1px 0 0 ${stolaSolidHex}) drop-shadow(0 1px 0 ${stolaSolidHex}) drop-shadow(0 -1px 0 ${stolaSolidHex}) drop-shadow(0 0 1px ${stolaSolidHex})` 
+                        }}
                       >
                         <div 
                           className="w-full h-full"
@@ -475,8 +506,8 @@ export function StepConfig({
                     {
                       id: "uni_a",
                       code: "A",
-                      title: "Opción A — Impresión",
-                      desc: "Estola Lisa",
+                      title: "Opción A — Estola Lisa",
+                      desc: "Estola lisa sin estampado ni bordado",
                       price: PRICES.UNI_A,
                       payload: { kind: "A" } as const,
                       isActive: pkg?.kind === "A"
@@ -484,8 +515,8 @@ export function StepConfig({
                     {
                       id: "uni_b",
                       code: "B",
-                      title: "Opción B — Bordado Sencillo",
-                      desc: "Estola personalizada con bordado tradicional",
+                      title: "Opción B — Impresión de Alta Calidad",
+                      desc: "Estola personalizada con impresión digital de alta calidad",
                       price: PRICES.UNI_B,
                       payload: { kind: "B", variant: "uni_b" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "uni_b"
@@ -493,8 +524,8 @@ export function StepConfig({
                     {
                       id: "uni_c",
                       code: "C",
-                      title: "Opción C — Bordado Premium",
-                      desc: "Estola personalizada con bordado premium de alta definición",
+                      title: "Opción C — Bordado de Alta Calidad",
+                      desc: "Estola personalizada con bordado de alta resolución",
                       price: PRICES.UNI_C,
                       payload: { kind: "B", variant: "uni_c" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "uni_c"
@@ -747,46 +778,51 @@ export function StepConfig({
             )}
 
             {/* Color de Estola */}
-            {(level === "preescolar" ||
-              level === "primaria" ||
-              level === "secundaria" ||
-              level === "preparatoria" ||
-              level === "universidad") && (
-              <section className="animate-in fade-in slide-in-from-top-2 duration-300">
-                <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                  Color de Estola
-                </p>
-                <div className="flex flex-wrap gap-2.5">
-                  {STOLA_COLORS.filter((s: any) => {
-                    if (level === "preescolar") return s.isBasic;
-                    if (pkg?.kind === "B" || pkg?.kind === "C") return true;
-                    return s.id === "dorada";
-                  }).map((s) => {
-                    const active = stolaColor === s.id;
-                    return (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => onStolaColor(s.id)}
-                        className={cn(
-                          "flex items-center gap-2.5 px-4 py-2.5 rounded-full border text-xs sm:text-sm font-medium transition-all cursor-pointer relative",
-                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                          active
-                            ? "border-navy bg-cream text-foreground"
-                            : "border-hairline text-foreground/80 hover:border-navy/40",
-                        )}
-                      >
-                        <span
-                          className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
-                          style={{ background: (s as any).gradient || s.hex }}
-                        />
-                        <span>{s.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
+            {(() => {
+              const visibleStolas = STOLA_COLORS.filter((s: any) => {
+                if (level === "preescolar") {
+                  if (pkg?.kind === "A") return s.isBasic;
+                  return false;
+                }
+                if (pkg?.kind === "B" || pkg?.kind === "C") return true;
+                return s.id === "dorada";
+              });
+
+              if (visibleStolas.length === 0) return null;
+
+              return (
+                <section className="animate-in fade-in slide-in-from-top-2 duration-300">
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
+                    Color de Estola
+                  </p>
+                  <div className="flex flex-wrap gap-2.5">
+                    {visibleStolas.map((s) => {
+                      const active = stolaColor === s.id;
+                      return (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => onStolaColor(s.id)}
+                          className={cn(
+                            "flex items-center gap-2.5 px-4 py-2.5 rounded-full border text-xs sm:text-sm font-medium transition-all cursor-pointer relative",
+                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                            active
+                              ? "border-navy bg-cream text-foreground"
+                              : "border-hairline text-foreground/80 hover:border-navy/40",
+                          )}
+                        >
+                          <span
+                            className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
+                            style={{ background: (s as any).gradient || s.hex }}
+                          />
+                          <span>{s.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })()}
 
             {/* Features */}
             <section>
