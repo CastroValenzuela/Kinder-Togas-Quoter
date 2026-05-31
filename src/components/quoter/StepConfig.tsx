@@ -284,9 +284,9 @@ export function StepConfig({
               <AnimatePresence mode="wait">
                 <motion.div
                   key={showcaseMedia.src + (showcaseMedia.mask ? stolaColor : "")}
-                  initial={{ opacity: 0, scale: 0.97, filter: "blur(8px)" }}
-                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, scale: 1.03, filter: "blur(8px)" }}
+                  initial={{ opacity: 0, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, filter: "blur(8px)" }}
                   transition={{ duration: 0.4, ease: "easeInOut" }}
                   className="relative w-full max-h-full aspect-[816/1118] flex items-center justify-center z-10"
                 >
