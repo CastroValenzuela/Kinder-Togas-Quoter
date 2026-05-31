@@ -288,7 +288,7 @@ export function StepConfig({
                   animate={{ opacity: 1, filter: "blur(0px)" }}
                   exit={{ opacity: 0, filter: "blur(8px)" }}
                   transition={{ duration: 0.4, ease: "easeInOut" }}
-                  className="relative w-full max-h-full aspect-[816/1118] flex items-center justify-center z-10"
+                  className="relative max-h-full aspect-[816/1118] flex items-center justify-center z-10"
                 >
                   <img
                     src={showcaseMedia.src}
