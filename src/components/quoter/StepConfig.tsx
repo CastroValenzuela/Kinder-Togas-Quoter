@@ -42,30 +42,43 @@ const preescolarRojo = preescolarRojoDorado;
 import primariaPaqueteANegroDorado from "@/assets/Primaria/Paquete A/negro-dorado.jpg";
 import primariaB1Base from "@/assets/Primaria/B1/B1-Base.jpg";
 import primariaB1Mask from "@/assets/Primaria/B1/B1-estola-base.png";
+import primariaB1Negro from "@/assets/Primaria/B1/B1-estola-negro.png";
 import primariaB2Base from "@/assets/Primaria/B2/B2.jpg";
 import primariaB2Mask from "@/assets/Primaria/B2/B2-estola-base.png";
+import primariaB2Negro from "@/assets/Primaria/B2/B2-estola-negro.png";
 import primariaB3Base from "@/assets/Primaria/B3/B3.jpg";
 import primariaB3Mask from "@/assets/Primaria/B3/B3-estola-base.png";
+import primariaB3Negro from "@/assets/Primaria/B3/B3-estola-negro.png";
 
 import secundariaPaqueteANegroDorado from "@/assets/Secundaria/Paquete A/negro-dorado.jpg";
 import secundariaB1Base from "@/assets/Secundaria/B1/B1.jpg";
 import secundariaB1Mask from "@/assets/Secundaria/B1/B1-estola-base.png";
+import secundariaB1Negro from "@/assets/Secundaria/B1/B1-estola-negro.png";
 import secundariaB2Base from "@/assets/Secundaria/B2/B2.jpg";
 import secundariaB2Mask from "@/assets/Secundaria/B2/B2-base-estola.png";
+import secundariaB2Negro from "@/assets/Secundaria/B2/b2-estola-negro.png";
 
 import preparatoriaPaqueteANegroDorado from "@/assets/Preparatoria/Paquete A/negro-dorado.jpg";
 import preparatoriaB1Base from "@/assets/Preparatoria/B1/B1-base.jpg";
 import preparatoriaB1Mask from "@/assets/Preparatoria/B1/B1-estola-base.png";
+import preparatoriaB1Negro from "@/assets/Preparatoria/B1/B1-estola-negro.png";
 import preparatoriaB2Base from "@/assets/Preparatoria/B2/B2-base.jpg";
 import preparatoriaB2Mask from "@/assets/Preparatoria/B2/B2-estola-base.png";
+import preparatoriaB2Negro from "@/assets/Preparatoria/B2/B2-estola-negro.png";
 import preparatoriaC1Base from "@/assets/Preparatoria/C1/C1-base.jpg";
 import preparatoriaC1Mask from "@/assets/Preparatoria/C1/C1-estola-base.png";
+import preparatoriaC1Negro from "@/assets/Preparatoria/C1/C1-estola-negro.png";
 import preparatoriaC2Base from "@/assets/Preparatoria/C2/C2-base.jpg";
 import preparatoriaC2Mask from "@/assets/Preparatoria/C2/C2-estola-base.png";
+import preparatoriaC2Negro from "@/assets/Preparatoria/C2/C2-estola-negro.png";
 
 import uniA from "@/assets/Universidad/A.jpg";
-import uniB from "@/assets/Universidad/B.jpg";
-import uniC from "@/assets/Universidad/C.jpg";
+import uniBBase from "@/assets/Universidad/B/B-base.jpg";
+import uniBMask from "@/assets/Universidad/B/B-estola-base.png";
+import uniBNegro from "@/assets/Universidad/B/B-estola-negro.png";
+import uniCBase from "@/assets/Universidad/C/C-base.jpg";
+import uniCMask from "@/assets/Universidad/C/C-estola-base.png";
+import uniCNegro from "@/assets/Universidad/C/C-estola-negro.png";
 
 import {
   CITIES,
@@ -310,38 +323,38 @@ export function StepConfig({
       if (pkg?.kind === "A") {
         result = primariaPaqueteANegroDorado;
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "pri_c") result = { src: primariaB1Base, mask: primariaB1Mask };
-        else if (pkg.variant === "pri_b") result = { src: primariaB2Base, mask: primariaB2Mask };
-        else if (pkg.variant === "pri_a") result = { src: primariaB3Base, mask: primariaB3Mask };
-        else result = { src: primariaB1Base, mask: primariaB1Mask }; // fallback for other variants
+        if (pkg.variant === "pri_c") result = { src: primariaB1Base, mask: primariaB1Mask, stolaNegro: primariaB1Negro };
+        else if (pkg.variant === "pri_b") result = { src: primariaB2Base, mask: primariaB2Mask, stolaNegro: primariaB2Negro };
+        else if (pkg.variant === "pri_a") result = { src: primariaB3Base, mask: primariaB3Mask, stolaNegro: primariaB3Negro };
+        else result = { src: primariaB1Base, mask: primariaB1Mask, stolaNegro: primariaB1Negro }; // fallback for other variants
       }
     } else if (level === "secundaria") {
       if (pkg?.kind === "A") {
         result = secundariaPaqueteANegroDorado;
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "sec_b") result = { src: secundariaB1Base, mask: secundariaB1Mask };
-        else if (pkg.variant === "sec_a") result = { src: secundariaB2Base, mask: secundariaB2Mask };
-        else result = { src: secundariaB1Base, mask: secundariaB1Mask }; // fallback
+        if (pkg.variant === "sec_b") result = { src: secundariaB1Base, mask: secundariaB1Mask, stolaNegro: secundariaB1Negro };
+        else if (pkg.variant === "sec_a") result = { src: secundariaB2Base, mask: secundariaB2Mask, stolaNegro: secundariaB2Negro };
+        else result = { src: secundariaB1Base, mask: secundariaB1Mask, stolaNegro: secundariaB1Negro }; // fallback
       }
     } else if (level === "preparatoria") {
       if (pkg?.kind === "A") {
         result = preparatoriaPaqueteANegroDorado;
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "prep_b") result = { src: preparatoriaB1Base, mask: preparatoriaB1Mask };
-        else if (pkg.variant === "prep_a") result = { src: preparatoriaB2Base, mask: preparatoriaB2Mask };
-        else result = { src: preparatoriaB1Base, mask: preparatoriaB1Mask }; // fallback
+        if (pkg.variant === "prep_b") result = { src: preparatoriaB1Base, mask: preparatoriaB1Mask, stolaNegro: preparatoriaB1Negro };
+        else if (pkg.variant === "prep_a") result = { src: preparatoriaB2Base, mask: preparatoriaB2Mask, stolaNegro: preparatoriaB2Negro };
+        else result = { src: preparatoriaB1Base, mask: preparatoriaB1Mask, stolaNegro: preparatoriaB1Negro }; // fallback
       } else if (pkg?.kind === "C") {
-        if (pkg.variant === "prep_c1") result = { src: preparatoriaC1Base, mask: preparatoriaC1Mask };
-        else if (pkg.variant === "prep_c2") result = { src: preparatoriaC2Base, mask: preparatoriaC2Mask };
-        else result = { src: preparatoriaC1Base, mask: preparatoriaC1Mask }; // fallback
+        if (pkg.variant === "prep_c1") result = { src: preparatoriaC1Base, mask: preparatoriaC1Mask, stolaNegro: preparatoriaC1Negro };
+        else if (pkg.variant === "prep_c2") result = { src: preparatoriaC2Base, mask: preparatoriaC2Mask, stolaNegro: preparatoriaC2Negro };
+        else result = { src: preparatoriaC1Base, mask: preparatoriaC1Mask, stolaNegro: preparatoriaC1Negro }; // fallback
       }
     } else if (level === "universidad") {
       if (pkg?.kind === "A") {
         result = uniA;
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "uni_b") result = uniB;
-        else if (pkg.variant === "uni_c") result = uniC;
-        else result = uniB; // fallback
+        if (pkg.variant === "uni_b") result = { src: uniBBase, mask: uniBMask, stolaNegro: uniBNegro };
+        else if (pkg.variant === "uni_c") result = { src: uniCBase, mask: uniCMask, stolaNegro: uniCNegro };
+        else result = { src: uniBBase, mask: uniBMask, stolaNegro: uniBNegro }; // fallback
       }
     }
     
@@ -384,19 +397,32 @@ export function StepConfig({
                      const stolaBg = (activeStola as any)?.gradient || activeStola?.hex || "transparent";
                      const isBlackStola = stolaColor === "negro";
 
-                    const maskStyles = {
-                      WebkitMaskImage: `url(${showcaseMedia.mask})`,
-                      WebkitMaskSize: "100% 100%",
-                      WebkitMaskPosition: "center",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskImage: `url(${showcaseMedia.mask})`,
-                      maskSize: "100% 100%",
-                      maskPosition: "center",
-                      maskRepeat: "no-repeat"
-                    };
+                     const maskStyles = {
+                       WebkitMaskImage: `url(${showcaseMedia.mask})`,
+                       WebkitMaskSize: "100% 100%",
+                       WebkitMaskPosition: "center",
+                       WebkitMaskRepeat: "no-repeat",
+                       maskImage: `url(${showcaseMedia.mask})`,
+                       maskSize: "100% 100%",
+                       maskPosition: "center",
+                       maskRepeat: "no-repeat"
+                     };
 
                     if (isBlackStola) {
-                      // Usamos una escala mayor (1.06) para B2 y B3 para empujar sus líneas blancas súper gruesas fuera de la máscara.
+                      // Si el usuario subió el PNG renderizado en negro, lo superponemos directamente.
+                      if (showcaseMedia.stolaNegro) {
+                        return (
+                          <div className="absolute inset-0 z-20">
+                            <img
+                              src={showcaseMedia.stolaNegro}
+                              alt="Estola negra"
+                              className="w-full h-full object-contain drop-shadow-sm"
+                            />
+                          </div>
+                        );
+                      }
+
+                      // Fallback: Usamos una escala mayor (1.06) para paquetes antiguos para empujar sus líneas blancas.
                       // Para B1 usamos 1.025 porque el usuario ya redujo la máscara manualmente.
                       const isB1 = pkg?.variant === "pri_c" || pkg?.variant === "sec_b";
                       const scaleClass = isB1 ? "scale-[1.025]" : "scale-[1.06]";
