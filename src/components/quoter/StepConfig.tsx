@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem } from "lucide-react";
 const assets = import.meta.glob('@/assets/**/*.{jpg,png}', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 
@@ -196,6 +196,30 @@ export function StepConfig({
   const isPrimaria = level === "primaria";
   const isPreparatoria = level === "preparatoria";
   const isUni = level === "universidad";
+
+  // 3D Tilt Effect Logic
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { damping: 25, stiffness: 150, mass: 0.5 };
+  const mouseXSpring = useSpring(mouseX, springConfig);
+  const mouseYSpring = useSpring(mouseY, springConfig);
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["2.5deg", "-2.5deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-2.5deg", "2.5deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    mouseX.set(x / rect.width - 0.5);
+    mouseY.set(y / rect.height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
   
   // Filtrar variantes según el nivel
   const visibleVariants = B_VARIANTS.filter((v) => {
@@ -273,8 +297,13 @@ export function StepConfig({
       <div className="rounded-2xl border border-hairline bg-card overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.04),0_20px_50px_-30px_rgba(17,34,68,0.18)]">
         <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr]">
           {/* LEFT — Visual showcase */}
-          <div className="relative bg-cream/60 lg:sticky lg:top-0 lg:self-start">
-            <div className="aspect-[4/5] lg:aspect-auto lg:h-[680px] w-full overflow-hidden relative flex items-center justify-center p-0">
+          <div className="relative bg-cream/60 lg:sticky lg:top-0 lg:self-start perspective-[1000px]">
+            <motion.div 
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+              className="aspect-[4/5] lg:aspect-auto lg:h-[680px] w-full overflow-hidden relative flex items-center justify-center p-0 cursor-crosshair"
+            >
               
               {/* Premium Skeleton Loader */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
@@ -376,7 +405,7 @@ export function StepConfig({
                   })()}
                 </motion.div>
               </AnimatePresence>
-            </div>
+            </motion.div>
           </div>
 
           {/* RIGHT — Control panel */}
