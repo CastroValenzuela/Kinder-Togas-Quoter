@@ -54,10 +54,14 @@ import secundariaB2Base from "@/assets/Secundaria/B2/B2.jpg";
 import secundariaB2Mask from "@/assets/Secundaria/B2/B2-base-estola.png";
 
 import preparatoriaPaqueteANegroDorado from "@/assets/Preparatoria/Paquete A/negro-dorado.jpg";
-import preparatoriaB1 from "@/assets/Preparatoria/B.1.jpg";
-import preparatoriaB2 from "@/assets/Preparatoria/B.2.jpg";
-import preparatoriaC1 from "@/assets/Preparatoria/C1.jpg";
-import preparatoriaC2 from "@/assets/Preparatoria/C2.jpg";
+import preparatoriaB1Base from "@/assets/Preparatoria/B1/B1-base.jpg";
+import preparatoriaB1Mask from "@/assets/Preparatoria/B1/B1-estola-base.png";
+import preparatoriaB2Base from "@/assets/Preparatoria/B2/B2-base.jpg";
+import preparatoriaB2Mask from "@/assets/Preparatoria/B2/B2-estola-base.png";
+import preparatoriaC1Base from "@/assets/Preparatoria/C1/C1-base.jpg";
+import preparatoriaC1Mask from "@/assets/Preparatoria/C1/C1-estola-base.png";
+import preparatoriaC2Base from "@/assets/Preparatoria/C2/C2-base.jpg";
+import preparatoriaC2Mask from "@/assets/Preparatoria/C2/C2-estola-base.png";
 
 import uniA from "@/assets/Universidad/A.jpg";
 import uniB from "@/assets/Universidad/B.jpg";
@@ -323,13 +327,13 @@ export function StepConfig({
       if (pkg?.kind === "A") {
         result = preparatoriaPaqueteANegroDorado;
       } else if (pkg?.kind === "B") {
-        if (pkg.variant === "prep_b") result = preparatoriaB1;
-        else if (pkg.variant === "prep_a") result = preparatoriaB2;
-        else result = preparatoriaB1; // fallback
+        if (pkg.variant === "prep_b") result = { src: preparatoriaB1Base, mask: preparatoriaB1Mask };
+        else if (pkg.variant === "prep_a") result = { src: preparatoriaB2Base, mask: preparatoriaB2Mask };
+        else result = { src: preparatoriaB1Base, mask: preparatoriaB1Mask }; // fallback
       } else if (pkg?.kind === "C") {
-        if (pkg.variant === "prep_c1") result = preparatoriaC1;
-        else if (pkg.variant === "prep_c2") result = preparatoriaC2;
-        else result = preparatoriaC1; // fallback
+        if (pkg.variant === "prep_c1") result = { src: preparatoriaC1Base, mask: preparatoriaC1Mask };
+        else if (pkg.variant === "prep_c2") result = { src: preparatoriaC2Base, mask: preparatoriaC2Mask };
+        else result = { src: preparatoriaC1Base, mask: preparatoriaC1Mask }; // fallback
       }
     } else if (level === "universidad") {
       if (pkg?.kind === "A") {
@@ -392,42 +396,31 @@ export function StepConfig({
                     };
 
                     if (isBlackStola) {
-                      return (
-                        <div className="absolute inset-0">
-                          {/* Layer 1: Perfect black stola exactly like the other colors (using mix-blend-multiply) */}
-                          <div 
-                            className="absolute inset-0 mix-blend-multiply"
-                            style={{ 
-                              filter: "drop-shadow(1px 0 0 #1A1A1A) drop-shadow(-1px 0 0 #1A1A1A) drop-shadow(0 1px 0 #1A1A1A) drop-shadow(0 -1px 0 #1A1A1A) drop-shadow(0 0 1px #1A1A1A)" 
-                            }}
-                          >
-                            <div 
-                              className="w-full h-full"
-                              style={{
-                                background: "#1A1A1A",
-                                ...maskStyles
-                              }}
-                            />
-                          </div>
+                      // Usamos una escala mayor (1.06) para B2 y B3 para empujar sus líneas blancas súper gruesas fuera de la máscara.
+                      // Para B1 usamos 1.025 porque el usuario ya redujo la máscara manualmente.
+                      const isB1 = pkg?.variant === "pri_c" || pkg?.variant === "sec_b";
+                      const scaleClass = isB1 ? "scale-[1.025]" : "scale-[1.06]";
 
-                          {/* Layer 2: White logos rendered on top using screen blend mode, masked to lower half */}
-                          <div 
-                            className="absolute inset-0 mix-blend-screen pointer-events-none"
-                            style={maskStyles}
-                          >
+                      return (
+                        <div 
+                          className="absolute inset-0"
+                          style={{ 
+                            // Este drop shadow expande la estola negra 1 pixel hacia afuera en todas direcciones.
+                            // Esto cubre perfectamente la línea blanca de la estola original que se asomaba por detrás.
+                            filter: `drop-shadow(1px 0 0 #1A1A1A) drop-shadow(-1px 0 0 #1A1A1A) drop-shadow(0 1px 0 #1A1A1A) drop-shadow(0 -1px 0 #1A1A1A)` 
+                          }}
+                        >
+                          {/* El contenedor con la máscara recorta exactamente la silueta de la estola */}
+                          <div className="w-full h-full relative" style={maskStyles}>
                             <img
                               src={showcaseMedia.src}
-                              alt="Logos blancos"
-                              className="w-full h-full object-contain"
-                              style={{
-                                filter: "invert(1) grayscale(1) brightness(0.7) contrast(1.2)",
-                                opacity: 0.8,
-                                WebkitMaskImage: "linear-gradient(to bottom, transparent 48%, black 58%)",
-                                maskImage: "linear-gradient(to bottom, transparent 48%, black 58%)",
-                                WebkitMaskSize: "100% 100%",
-                                maskSize: "100% 100%"
-                              }}
+                              alt="Estola negra con logos blancos"
+                              // TRUCO MAESTRO DINÁMICO: scaleClass empuja las orillas blancas brillantes fuera de la máscara.
+                              className={`w-full h-full object-contain invert grayscale brightness-[90%] contrast-[130%] ${scaleClass} origin-center`}
                             />
+                            
+                            {/* Cubrimos la mancha del cuello con negro puro desvanecido */}
+                            <div className="absolute top-0 left-0 w-full h-[45%] bg-gradient-to-b from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent pointer-events-none" />
                           </div>
                         </div>
                       );
