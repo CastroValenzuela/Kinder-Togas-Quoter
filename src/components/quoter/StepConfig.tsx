@@ -1,84 +1,49 @@
 import { useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem } from "lucide-react";
-import gownImg from "@/assets/gown-showcase.jpg";
+const assets = import.meta.glob('@/assets/**/*.{jpg,png}', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 
-import preescolarBalance from "@/assets/Preescolar/balance.jpg";
-import preescolarEsencial from "@/assets/Preescolar/esencial.jpg";
+const getAsset = (path: string) => {
+  const url = assets[`/src/assets/${path}`];
+  if (!url) console.warn(`Asset not found: ${path}`);
+  return url || "";
+};
 
-import preescolarNegroAzul from "@/assets/Preescolar/Paquete A/negro-azul.jpg";
-import preescolarNegroDorado from "@/assets/Preescolar/Paquete A/negro-dorado.jpg";
-import preescolarNegroPlata from "@/assets/Preescolar/Paquete A/negro-plata.jpg";
-import preescolarNegroRojo from "@/assets/Preescolar/Paquete A/negro-rojo.jpg";
+const PACKAGE_ASSETS: Record<string, { src: string, mask?: string, stolaNegro?: string }> = {
+  pri_c: { src: getAsset('Primaria/B1/B1-base.jpg'), mask: getAsset('Primaria/B1/B1-estola-base.png'), stolaNegro: getAsset('Primaria/B1/B1-estola-negro.png') },
+  pri_b: { src: getAsset('Primaria/B2/B2-base.jpg'), mask: getAsset('Primaria/B2/B2-estola-base.png'), stolaNegro: getAsset('Primaria/B2/B2-estola-negro.png') },
+  pri_a: { src: getAsset('Primaria/B3/B3-base.jpg'), mask: getAsset('Primaria/B3/B3-estola-base.png'), stolaNegro: getAsset('Primaria/B3/B3-estola-negro.png') },
+  sec_b: { src: getAsset('Secundaria/B1/B1-base.jpg'), mask: getAsset('Secundaria/B1/B1-estola-base.png'), stolaNegro: getAsset('Secundaria/B1/B1-estola-negro.png') },
+  sec_a: { src: getAsset('Secundaria/B2/B2-base.jpg'), mask: getAsset('Secundaria/B2/B2-estola-base.png'), stolaNegro: getAsset('Secundaria/B2/B2-estola-negro.png') },
+  prep_b: { src: getAsset('Preparatoria/B1/B1-base.jpg'), mask: getAsset('Preparatoria/B1/B1-estola-base.png'), stolaNegro: getAsset('Preparatoria/B1/B1-estola-negro.png') },
+  prep_a: { src: getAsset('Preparatoria/B2/B2-base.jpg'), mask: getAsset('Preparatoria/B2/B2-estola-base.png'), stolaNegro: getAsset('Preparatoria/B2/B2-estola-negro.png') },
+  prep_c1: { src: getAsset('Preparatoria/C1/C1-base.jpg'), mask: getAsset('Preparatoria/C1/C1-estola-base.png'), stolaNegro: getAsset('Preparatoria/C1/C1-estola-negro.png') },
+  prep_c2: { src: getAsset('Preparatoria/C2/C2-base.jpg'), mask: getAsset('Preparatoria/C2/C2-estola-base.png'), stolaNegro: getAsset('Preparatoria/C2/C2-estola-negro.png') },
+  uni_b: { src: getAsset('Universidad/B/B-base.jpg'), mask: getAsset('Universidad/B/B-estola-base.png'), stolaNegro: getAsset('Universidad/B/B-estola-negro.png') },
+  uni_c: { src: getAsset('Universidad/C/C-base.jpg'), mask: getAsset('Universidad/C/C-estola-base.png'), stolaNegro: getAsset('Universidad/C/C-estola-negro.png') },
+};
 
-import preescolarAzulAzul from "@/assets/Preescolar/Paquete A/azul-azul.jpg";
-import preescolarAzulDorado from "@/assets/Preescolar/Paquete A/azul-dorado.jpg";
-import preescolarAzulPlata from "@/assets/Preescolar/Paquete A/azul-plata.jpg";
-import preescolarAzulRojo from "@/assets/Preescolar/Paquete A/azul-rojo.jpg";
+const PAQUETE_A_ASSETS: Record<string, string> = {
+  primaria: getAsset('Primaria/Paquete A/negro-dorado.jpg'),
+  secundaria: getAsset('Secundaria/Paquete A/negro-dorado.jpg'),
+  preparatoria: getAsset('Preparatoria/Paquete A/negro-dorado.jpg'),
+  universidad: getAsset('Universidad/A.jpg'),
+};
 
-import preescolarVerdeAzul from "@/assets/Preescolar/Paquete A/verde-azul.jpg";
-import preescolarVerdeDorado from "@/assets/Preescolar/Paquete A/verde-dorado.jpg";
-import preescolarVerdePlata from "@/assets/Preescolar/Paquete A/verde-plata.jpg";
-import preescolarVerdeRojo from "@/assets/Preescolar/Paquete A/verde-rojo.jpg";
+const PREESCOLAR_PAQUETE_B: Record<string, string> = {
+  esencial: getAsset('Preescolar/esencial.jpg'),
+  hybrid: getAsset('Preescolar/balance.jpg'),
+  max: getAsset('Preescolar/premium.jpg'),
+};
 
-import preescolarTurquesaAzul from "@/assets/Preescolar/Paquete A/turquesa-turquesa.jpg";
-import preescolarTurquesaDorado from "@/assets/Preescolar/Paquete A/turquesa-dorado.jpg";
-import preescolarTurquesaPlata from "@/assets/Preescolar/Paquete A/turquesa-plata.jpg";
-import preescolarTurquesaRojo from "@/assets/Preescolar/Paquete A/turquesa-rojo.jpg";
-
-import preescolarRojoAzul from "@/assets/Preescolar/Paquete A/rojo-azul.jpg";
-import preescolarRojoDorado from "@/assets/Preescolar/Paquete A/rojo-dorado.jpg";
-import preescolarRojoPlata from "@/assets/Preescolar/Paquete A/rojo-plata.jpg";
-import preescolarRojoRojo from "@/assets/Preescolar/Paquete A/rojo-rojo.jpg";
-
-import preescolarPremium from "@/assets/Preescolar/premium.jpg";
-
-const preescolarNegro = preescolarNegroDorado;
-const preescolarAzul = preescolarAzulDorado;
-const preescolarMagenta = preescolarTurquesaDorado;
-const preescolarVerde = preescolarVerdeDorado;
-const preescolarRojo = preescolarRojoDorado;
-
-import primariaPaqueteANegroDorado from "@/assets/Primaria/Paquete A/negro-dorado.jpg";
-import primariaB1Base from "@/assets/Primaria/B1/B1-Base.jpg";
-import primariaB1Mask from "@/assets/Primaria/B1/B1-estola-base.png";
-import primariaB1Negro from "@/assets/Primaria/B1/B1-estola-negro.png";
-import primariaB2Base from "@/assets/Primaria/B2/B2.jpg";
-import primariaB2Mask from "@/assets/Primaria/B2/B2-estola-base.png";
-import primariaB2Negro from "@/assets/Primaria/B2/B2-estola-negro.png";
-import primariaB3Base from "@/assets/Primaria/B3/B3.jpg";
-import primariaB3Mask from "@/assets/Primaria/B3/B3-estola-base.png";
-import primariaB3Negro from "@/assets/Primaria/B3/B3-estola-negro.png";
-
-import secundariaPaqueteANegroDorado from "@/assets/Secundaria/Paquete A/negro-dorado.jpg";
-import secundariaB1Base from "@/assets/Secundaria/B1/B1.jpg";
-import secundariaB1Mask from "@/assets/Secundaria/B1/B1-estola-base.png";
-import secundariaB1Negro from "@/assets/Secundaria/B1/B1-estola-negro.png";
-import secundariaB2Base from "@/assets/Secundaria/B2/B2.jpg";
-import secundariaB2Mask from "@/assets/Secundaria/B2/B2-base-estola.png";
-import secundariaB2Negro from "@/assets/Secundaria/B2/b2-estola-negro.png";
-
-import preparatoriaPaqueteANegroDorado from "@/assets/Preparatoria/Paquete A/negro-dorado.jpg";
-import preparatoriaB1Base from "@/assets/Preparatoria/B1/B1-base.jpg";
-import preparatoriaB1Mask from "@/assets/Preparatoria/B1/B1-estola-base.png";
-import preparatoriaB1Negro from "@/assets/Preparatoria/B1/B1-estola-negro.png";
-import preparatoriaB2Base from "@/assets/Preparatoria/B2/B2-base.jpg";
-import preparatoriaB2Mask from "@/assets/Preparatoria/B2/B2-estola-base.png";
-import preparatoriaB2Negro from "@/assets/Preparatoria/B2/B2-estola-negro.png";
-import preparatoriaC1Base from "@/assets/Preparatoria/C1/C1-base.jpg";
-import preparatoriaC1Mask from "@/assets/Preparatoria/C1/C1-estola-base.png";
-import preparatoriaC1Negro from "@/assets/Preparatoria/C1/C1-estola-negro.png";
-import preparatoriaC2Base from "@/assets/Preparatoria/C2/C2-base.jpg";
-import preparatoriaC2Mask from "@/assets/Preparatoria/C2/C2-estola-base.png";
-import preparatoriaC2Negro from "@/assets/Preparatoria/C2/C2-estola-negro.png";
-
-import uniA from "@/assets/Universidad/A.jpg";
-import uniBBase from "@/assets/Universidad/B/B-base.jpg";
-import uniBMask from "@/assets/Universidad/B/B-estola-base.png";
-import uniBNegro from "@/assets/Universidad/B/B-estola-negro.png";
-import uniCBase from "@/assets/Universidad/C/C-base.jpg";
-import uniCMask from "@/assets/Universidad/C/C-estola-base.png";
-import uniCNegro from "@/assets/Universidad/C/C-estola-negro.png";
+const PREESCOLAR_PAQUETE_A: Record<string, Record<string, string>> = {
+  negro: { dorada: getAsset('Preescolar/Paquete A/negro-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/negro-plata.jpg'), azul: getAsset('Preescolar/Paquete A/negro-azul.jpg'), roja: getAsset('Preescolar/Paquete A/negro-rojo.jpg'), default: getAsset('Preescolar/Paquete A/negro-dorado.jpg') },
+  azul: { dorada: getAsset('Preescolar/Paquete A/azul-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/azul-plata.jpg'), azul: getAsset('Preescolar/Paquete A/azul-azul.jpg'), roja: getAsset('Preescolar/Paquete A/azul-rojo.jpg'), default: getAsset('Preescolar/Paquete A/azul-dorado.jpg') },
+  verde: { dorada: getAsset('Preescolar/Paquete A/verde-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/verde-plata.jpg'), azul: getAsset('Preescolar/Paquete A/verde-azul.jpg'), roja: getAsset('Preescolar/Paquete A/verde-rojo.jpg'), default: getAsset('Preescolar/Paquete A/verde-dorado.jpg') },
+  turquesa: { dorada: getAsset('Preescolar/Paquete A/turquesa-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/turquesa-plata.jpg'), azul: getAsset('Preescolar/Paquete A/turquesa-turquesa.jpg'), roja: getAsset('Preescolar/Paquete A/turquesa-rojo.jpg'), default: getAsset('Preescolar/Paquete A/turquesa-dorado.jpg') },
+  rojo: { dorada: getAsset('Preescolar/Paquete A/rojo-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/rojo-plata.jpg'), azul: getAsset('Preescolar/Paquete A/rojo-azul.jpg'), roja: getAsset('Preescolar/Paquete A/rojo-rojo.jpg'), default: getAsset('Preescolar/Paquete A/rojo-dorado.jpg') },
+  magenta: { dorada: getAsset('Preescolar/Paquete A/turquesa-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/turquesa-plata.jpg'), azul: getAsset('Preescolar/Paquete A/turquesa-turquesa.jpg'), roja: getAsset('Preescolar/Paquete A/turquesa-rojo.jpg'), default: getAsset('Preescolar/Paquete A/turquesa-dorado.jpg') },
+};
 
 import {
   CITIES,
@@ -273,88 +238,20 @@ export function StepConfig({
 
   // Get dynamic image showcase based on level and selected configuration
   const showcaseMedia = useMemo(() => {
-    let result: string | { src: string; mask?: string } = gownImg;
+    let result: string | { src: string; mask?: string; stolaNegro?: string } = getAsset('gown-showcase.jpg');
     
     if (level === "preescolar") {
       if (pkg?.kind === "A") {
-        if (togaColor === "azul") {
-          if (stolaColor === "dorada") result = preescolarAzulDorado;
-          else if (stolaColor === "plateada") result = preescolarAzulPlata;
-          else if (stolaColor === "azul") result = preescolarAzulAzul;
-          else if (stolaColor === "roja") result = preescolarAzulRojo;
-          else result = preescolarAzul;
-        }
-        else if (togaColor === "magenta") {
-          if (stolaColor === "dorada") result = preescolarTurquesaDorado;
-          else if (stolaColor === "plateada") result = preescolarTurquesaPlata;
-          else if (stolaColor === "azul") result = preescolarTurquesaAzul;
-          else if (stolaColor === "roja") result = preescolarTurquesaRojo;
-          else result = preescolarMagenta;
-        }
-        else if (togaColor === "rojo") {
-          if (stolaColor === "dorada") result = preescolarRojoDorado;
-          else if (stolaColor === "plateada") result = preescolarRojoPlata;
-          else if (stolaColor === "azul") result = preescolarRojoAzul;
-          else if (stolaColor === "roja") result = preescolarRojoRojo;
-          else result = preescolarRojo;
-        }
-        else if (togaColor === "verde") {
-          if (stolaColor === "dorada") result = preescolarVerdeDorado;
-          else if (stolaColor === "plateada") result = preescolarVerdePlata;
-          else if (stolaColor === "azul") result = preescolarVerdeAzul;
-          else if (stolaColor === "roja") result = preescolarVerdeRojo;
-          else result = preescolarVerde;
-        }
-        else {
-          // stolaColor specific check for black toga
-          if (stolaColor === "dorada") result = preescolarNegroDorado;
-          else if (stolaColor === "plateada") result = preescolarNegroPlata;
-          else if (stolaColor === "azul") result = preescolarNegroAzul;
-          else if (stolaColor === "roja") result = preescolarNegroRojo;
-          else result = preescolarNegro;
-        }
-      } else if (pkg?.kind === "B") {
-        if (pkg.variant === "esencial") result = preescolarEsencial;
-        else if (pkg.variant === "hybrid") result = preescolarBalance;
-        else if (pkg.variant === "max") result = preescolarPremium;
-        else result = preescolarNegro; // fallback
+        const colorVariants = PREESCOLAR_PAQUETE_A[togaColor] || PREESCOLAR_PAQUETE_A.negro;
+        result = colorVariants[stolaColor] || colorVariants.default;
+      } else if (pkg?.kind === "B" && pkg?.variant) {
+        result = PREESCOLAR_PAQUETE_B[pkg.variant] || getAsset('Preescolar/balance.jpg');
       }
-    } else if (level === "primaria") {
+    } else {
       if (pkg?.kind === "A") {
-        result = primariaPaqueteANegroDorado;
-      } else if (pkg?.kind === "B") {
-        if (pkg.variant === "pri_c") result = { src: primariaB1Base, mask: primariaB1Mask, stolaNegro: primariaB1Negro };
-        else if (pkg.variant === "pri_b") result = { src: primariaB2Base, mask: primariaB2Mask, stolaNegro: primariaB2Negro };
-        else if (pkg.variant === "pri_a") result = { src: primariaB3Base, mask: primariaB3Mask, stolaNegro: primariaB3Negro };
-        else result = { src: primariaB1Base, mask: primariaB1Mask, stolaNegro: primariaB1Negro }; // fallback for other variants
-      }
-    } else if (level === "secundaria") {
-      if (pkg?.kind === "A") {
-        result = secundariaPaqueteANegroDorado;
-      } else if (pkg?.kind === "B") {
-        if (pkg.variant === "sec_b") result = { src: secundariaB1Base, mask: secundariaB1Mask, stolaNegro: secundariaB1Negro };
-        else if (pkg.variant === "sec_a") result = { src: secundariaB2Base, mask: secundariaB2Mask, stolaNegro: secundariaB2Negro };
-        else result = { src: secundariaB1Base, mask: secundariaB1Mask, stolaNegro: secundariaB1Negro }; // fallback
-      }
-    } else if (level === "preparatoria") {
-      if (pkg?.kind === "A") {
-        result = preparatoriaPaqueteANegroDorado;
-      } else if (pkg?.kind === "B") {
-        if (pkg.variant === "prep_b") result = { src: preparatoriaB1Base, mask: preparatoriaB1Mask, stolaNegro: preparatoriaB1Negro };
-        else if (pkg.variant === "prep_a") result = { src: preparatoriaB2Base, mask: preparatoriaB2Mask, stolaNegro: preparatoriaB2Negro };
-        else result = { src: preparatoriaB1Base, mask: preparatoriaB1Mask, stolaNegro: preparatoriaB1Negro }; // fallback
-      } else if (pkg?.kind === "C") {
-        if (pkg.variant === "prep_c1") result = { src: preparatoriaC1Base, mask: preparatoriaC1Mask, stolaNegro: preparatoriaC1Negro };
-        else if (pkg.variant === "prep_c2") result = { src: preparatoriaC2Base, mask: preparatoriaC2Mask, stolaNegro: preparatoriaC2Negro };
-        else result = { src: preparatoriaC1Base, mask: preparatoriaC1Mask, stolaNegro: preparatoriaC1Negro }; // fallback
-      }
-    } else if (level === "universidad") {
-      if (pkg?.kind === "A") {
-        result = uniA;
-      } else if (pkg?.kind === "B") {
-        if (pkg.variant === "uni_b") result = { src: uniBBase, mask: uniBMask, stolaNegro: uniBNegro };
-        else if (pkg.variant === "uni_c") result = { src: uniCBase, mask: uniCMask, stolaNegro: uniCNegro };
-        else result = { src: uniBBase, mask: uniBMask, stolaNegro: uniBNegro }; // fallback
+        result = PAQUETE_A_ASSETS[level!] || getAsset('gown-showcase.jpg');
+      } else if ((pkg?.kind === "B" || pkg?.kind === "C") && pkg?.variant) {
+        result = PACKAGE_ASSETS[pkg.variant] || getAsset('gown-showcase.jpg');
       }
     }
     
@@ -378,14 +275,20 @@ export function StepConfig({
           {/* LEFT — Visual showcase */}
           <div className="relative bg-cream/60 lg:sticky lg:top-0 lg:self-start">
             <div className="aspect-[4/5] lg:aspect-auto lg:h-[680px] w-full overflow-hidden relative flex items-center justify-center p-0">
+              
+              {/* Premium Skeleton Loader */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                <div className="w-[75%] h-[85%] bg-black/5 dark:bg-white/5 rounded-3xl animate-pulse" />
+              </div>
+
               <AnimatePresence mode="wait">
                 <motion.div
                   key={showcaseMedia.src + (showcaseMedia.mask ? stolaColor : "")}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="relative max-h-full aspect-[816/1118] flex items-center justify-center"
+                  initial={{ opacity: 0, scale: 0.97, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, scale: 1.03, filter: "blur(8px)" }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="relative w-full max-h-full aspect-[816/1118] flex items-center justify-center z-10"
                 >
                   <img
                     src={showcaseMedia.src}
