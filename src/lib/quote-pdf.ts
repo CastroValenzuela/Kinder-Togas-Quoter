@@ -63,120 +63,92 @@ export function generateQuotePDF(q: QuoteData): void {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const margin = 56;
+  const margin = 50;
   let currentY = 50;
 
-  // Helper for colors
-  const navy: [number, number, number] = [30, 35, 70];
-  const gold: [number, number, number] = [184, 158, 105]; // Stylized gold/cream
-  const lightGray: [number, number, number] = [245, 245, 250];
+  // Colors - Minimalist Palette
+  const textColor: [number, number, number] = [30, 30, 30]; // Dark charcoal
+  const mutedColor: [number, number, number] = [120, 120, 120]; // Gray
+  const accentColor: [number, number, number] = [30, 35, 70]; // Navy blue for absolute highlights
+  const lineColor: [number, number, number] = [230, 230, 230]; // Very light gray for dividers
 
-  // 1. WATERMARK (Light text in background)
-  doc.saveGraphicsState();
-  doc.setGState(new (doc as any).GState({ opacity: 0.05 }));
+  // --- HEADER ---
+  // Logo
+  doc.addImage(LOGO_BASE64, "PNG", margin, currentY, 55, 55);
+
+  // Brand Name & Slogan (Top Right)
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(60);
-  doc.setTextColor(navy[0], navy[1], navy[2]);
-  doc.text("KINDER TOGAS", pageW / 2, pageH / 2, { align: "center", angle: 45 });
-  doc.restoreGraphicsState();
-
-  // 2. HEADER: Real Logo
-  doc.addImage(LOGO_BASE64, "PNG", margin, currentY + 15, 50, 50);
-
-  doc.setFontSize(14);
-  doc.setTextColor(navy[0], navy[1], navy[2]);
-  doc.text("KINDER TOGAS", margin + 65, currentY + 25);
+  doc.setFontSize(16);
+  doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
+  doc.text("KINDER TOGAS", pageW - margin, currentY + 15, { align: "right" });
+  
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
-  doc.text("MOMENTOS QUE SE QUEDAN PARA SIEMPRE", margin + 65, currentY + 38);
-
-  // Quote Title
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.text(`FOLIO: ${q.quoteNumber || 'N/A'}`, pageW - margin, currentY + 25, { align: "right" });
+  doc.setTextColor(mutedColor[0], mutedColor[1], mutedColor[2]);
+  doc.text("MOMENTOS QUE SE QUEDAN PARA SIEMPRE", pageW - margin, currentY + 28, { align: "right" });
+  
   doc.setFontSize(9);
+  doc.text("ventas@kindertogas.com | WA: 646 130 5987", pageW - margin, currentY + 42, { align: "right" });
+
+  currentY += 80;
+
+  // --- TITLE & META ---
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+  doc.text("Cotización", margin, currentY);
+
   doc.setFont("helvetica", "normal");
-  doc.text(`Fecha: ${new Date().toLocaleDateString("es-MX")}`, pageW - margin, currentY + 38, { align: "right" });
-  
-  currentY += 100;
-
-  // 3. DETAILS BOX (Glassmorphism style)
-  doc.setFillColor(lightGray[0], lightGray[1], lightGray[2]);
-  doc.roundedRect(margin, currentY, pageW - (margin * 2), 110, 5, 5, "F");
-  
-  const detailsX = margin + 20;
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(9);
-  doc.setTextColor(navy[0], navy[1], navy[2]);
-  doc.text("DATOS DEL CLIENTE", detailsX, currentY + 20);
-  
-  doc.setDrawColor(navy[0], navy[1], navy[2]);
-  doc.setLineWidth(0.5);
-  doc.line(detailsX, currentY + 25, detailsX + 100, currentY + 25);
-
-  doc.setTextColor(0, 0, 0);
   doc.setFontSize(10);
-  doc.text("Institución:", detailsX, currentY + 45);
-  doc.text("Solicitante:", detailsX, currentY + 60);
-  doc.text("Teléfono:", detailsX, currentY + 75);
-  doc.text("Nivel:", detailsX, currentY + 90);
-  doc.text("Alumnos:", detailsX, currentY + 105);
+  doc.setTextColor(mutedColor[0], mutedColor[1], mutedColor[2]);
+  doc.text(`FOLIO: ${q.quoteNumber || 'N/A'}`, pageW - margin, currentY - 5, { align: "right" });
+  doc.text(`Fecha: ${new Date().toLocaleDateString("es-MX")}`, pageW - margin, currentY + 10, { align: "right" });
 
-  doc.setFont("helvetica", "normal");
-  doc.text(q.school || "N/A", detailsX + 70, currentY + 45);
-  doc.text(q.contact || "N/A", detailsX + 70, currentY + 60);
-  doc.text(q.phone || "N/A", detailsX + 70, currentY + 75);
-  doc.text(levelLabel(q.level), detailsX + 70, currentY + 90);
-  doc.text(String(q.quantity), detailsX + 70, currentY + 105);
+  currentY += 35;
 
-  if (q.date) {
-    doc.setFont("helvetica", "bold");
-    doc.text("Fecha Evento:", detailsX + 250, currentY + 45);
-    doc.setFont("helvetica", "normal");
-    doc.text(formatDate(q.date), detailsX + 330, currentY + 45);
-  }
+  // Divider
+  doc.setDrawColor(lineColor[0], lineColor[1], lineColor[2]);
+  doc.setLineWidth(1);
+  doc.line(margin, currentY, pageW - margin, currentY);
+  currentY += 30;
 
-  if (q.city) {
-    const cityText = q.city === "tijuana" ? "Tijuana" : (q.city === "ensenada" ? "Ensenada" : cityLabel(q.city));
-    doc.setFont("helvetica", "bold");
-    doc.text("Sede / Ciudad:", detailsX + 250, currentY + 90);
-    doc.setFont("helvetica", "normal");
-    doc.text(cityText, detailsX + 330, currentY + 90);
-  }
+  // --- CLIENT DETAILS (2 Columns, Minimal) ---
+  const leftColX = margin;
+  const rightColX = pageW / 2 + 20;
 
-  if (q.level) {
-    const selectedToga = (q.level !== "preescolar" || q.pkg?.kind === "A") ? colorLabel(q.togaColor) : "Negro";
-    const stolaVal = stolaLabel(q.stolaColor);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(mutedColor[0], mutedColor[1], mutedColor[2]);
+  doc.text("PARA:", leftColX, currentY);
+  doc.text("DETALLES DEL EVENTO:", rightColX, currentY);
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Color Toga:", detailsX + 250, currentY + 60);
-    doc.setFont("helvetica", "normal");
-    doc.text(selectedToga, detailsX + 330, currentY + 60);
+  currentY += 15;
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Estola:", detailsX + 250, currentY + 75);
-    doc.setFont("helvetica", "normal");
-    doc.text(stolaVal, detailsX + 330, currentY + 75);
-  }
-
-  currentY += 140;
-
-  // 4. SERVICE DESCRIPTION
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
-  doc.setTextColor(navy[0], navy[1], navy[2]);
-  doc.text("DETALLES DEL SERVICIO", margin, currentY);
-  currentY += 15;
+  doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+  doc.text(q.school || "Institución no especificada", leftColX, currentY);
   
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(60, 60, 60);
-  const desc = `Servicio integral de graduación para nivel ${levelLabel(q.level)}. Incluye renta de toga y birrete de alta calidad, estola personalizada con logo de la institución y año de egreso. El servicio garantiza uniformidad y distinción para todos los graduados.`;
-  const splitDesc = doc.splitTextToSize(desc, pageW - (margin * 2));
-  doc.text(splitDesc, margin, currentY);
-  currentY += splitDesc.length * 12 + 25;
+  doc.setFontSize(10);
+  doc.text(`Nivel: ${levelLabel(q.level)}`, rightColX, currentY);
 
-  // 5. PRICING TABLE
+  currentY += 15;
+
+  doc.setFontSize(10);
+  doc.text(q.contact || "Sin nombre de contacto", leftColX, currentY);
+  
+  const cityText = q.city === "tijuana" ? "Tijuana" : (q.city === "ensenada" ? "Ensenada" : cityLabel(q.city));
+  doc.text(`Sede: ${cityText}`, rightColX, currentY);
+
+  currentY += 15;
+
+  doc.text(q.phone || "Sin teléfono", leftColX, currentY);
+  doc.text(`Fecha estimada: ${q.date ? formatDate(q.date) : 'Por definir'}`, rightColX, currentY);
+
+  currentY += 45;
+
+  // --- PRICING TABLE (Minimalist style) ---
   const unit = unitPrice(q.pkg, q.level);
   const originalUnit = unitOriginalPrice(q.pkg, q.level);
   const discountPercent = getDiscountPercent(q.pkg, q.level);
@@ -185,35 +157,18 @@ export function generateQuotePDF(q: QuoteData): void {
   const selectedToga = (q.level !== "preescolar" || q.pkg?.kind === "A") ? colorLabel(q.togaColor) : "Negro";
   const stolaVal = stolaLabel(q.stolaColor);
 
-  const itemDescription = `Paquete ${packageLabel(q.pkg, q.level)}\n(Toga: ${selectedToga}, Birrete, Estola: ${stolaVal})`;
+  const itemDescription = `Servicio integral de graduación: ${packageLabel(q.pkg, q.level)}\n• Toga color: ${selectedToga}\n• Estola color: ${stolaVal}\n• Incluye birrete premium.`;
 
-  // Construir filas dinámicas según si hay descuento o no
   const tableBody: any[] = [];
   if (discountPercent > 0) {
     const originalTotal = originalUnit * q.quantity;
     const savings = (originalUnit - unit) * q.quantity;
-    
     tableBody.push(
-      [
-        { content: itemDescription, styles: { fontStyle: "bold" } },
-        q.quantity.toString(),
-        formatMXN(originalUnit),
-        formatMXN(originalTotal)
-      ],
-      [
-        { content: `Descuento Promocional Especial (${discountPercent}%)`, styles: { fontStyle: "italic", textColor: [184, 158, 105] as [number, number, number] } },
-        "1",
-        `-${formatMXN(originalUnit - unit)}`,
-        `-${formatMXN(savings)}`
-      ]
+      [itemDescription, q.quantity.toString(), formatMXN(originalUnit), formatMXN(originalTotal)],
+      [{ content: `Descuento Especial Aplicado (${discountPercent}%)`, styles: { fontStyle: "italic", textColor: [184, 158, 105] as [number, number, number] } }, "1", `-${formatMXN(originalUnit - unit)}`, `-${formatMXN(savings)}`]
     );
   } else {
-    tableBody.push([
-      { content: itemDescription, styles: { fontStyle: "bold" } },
-      q.quantity.toString(),
-      formatMXN(unit),
-      formatMXN(total)
-    ]);
+    tableBody.push([itemDescription, q.quantity.toString(), formatMXN(unit), formatMXN(total)]);
   }
 
   autoTable(doc, {
@@ -221,70 +176,89 @@ export function generateQuotePDF(q: QuoteData): void {
     margin: { left: margin, right: margin },
     head: [["DESCRIPCIÓN", "CANTIDAD", "UNITARIO", "TOTAL"]],
     body: tableBody,
-    foot: [
-      ["", "", "TOTAL GENERAL", formatMXN(total)]
-    ],
-    styles: { font: "helvetica", fontSize: 9, cellPadding: 10 },
-    headStyles: { fillColor: navy, textColor: 255, halign: "center" },
-    footStyles: { fillColor: [230, 230, 235], textColor: navy, fontStyle: "bold", halign: "right" },
+    foot: [["", "", "TOTAL:", formatMXN(total)]],
+    theme: "plain", // No backgrounds
+    styles: { 
+      font: "helvetica", 
+      fontSize: 10, 
+      cellPadding: 12,
+      textColor: textColor
+    },
+    headStyles: { 
+      fontStyle: "bold", 
+      textColor: mutedColor, 
+      fontSize: 8,
+      halign: "left"
+    },
+    footStyles: { 
+      fontStyle: "bold", 
+      textColor: accentColor, 
+      fontSize: 12,
+      halign: "right"
+    },
     columnStyles: {
-      1: { halign: "center" },
-      2: { halign: "right" },
-      3: { halign: "right" }
+      0: { cellWidth: "auto" },
+      1: { cellWidth: 70, halign: "center" },
+      2: { cellWidth: 80, halign: "right" },
+      3: { cellWidth: 90, halign: "right" }
+    },
+    didDrawPage: (data) => {
+      // Custom clean borders for the table header and footer
+      const table = data.table;
+      doc.setDrawColor(lineColor[0], lineColor[1], lineColor[2]);
+      doc.setLineWidth(1);
+      
+      // Line under header
+      const headerY = table.head[0].height + data.settings.startY!;
+      doc.line(margin, headerY, pageW - margin, headerY);
+      
+      // Line above footer
+      // @ts-expect-error accessing private property
+      const footerY = table.cursor.y - table.foot[0].height;
+      doc.line(margin, footerY, pageW - margin, footerY);
     }
   });
 
   // @ts-expect-error autotable adds lastAutoTable
-  currentY = doc.lastAutoTable.finalY + 50;
+  currentY = doc.lastAutoTable.finalY + 60;
 
-  // 6. TERMS AND CONDITIONS (Two columns)
+  // --- NOTES & CONDITIONS ---
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(10);
-  doc.setTextColor(navy[0], navy[1], navy[2]);
-  doc.text("NOTAS Y CONDICIONES", margin, currentY);
-  currentY += 20;
+  doc.setFontSize(8);
+  doc.setTextColor(mutedColor[0], mutedColor[1], mutedColor[2]);
+  doc.text("TÉRMINOS Y CONDICIONES", margin, currentY);
+  
+  currentY += 15;
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
-  doc.setTextColor(80, 80, 80);
+  doc.setTextColor(textColor[0], textColor[1], textColor[2]);
   
   const col1 = [
-    "• Precios en Moneda Nacional (MXN).",
-    "• Incluye renta de Toga, Birrete y Estola.",
-    "• La estola se queda con el alumno.",
-    "• Garantía reembolsable de $800 por equipo.",
+    "• Todos los precios están expresados en Moneda Nacional (MXN).",
+    "• La cotización tiene una vigencia estricta de 15 días.",
+    "• Para agendar fecha y congelar precio, se requiere un 50% de anticipo.",
   ];
   const col2 = [
-    "• Vigencia de cotización: 15 días.",
-    "• Se requiere 50% de anticipo para contrato.",
-    "• Liquidación total 5 días antes del evento.",
-    "• Sujeto a disponibilidad de agenda.",
+    "• El 50% restante deberá liquidarse 5 días antes de la entrega.",
+    "• Se requiere un depósito en garantía reembolsable de $800 por equipo.",
+    "• La estola es un recuerdo personalizado y pertenece al alumno.",
   ];
 
-  col1.forEach((text, i) => doc.text(text, margin, currentY + (i * 12)));
-  col2.forEach((text, i) => doc.text(text, margin + 250, currentY + (i * 12)));
+  col1.forEach((text, i) => doc.text(text, margin, currentY + (i * 15)));
+  col2.forEach((text, i) => doc.text(text, pageW / 2 + 10, currentY + (i * 15)));
   
-  currentY += 80;
+  // --- FOOTER ---
+  const footerY = pageH - 40;
+  doc.setDrawColor(lineColor[0], lineColor[1], lineColor[2]);
+  doc.setLineWidth(1);
+  doc.line(margin, footerY - 20, pageW - margin, footerY - 20);
 
-  // 7. SIGNATURE AND CONTACT
-  doc.setDrawColor(200, 200, 200);
-  doc.line(margin, currentY + 40, margin + 150, currentY + 40);
   doc.setFontSize(8);
-  doc.text("Firma de Autorización", margin, currentY + 52);
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(10);
-  doc.text("CONTACTO", pageW - margin, currentY, { align: "right" });
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-  doc.text("WhatsApp: 646 130 5987", pageW - margin, currentY + 15, { align: "right" });
-  doc.text("Email: ventas@kindertogas.com", pageW - margin, currentY + 27, { align: "right" });
-  doc.text("Calle Ruiz y Cuarta #410, Ensenada", pageW - margin, currentY + 39, { align: "right" });
-
-  // 8. FOOTER
-  doc.setFontSize(7);
-  doc.setTextColor(150, 150, 150);
-  doc.text("Esta es una cotización informativa y no representa un contrato legal hasta su firma y pago de anticipo.", pageW / 2, pageH - 30, { align: "center" });
+  doc.setTextColor(mutedColor[0], mutedColor[1], mutedColor[2]);
+  doc.text("Esta es una cotización informativa. No representa un contrato legal hasta el pago del anticipo.", pageW / 2, footerY, { align: "center" });
+  doc.text("www.kindertogas.com", pageW / 2, footerY + 12, { align: "center" });
 
   doc.save(`Cotizacion_KinderTogas_${q.quoteNumber || 'N_A'}.pdf`);
 }
+
