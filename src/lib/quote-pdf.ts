@@ -188,34 +188,23 @@ export function generateQuotePDF(q: QuoteData): void {
       fontStyle: "bold", 
       textColor: mutedColor, 
       fontSize: 8,
-      halign: "left"
+      halign: "left",
+      lineWidth: { bottom: 1 },
+      lineColor: lineColor
     },
     footStyles: { 
       fontStyle: "bold", 
       textColor: accentColor, 
       fontSize: 12,
-      halign: "right"
+      halign: "right",
+      lineWidth: { top: 1 },
+      lineColor: lineColor
     },
     columnStyles: {
       0: { cellWidth: "auto" },
       1: { cellWidth: 70, halign: "center" },
       2: { cellWidth: 80, halign: "right" },
       3: { cellWidth: 90, halign: "right" }
-    },
-    didDrawPage: (data) => {
-      // Custom clean borders for the table header and footer
-      const table = data.table;
-      doc.setDrawColor(lineColor[0], lineColor[1], lineColor[2]);
-      doc.setLineWidth(1);
-      
-      // Line under header
-      const headerY = table.head[0].height + data.settings.startY!;
-      doc.line(margin, headerY, pageW - margin, headerY);
-      
-      // Line above footer
-      // @ts-expect-error accessing private property
-      const footerY = table.cursor.y - table.foot[0].height;
-      doc.line(margin, footerY, pageW - margin, footerY);
     }
   });
 
