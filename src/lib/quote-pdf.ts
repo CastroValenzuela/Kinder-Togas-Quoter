@@ -88,7 +88,7 @@ export function generateQuotePDF(q: QuoteData): void {
   doc.text("MOMENTOS QUE SE QUEDAN PARA SIEMPRE", pageW - margin, currentY + 28, { align: "right" });
   
   doc.setFontSize(9);
-  doc.text("ventas@kindertogas.com | WA: 646 130 5987", pageW - margin, currentY + 42, { align: "right" });
+  doc.text("kindertogas@gmail.com | WA: 646 130 5987", pageW - margin, currentY + 42, { align: "right" });
 
   currentY += 80;
 
