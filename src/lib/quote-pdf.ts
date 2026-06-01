@@ -143,10 +143,17 @@ export function generateQuotePDF(q: QuoteData): void {
 
   currentY += 15;
 
-  doc.text(q.phone || "Sin teléfono", leftColX, currentY);
+  doc.text(`Tel: ${q.phone || "Sin teléfono"}`, leftColX, currentY);
   doc.text(`Fecha estimada: ${q.date ? formatDate(q.date) : 'Por definir'}`, rightColX, currentY);
 
-  currentY += 45;
+  currentY += 15;
+
+  if (q.email) {
+    doc.text(`Email: ${q.email}`, leftColX, currentY);
+    currentY += 15;
+  }
+
+  currentY += 30;
 
   // --- PRICING TABLE (Minimalist style) ---
   const unit = unitPrice(q.pkg, q.level);
