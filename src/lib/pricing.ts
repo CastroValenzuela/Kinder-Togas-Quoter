@@ -67,6 +67,14 @@ export const STOLA_COLORS = [
   { id: "gris_acero", label: "Gris Acero", hex: "#475569" },
   { id: "rosa_fiusha", label: "Rosa Fiusha", hex: "#D946EF" },
   { id: "rosa_claro", label: "Rosa Claro", hex: "#FBCFE8" },
+  // Nuevos colores específicos de Venta Preescolar
+  { id: "azul_pastel", label: "Azul Pastel", hex: "#93C5FD" },
+  { id: "azul_turquesa", label: "Azul Turquesa", hex: "#06B6D4" },
+  { id: "azul_marino", label: "Azul Marino", hex: "#1E3A8A" },
+  { id: "anaranjado", label: "Anaranjado", hex: "#F97316" },
+  { id: "verde_limon", label: "Verde Limón", hex: "#A3E635" },
+  { id: "amarillo", label: "Amarillo", hex: "#FDE047" },
+  { id: "rojo", label: "Rojo", hex: "#DC2626" },
 ];
 
 export function stolaLabel(stola?: string): string {
@@ -77,6 +85,7 @@ export function stolaLabel(stola?: string): string {
     plateada: "Plateada",
     azul: "Azul Rey",
     roja: "Rojo",
+    rojo: "Rojo",
     verde_esmeralda: "Verde Esmeralda",
     negro: "Negro",
     verde_bandera: "Verde Bandera",
@@ -86,10 +95,16 @@ export function stolaLabel(stola?: string): string {
     morado: "Morado",
     blanco: "Blanco",
     naranja: "Naranja",
+    anaranjado: "Anaranjado",
     cafe: "Café",
     gris_acero: "Gris Acero",
     rosa_fiusha: "Rosa Fiusha",
     rosa_claro: "Rosa Claro",
+    azul_pastel: "Azul Pastel",
+    azul_turquesa: "Azul Turquesa",
+    azul_marino: "Azul Marino",
+    verde_limon: "Verde Limón",
+    amarillo: "Amarillo",
     balance: "Blanco (Diseño Balance)",
     premium: "Blanco (Diseño Premium)",
   };
@@ -326,8 +341,16 @@ export function unitPrice(pkg?: PackageChoice, level?: Level): number {
   return basePrice;
 }
 
-export function packageLabel(pkg?: PackageChoice, level?: Level): string {
+export function packageLabel(pkg?: PackageChoice, level?: Level, service?: ServiceType): string {
   if (!pkg) return "—";
+  if (service === "venta") {
+    if (level === "preescolar") {
+      if (pkg.variant === "esencial") return "Estola E.1 Clásica";
+      if (pkg.variant === "hybrid") return "Estola E.2 Combinada";
+      if (pkg.variant === "max") return "Estola E.3 Premium";
+      return "Estola Personalizada";
+    }
+  }
   if (pkg.kind === "A") {
     if (level === "universidad") return "Opción A — Estola Lisa";
     return "Paquete A — Básico";

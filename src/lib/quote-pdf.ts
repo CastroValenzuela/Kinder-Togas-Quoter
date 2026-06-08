@@ -4,6 +4,7 @@ import {
   type Level,
   type City,
   type PackageChoice,
+  type ServiceType,
   unitPrice,
   unitOriginalPrice,
   getDiscountPercent,
@@ -28,6 +29,7 @@ export type QuoteData = {
   date: string;
   email?: string;
   quoteNumber?: string;
+  service?: ServiceType;
   togaColor?: string;
   stolaColor?: string;
 };
@@ -39,7 +41,7 @@ export function buildSummaryText(q: QuoteData): string {
   const stolaVal = stolaLabel(q.stolaColor);
   const cityText = q.city === "tijuana" ? "Tijuana" : (q.city === "ensenada" ? "Ensenada" : cityLabel(q.city));
 
-  return [
+  const rows = [
     `Cotización Kinder Togas - Folio: ${q.quoteNumber || 'N/A'}`,
     "",
     `Nivel: ${levelLabel(q.level)}`,
@@ -48,15 +50,21 @@ export function buildSummaryText(q: QuoteData): string {
     `Teléfono: ${q.phone}`,
     `Fecha evento: ${q.date ? formatDate(q.date) : 'N/A'}`,
     `Sede / Ciudad: ${cityText}`,
-    `Paquete: ${packageLabel(q.pkg, q.level)}`,
-    `Color Toga: ${selectedToga}`,
+    `Paquete: ${packageLabel(q.pkg, q.level, q.service)}`,
+  ];
+  if (q.service !== "venta") {
+    rows.push(`Color Toga: ${selectedToga}`);
+  }
+  rows.push(
     `Estola: ${stolaVal}`,
     `Cantidad de alumnos: ${q.quantity}`,
     `Precio unitario: ${formatMXN(unit)}`,
     `Total: ${formatMXN(total)}`,
     "",
-    "Cotización válida 15 días.",
-  ].join("\n");
+    "Cotización válida 15 días."
+  );
+
+  return rows.join("\n");
 }
 
 export function generateQuotePDF(q: QuoteData): void {
@@ -164,7 +172,9 @@ export function generateQuotePDF(q: QuoteData): void {
   const selectedToga = (q.level !== "preescolar" || q.pkg?.kind === "A") ? colorLabel(q.togaColor) : "Negro";
   const stolaVal = stolaLabel(q.stolaColor);
 
-  const itemDescription = `Servicio integral de graduación: ${packageLabel(q.pkg, q.level)}\n• Toga color: ${selectedToga}\n• Estola color: ${stolaVal}\n• Incluye birrete premium.`;
+  const itemDescription = q.service === "venta"
+    ? `Estola personalizada de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Estola color: ${stolaVal}\n• Impresión/acabado premium.`
+    : `Servicio integral de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Toga color: ${selectedToga}\n• Estola color: ${stolaVal}\n• Incluye birrete premium.`;
 
   const tableBody: any[] = [];
   if (discountPercent > 0) {
@@ -235,7 +245,11 @@ export function generateQuotePDF(q: QuoteData): void {
     "• La cotización tiene una vigencia estricta de 15 días.",
     "• Para agendar fecha y congelar precio, se requiere un 50% de anticipo.",
   ];
-  const col2 = [
+  const col2 = q.service === "venta" ? [
+    "• El 50% restante deberá liquidarse 5 días antes de la entrega.",
+    "• Pedido mínimo: 12 piezas.",
+    "• La estola es un recuerdo personalizado y pertenece al alumno.",
+  ] : [
     "• El 50% restante deberá liquidarse 5 días antes de la entrega.",
     "• Se requiere un depósito en garantía reembolsable de $800 por equipo.",
     "• La estola es un recuerdo personalizado y pertenece al alumno.",

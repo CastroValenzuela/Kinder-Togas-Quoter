@@ -27,6 +27,7 @@ import {
 } from "@/lib/pricing";
 import logo from "@/assets/logo.png";
 import { supabase } from "@/lib/supabase";
+import { MEXICO_STATES } from "@/lib/mexico-locations";
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -73,12 +74,26 @@ export function Quoter() {
   const [quoteNumber, setQuoteNumber] = useState(() => ls("kt-quote-number") || "");
   const [togaColor, setTogaColor] = useState<string>(() => ls("kt-quote-toga-color") || "negro");
   const [stolaColor, setStolaColor] = useState<string>(() => ls("kt-quote-stola-color") || "dorada");
+  const [stateSelected, setStateSelected] = useState(() => ls("kt-quote-state-selected") || "");
+  const [citySelected, setCitySelected] = useState(() => ls("kt-quote-city-selected") || "");
   const [honeypot, setHoneypot] = useState("");
   const [startTime] = useState(() => Date.now());
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [pricesLoaded, setPricesLoaded] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
+
+  // Synchronize schoolAddress for Venta based on selected state and city
+  useEffect(() => {
+    if (service === "venta" && stateSelected) {
+      if (citySelected) {
+        const stateName = MEXICO_STATES.find(s => s.id === stateSelected)?.name || stateSelected;
+        setSchoolAddress(`${citySelected}, ${stateName}`);
+      } else {
+        setSchoolAddress("");
+      }
+    }
+  }, [service, stateSelected, citySelected]);
 
   // Load dynamic pricing rules on mount
   useEffect(() => {
@@ -119,9 +134,11 @@ export function Quoter() {
     localStorage.setItem("kt-quote-email", email);
     localStorage.setItem("kt-quote-toga-color", togaColor);
     localStorage.setItem("kt-quote-stola-color", stolaColor);
+    localStorage.setItem("kt-quote-state-selected", stateSelected);
+    localStorage.setItem("kt-quote-city-selected", citySelected);
     if (quoteNumber) localStorage.setItem("kt-quote-number", quoteNumber);
     else localStorage.removeItem("kt-quote-number");
-  }, [step, level, service, city, pkg, quantity, school, schoolAddress, contact, phone, date, email, quoteNumber, togaColor, stolaColor]);
+  }, [step, level, service, city, pkg, quantity, school, schoolAddress, contact, phone, date, email, quoteNumber, togaColor, stolaColor, stateSelected, citySelected]);
 
   const total = useMemo(() => unitPrice(pkg, level) * quantity, [pkg, level, quantity, pricesLoaded]);
 
@@ -161,13 +178,13 @@ export function Quoter() {
             estimated_date: date || null,
             school_level: level,
             service_option: service,
-            city: city || null,
+            city: service === 'venta' ? citySelected : (city || null),
             package_kind: pkg?.kind,
             package_variant: pkg?.kind === 'B' ? pkg.variant : null,
             student_count: quantity,
             unit_price: unitPrice(pkg, level),
             total_price: total,
-            toga_color: togaColor,
+            toga_color: service === 'venta' ? null : togaColor,
             stola_color: stolaColor,
             discount_percent: getDiscountPercent(pkg, level),
             original_unit_price: unitOriginalPrice(pkg, level),
@@ -194,7 +211,7 @@ export function Quoter() {
       }
     }
     save();
-  }, [step, quoteNumber, isSaved, isSaving, school, contact, phone, email, level, city, pkg, quantity, date, total, service, honeypot, startTime, togaColor, stolaColor, turnstileToken]);
+  }, [step, quoteNumber, isSaved, isSaving, school, contact, phone, email, level, city, pkg, quantity, date, total, service, honeypot, startTime, togaColor, stolaColor, turnstileToken, stateSelected, citySelected]);
   void total;
 
   const canNext: Record<Step, boolean> = {
@@ -208,7 +225,10 @@ export function Quoter() {
        contact.trim().length >= 3 && 
        phone.replace(/\D/g, '').length === 10 && 
        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
-       date !== "",
+       date !== "" &&
+       (service === "venta"
+         ? !!stateSelected && !!citySelected
+         : true),
     5: true,
   };
 
@@ -244,6 +264,8 @@ export function Quoter() {
     setQuoteNumber("");
     setTogaColor("negro");
     setStolaColor("dorada");
+    setStateSelected("");
+    setCitySelected("");
     setIsSaved(false);
   };
 
@@ -341,7 +363,7 @@ export function Quoter() {
                   <span className="text-foreground/80">{service === "renta" ? "Renta" : "Venta"}</span>
                 </button>
               )}
-              {city && step > 3 && (
+              {service !== "venta" && city && step > 3 && (
                 <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <span className="text-[9px] text-muted-foreground/40 font-medium">Ciudad:</span>
                   <span className="text-foreground/80">{cityLabel(city)}</span>
@@ -350,7 +372,7 @@ export function Quoter() {
               {pkg && step > 3 && (
                 <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <span className="text-[9px] text-muted-foreground/40 font-medium">Paquete:</span>
-                  <span className="text-foreground/80">{packageLabel(pkg, level)}</span>
+                  <span className="text-foreground/80">{packageLabel(pkg, level, service)}</span>
                 </button>
               )}
               {quantity > 0 && step > 3 && (
@@ -359,7 +381,7 @@ export function Quoter() {
                   <span className="text-foreground/80">{quantity}</span>
                 </button>
               )}
-              {((pkg?.kind === "A" && level === "preescolar") || level !== "preescolar") && togaColor && step > 3 && (
+              {service !== "venta" && ((pkg?.kind === "A" && level === "preescolar") || level !== "preescolar") && togaColor && step > 3 && (
                 <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring animate-in fade-in slide-in-from-top-1 duration-300">
                   <span className="text-[9px] text-muted-foreground/40 font-medium">Toga:</span>
                   <span className="text-foreground/80">{colorLabel(togaColor)}</span>
@@ -408,9 +430,16 @@ export function Quoter() {
             {step === 2 && (
               <StepService
                 value={service}
+                level={level}
                 onChange={(s) => {
                   setService(s);
-                  if (s === "renta") setTimeout(() => setStep(3), 220);
+                  if (s === "venta" && level === "preescolar") {
+                    setPkg({ kind: "B", variant: "esencial" });
+                    setStolaColor("blanco");
+                  } else {
+                    setPkg({ kind: "A" });
+                  }
+                  setTimeout(() => setStep(3), 220);
                 }}
               />
             )}
@@ -441,6 +470,9 @@ export function Quoter() {
                 date={date}
                 email={email}
                 honeypot={honeypot}
+                service={service}
+                stateSelected={stateSelected}
+                citySelected={citySelected}
                 onSchool={setSchool}
                 onSchoolAddress={setSchoolAddress}
                 onContact={setContact}
@@ -448,6 +480,8 @@ export function Quoter() {
                 onDate={setDate}
                 onEmail={setEmail}
                 onHoneypot={setHoneypot}
+                onStateSelected={setStateSelected}
+                onCitySelected={setCitySelected}
                 onContinue={goNext}
               />
             )}

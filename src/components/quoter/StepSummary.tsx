@@ -47,7 +47,7 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
     { label: "Nivel escolar", value: levelLabel(level), step: 1 },
     { label: "Servicio", value: service === "renta" ? "Renta" : "Venta", step: 2 },
     { label: "Sede / Ciudad", value: city === "tijuana" ? "Tijuana" : (city === "ensenada" ? "Ensenada" : cityLabel(city)), step: 3 },
-    { label: "Paquete", value: packageLabel(pkg, level), step: 3 },
+    { label: "Paquete", value: packageLabel(pkg, level, service), step: 3 },
     ...(discountPercent > 0 ? [
       { label: "Precio de Lista (Unitario)", value: formatMXN(originalUnit), step: 3 },
       { label: "Descuento Promocional", value: `-${discountPercent}%`, step: 3 },
@@ -67,10 +67,16 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
 
     const packageIndex = rows.findIndex(r => r.label === "Paquete");
     if (packageIndex !== -1) {
-      rows.splice(packageIndex + 1, 0, 
-        { label: "Color Toga", value: selectedToga, step: (pkg?.kind === "A" || level !== "preescolar") ? 3 : null },
-        { label: "Estola", value: stolaVal, step: 3 }
-      );
+      if (service === "venta") {
+        rows.splice(packageIndex + 1, 0, 
+          { label: "Estola", value: stolaVal, step: 3 }
+        );
+      } else {
+        rows.splice(packageIndex + 1, 0, 
+          { label: "Color Toga", value: selectedToga, step: (pkg?.kind === "A" || level !== "preescolar") ? 3 : null },
+          { label: "Estola", value: stolaVal, step: 3 }
+        );
+      }
     }
   }
 
@@ -204,20 +210,24 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
           const selectedStola = stolaLabel(stolaColor);
           const serviceLabel = service === "renta" ? "Renta" : "Venta";
 
+          const togaLine = service === "venta" ? "" : `🎨 *Toga:* Color ${selectedToga}\n`;
+          const includesText = service === "venta"
+            ? "Estola personalizada de graduación."
+            : "Toga, Birrete, Borla del año, Estola personalizada y logística coordinada.";
+
           const text = `🎓 *¡Hola a todos!* Les comparto la propuesta oficial de *Kinder Togas* para la graduación de nuestros hijos:
 
 🏫 *Colegio:* ${school}
 🏛️ *Nivel:* ${levelLabel(level)}
 📋 *Servicio:* ${serviceLabel}
-🏷️ *Paquete:* ${packageLabel(pkg, level)}
-🎨 *Toga:* Color ${selectedToga}
-🎗️ *Estola:* ${selectedStola}
+🏷️ *Paquete:* ${packageLabel(pkg, level, service)}
+${togaLine}🎗️ *Estola:* ${selectedStola}
 📦 *Cantidad:* ${quantity} graduados
 💰 *Precio Unitario:* ${formatMXN(unit)}
 💵 *Inversión Total:* ${formatMXN(total)}
 
 📄 *Folio de Cotización:* ${quoteNumber || "—"}
-✨ *Incluye:* Toga, Birrete, Borla del año, Estola personalizada y logística coordinada.
+✨ *Incluye:* ${includesText}
 
 ¿Qué opinan? ¡Está súper completa! 🎓✨`;
 
@@ -229,7 +239,7 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
           <div className="order-2 lg:order-3 lg:col-span-2 pt-8 pb-4 flex flex-col sm:flex-row justify-center items-center gap-6 lg:mt-4 lg:border-t border-hairline">
             <button
               type="button"
-              onClick={() => generateQuotePDF({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, togaColor, stolaColor })}
+              onClick={() => generateQuotePDF({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor })}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-full bg-navy text-navy-foreground px-10 py-4.5 text-base font-semibold hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               <Download className="h-5 w-5" /> Descargar mi Cotización (PDF)

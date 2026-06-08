@@ -10,39 +10,45 @@ const getAsset = (path: string) => {
 };
 
 const PACKAGE_ASSETS: Record<string, { src: string, mask?: string, stolaNegro?: string }> = {
-  pri_c: { src: getAsset('Primaria/B1/B1-base.jpg'), mask: getAsset('Primaria/B1/B1-estola-base.png'), stolaNegro: getAsset('Primaria/B1/B1-estola-negro.png') },
-  pri_b: { src: getAsset('Primaria/B2/B2-base.jpg'), mask: getAsset('Primaria/B2/B2-estola-base.png'), stolaNegro: getAsset('Primaria/B2/B2-estola-negro.png') },
-  pri_a: { src: getAsset('Primaria/B3/B3-base.jpg'), mask: getAsset('Primaria/B3/B3-estola-base.png'), stolaNegro: getAsset('Primaria/B3/B3-estola-negro.png') },
-  sec_b: { src: getAsset('Secundaria/B1/B1-base.jpg'), mask: getAsset('Secundaria/B1/B1-estola-base.png'), stolaNegro: getAsset('Secundaria/B1/B1-estola-negro.png') },
-  sec_a: { src: getAsset('Secundaria/B2/B2-base.jpg'), mask: getAsset('Secundaria/B2/B2-estola-base.png'), stolaNegro: getAsset('Secundaria/B2/B2-estola-negro.png') },
-  prep_b: { src: getAsset('Preparatoria/B1/B1-base.jpg'), mask: getAsset('Preparatoria/B1/B1-estola-base.png'), stolaNegro: getAsset('Preparatoria/B1/B1-estola-negro.png') },
-  prep_a: { src: getAsset('Preparatoria/B2/B2-base.jpg'), mask: getAsset('Preparatoria/B2/B2-estola-base.png'), stolaNegro: getAsset('Preparatoria/B2/B2-estola-negro.png') },
-  prep_c1: { src: getAsset('Preparatoria/C1/C1-base.jpg'), mask: getAsset('Preparatoria/C1/C1-estola-base.png'), stolaNegro: getAsset('Preparatoria/C1/C1-estola-negro.png') },
-  prep_c2: { src: getAsset('Preparatoria/C2/C2-base.jpg'), mask: getAsset('Preparatoria/C2/C2-estola-base.png'), stolaNegro: getAsset('Preparatoria/C2/C2-estola-negro.png') },
-  uni_b: { src: getAsset('Universidad/B/B-base.jpg'), mask: getAsset('Universidad/B/B-estola-base.png'), stolaNegro: getAsset('Universidad/B/B-estola-negro.png') },
-  uni_c: { src: getAsset('Universidad/C/C-base.jpg'), mask: getAsset('Universidad/C/C-estola-base.png'), stolaNegro: getAsset('Universidad/C/C-estola-negro.png') },
+  pri_c: { src: getAsset('Renta/Primaria/B1/B1-base.jpg'), mask: getAsset('Renta/Primaria/B1/B1-estola-base.png'), stolaNegro: getAsset('Renta/Primaria/B1/B1-estola-negro.png') },
+  pri_b: { src: getAsset('Renta/Primaria/B2/B2-base.jpg'), mask: getAsset('Renta/Primaria/B2/B2-estola-base.png'), stolaNegro: getAsset('Renta/Primaria/B2/B2-estola-negro.png') },
+  pri_a: { src: getAsset('Renta/Primaria/B3/B3-base.jpg'), mask: getAsset('Renta/Primaria/B3/B3-estola-base.png'), stolaNegro: getAsset('Renta/Primaria/B3/B3-estola-negro.png') },
+  sec_b: { src: getAsset('Renta/Secundaria/B1/B1-base.jpg'), mask: getAsset('Renta/Secundaria/B1/B1-estola-base.png'), stolaNegro: getAsset('Renta/Secundaria/B1/B1-estola-negro.png') },
+  sec_a: { src: getAsset('Renta/Secundaria/B2/B2-base.jpg'), mask: getAsset('Renta/Secundaria/B2/B2-estola-base.png'), stolaNegro: getAsset('Renta/Secundaria/B2/B2-estola-negro.png') },
+  prep_b: { src: getAsset('Renta/Preparatoria/B1/B1-base.jpg'), mask: getAsset('Renta/Preparatoria/B1/B1-estola-base.png'), stolaNegro: getAsset('Renta/Preparatoria/B1/B1-estola-negro.png') },
+  prep_a: { src: getAsset('Renta/Preparatoria/B2/B2-base.jpg'), mask: getAsset('Renta/Preparatoria/B2/B2-estola-base.png'), stolaNegro: getAsset('Renta/Preparatoria/B2/B2-estola-negro.png') },
+  prep_c1: { src: getAsset('Renta/Preparatoria/C1/C1-base.jpg'), mask: getAsset('Renta/Preparatoria/C1/C1-estola-base.png'), stolaNegro: getAsset('Renta/Preparatoria/C1/C1-estola-negro.png') },
+  prep_c2: { src: getAsset('Renta/Preparatoria/C2/C2-base.jpg'), mask: getAsset('Renta/Preparatoria/C2/C2-estola-base.png'), stolaNegro: getAsset('Renta/Preparatoria/C2/C2-estola-negro.png') },
+  uni_b: { src: getAsset('Renta/Universidad/B/B-base.jpg'), mask: getAsset('Renta/Universidad/B/B-estola-base.png'), stolaNegro: getAsset('Renta/Universidad/B/B-estola-negro.png') },
+  uni_c: { src: getAsset('Renta/Universidad/C/C-base.jpg'), mask: getAsset('Renta/Universidad/C/C-estola-base.png'), stolaNegro: getAsset('Renta/Universidad/C/C-estola-negro.png') },
 };
 
 const PAQUETE_A_ASSETS: Record<string, string> = {
-  primaria: getAsset('Primaria/Paquete A/negro-dorado.jpg'),
-  secundaria: getAsset('Secundaria/Paquete A/negro-dorado.jpg'),
-  preparatoria: getAsset('Preparatoria/Paquete A/negro-dorado.jpg'),
-  universidad: getAsset('Universidad/A.jpg'),
+  primaria: getAsset('Renta/Primaria/Paquete A/negro-dorado.jpg'),
+  secundaria: getAsset('Renta/Secundaria/Paquete A/negro-dorado.jpg'),
+  preparatoria: getAsset('Renta/Preparatoria/Paquete A/negro-dorado.jpg'),
+  universidad: getAsset('Renta/Universidad/A.jpg'),
 };
 
 const PREESCOLAR_PAQUETE_B: Record<string, string> = {
-  esencial: getAsset('Preescolar/esencial.jpg'),
-  hybrid: getAsset('Preescolar/balance.jpg'),
-  max: getAsset('Preescolar/premium.jpg'),
+  esencial: getAsset('Renta/Preescolar/esencial.jpg'),
+  hybrid: getAsset('Renta/Preescolar/balance.jpg'),
+  max: getAsset('Renta/Preescolar/premium.jpg'),
+};
+
+const VENTA_PREESCOLAR_PAQUETE_B: Record<string, string> = {
+  esencial: getAsset('Venta/Preescolar/E1.jpg'),
+  hybrid: getAsset('Venta/Preescolar/E2.jpg'),
+  max: getAsset('Venta/Preescolar/E3.jpg'),
 };
 
 const PREESCOLAR_PAQUETE_A: Record<string, Record<string, string>> = {
-  negro: { dorada: getAsset('Preescolar/Paquete A/negro-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/negro-plata.jpg'), azul: getAsset('Preescolar/Paquete A/negro-azul.jpg'), roja: getAsset('Preescolar/Paquete A/negro-rojo.jpg'), default: getAsset('Preescolar/Paquete A/negro-dorado.jpg') },
-  azul: { dorada: getAsset('Preescolar/Paquete A/azul-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/azul-plata.jpg'), azul: getAsset('Preescolar/Paquete A/azul-azul.jpg'), roja: getAsset('Preescolar/Paquete A/azul-rojo.jpg'), default: getAsset('Preescolar/Paquete A/azul-dorado.jpg') },
-  verde: { dorada: getAsset('Preescolar/Paquete A/verde-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/verde-plata.jpg'), azul: getAsset('Preescolar/Paquete A/verde-azul.jpg'), roja: getAsset('Preescolar/Paquete A/verde-rojo.jpg'), default: getAsset('Preescolar/Paquete A/verde-dorado.jpg') },
-  turquesa: { dorada: getAsset('Preescolar/Paquete A/turquesa-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/turquesa-plata.jpg'), azul: getAsset('Preescolar/Paquete A/turquesa-turquesa.jpg'), roja: getAsset('Preescolar/Paquete A/turquesa-rojo.jpg'), default: getAsset('Preescolar/Paquete A/turquesa-dorado.jpg') },
-  rojo: { dorada: getAsset('Preescolar/Paquete A/rojo-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/rojo-plata.jpg'), azul: getAsset('Preescolar/Paquete A/rojo-azul.jpg'), roja: getAsset('Preescolar/Paquete A/rojo-rojo.jpg'), default: getAsset('Preescolar/Paquete A/rojo-dorado.jpg') },
-  magenta: { dorada: getAsset('Preescolar/Paquete A/turquesa-dorado.jpg'), plateada: getAsset('Preescolar/Paquete A/turquesa-plata.jpg'), azul: getAsset('Preescolar/Paquete A/turquesa-turquesa.jpg'), roja: getAsset('Preescolar/Paquete A/turquesa-rojo.jpg'), default: getAsset('Preescolar/Paquete A/turquesa-dorado.jpg') },
+  negro: { dorada: getAsset('Renta/Preescolar/Paquete A/negro-dorado.jpg'), plateada: getAsset('Renta/Preescolar/Paquete A/negro-plata.jpg'), azul: getAsset('Renta/Preescolar/Paquete A/negro-azul.jpg'), roja: getAsset('Renta/Preescolar/Paquete A/negro-rojo.jpg'), default: getAsset('Renta/Preescolar/Paquete A/negro-dorado.jpg') },
+  azul: { dorada: getAsset('Renta/Preescolar/Paquete A/azul-dorado.jpg'), plateada: getAsset('Renta/Preescolar/Paquete A/azul-plata.jpg'), azul: getAsset('Renta/Preescolar/Paquete A/azul-azul.jpg'), roja: getAsset('Renta/Preescolar/Paquete A/azul-rojo.jpg'), default: getAsset('Renta/Preescolar/Paquete A/azul-dorado.jpg') },
+  verde: { dorada: getAsset('Renta/Preescolar/Paquete A/verde-dorado.jpg'), plateada: getAsset('Renta/Preescolar/Paquete A/verde-plata.jpg'), azul: getAsset('Renta/Preescolar/Paquete A/verde-azul.jpg'), roja: getAsset('Renta/Preescolar/Paquete A/verde-rojo.jpg'), default: getAsset('Renta/Preescolar/Paquete A/verde-dorado.jpg') },
+  turquesa: { dorada: getAsset('Renta/Preescolar/Paquete A/turquesa-dorado.jpg'), plateada: getAsset('Renta/Preescolar/Paquete A/turquesa-plata.jpg'), azul: getAsset('Renta/Preescolar/Paquete A/turquesa-turquesa.jpg'), roja: getAsset('Renta/Preescolar/Paquete A/turquesa-rojo.jpg'), default: getAsset('Renta/Preescolar/Paquete A/turquesa-dorado.jpg') },
+  rojo: { dorada: getAsset('Renta/Preescolar/Paquete A/rojo-dorado.jpg'), plateada: getAsset('Renta/Preescolar/Paquete A/rojo-plata.jpg'), azul: getAsset('Renta/Preescolar/Paquete A/rojo-azul.jpg'), roja: getAsset('Renta/Preescolar/Paquete A/rojo-rojo.jpg'), default: getAsset('Renta/Preescolar/Paquete A/rojo-dorado.jpg') },
+  magenta: { dorada: getAsset('Renta/Preescolar/Paquete A/turquesa-dorado.jpg'), plateada: getAsset('Renta/Preescolar/Paquete A/turquesa-plata.jpg'), azul: getAsset('Renta/Preescolar/Paquete A/turquesa-turquesa.jpg'), roja: getAsset('Renta/Preescolar/Paquete A/turquesa-rojo.jpg'), default: getAsset('Renta/Preescolar/Paquete A/turquesa-dorado.jpg') },
 };
 
 import {
@@ -100,6 +106,24 @@ const FEATURES_B: Record<"esencial" | "hybrid" | "max", { icon: typeof Camera; t
     { icon: Camera, text: "Impresión 9×35 cm panorámica en ambos lados." },
     { icon: Shirt, text: "Toga premium, birrete, borla del año y estola." },
     { icon: Layers, text: "Máxima calidad de impresión profesional." },
+  ],
+};
+
+const FEATURES_VENTA_PREESCOLAR: Record<"esencial" | "hybrid" | "max", { icon: typeof Camera; text: string }[]> = {
+  esencial: [
+    { icon: Camera, text: "Diseño clásico 9x12 cm por lado en ambos lados." },
+    { icon: Sparkles, text: "Personalización esencial: Logo, nombre y año de graduación." },
+    { icon: Layers, text: "Acabado premium: Tela satinada de alta calidad con impresión profesional." },
+  ],
+  hybrid: [
+    { icon: Camera, text: "Diseño híbrido: 9×12 cm + 9×35 cm." },
+    { icon: Sparkles, text: "Personalización equilibrada: Una impresión grande y una pequeña." },
+    { icon: Layers, text: "Acabado premium: Tela satinada de alta calidad con impresión profesional." },
+  ],
+  max: [
+    { icon: Camera, text: "Cobertura completa: Diseño en ambos lados de la estola." },
+    { icon: Sparkles, text: "Personalización total: Nombre, logo escolar y temática personalizada." },
+    { icon: Layers, text: "Acabado premium: Tela satinada de alta calidad con impresión profesional." },
   ],
 };
 
@@ -234,7 +258,11 @@ export function StepConfig({
   });
 
   let features = FEATURES_A;
-  if (isUni) {
+  if (service === "venta" && level === "preescolar") {
+    if (pkg?.kind === "B" && pkg.variant) {
+      features = FEATURES_VENTA_PREESCOLAR[pkg.variant as "esencial" | "hybrid" | "max"] || FEATURES_A;
+    }
+  } else if (isUni) {
     if (pkg?.kind === "A") {
       features = FEATURES_UNI_A;
     } else if (pkg?.kind === "B" && pkg.variant === "uni_c") {
@@ -269,7 +297,11 @@ export function StepConfig({
         const colorVariants = PREESCOLAR_PAQUETE_A[togaColor] || PREESCOLAR_PAQUETE_A.negro;
         result = colorVariants[stolaColor] || colorVariants.default;
       } else if (pkg?.kind === "B" && pkg?.variant) {
-        result = PREESCOLAR_PAQUETE_B[pkg.variant] || getAsset('Preescolar/balance.jpg');
+        if (service === "venta") {
+          result = VENTA_PREESCOLAR_PAQUETE_B[pkg.variant] || getAsset('Venta/Preescolar/E2.jpg');
+        } else {
+          result = PREESCOLAR_PAQUETE_B[pkg.variant] || getAsset('Renta/Preescolar/balance.jpg');
+        }
       }
     } else {
       if (pkg?.kind === "A") {
@@ -281,7 +313,7 @@ export function StepConfig({
     
     // Normalize return type
     return typeof result === "string" ? { src: result } : result;
-  }, [level, pkg, togaColor, stolaColor]);
+  }, [level, pkg, togaColor, stolaColor, service]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -445,21 +477,20 @@ export function StepConfig({
               </section>
             )}
 
-            {/* Paquete — segmented / direct options for University */}
+            {/* Paquete — segmented / direct options for University and Venta Preescolar */}
             <section>
               <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                {isUni ? "Opción de Estola" : "Paquete"}
+                {(isUni || (service === "venta" && level === "preescolar")) ? "Opción de Estola" : "Paquete"}
               </p>
 
-              {isUni ? (
+              {(isUni || (service === "venta" && level === "preescolar")) ? (
                 <div className="space-y-2.5">
-                  {[
+                  {(isUni ? [
                     {
                       id: "uni_a",
                       code: "A",
                       title: "Opción A — Estola Lisa",
                       desc: "Estola lisa sin estampado ni bordado",
-                      price: PRICES.UNI_A,
                       payload: { kind: "A" } as const,
                       isActive: pkg?.kind === "A"
                     },
@@ -468,7 +499,6 @@ export function StepConfig({
                       code: "B",
                       title: "Opción B — Impresión de Alta Calidad",
                       desc: "Estola personalizada con impresión digital de alta calidad",
-                      price: PRICES.UNI_B,
                       payload: { kind: "B", variant: "uni_b" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "uni_b"
                     },
@@ -477,11 +507,35 @@ export function StepConfig({
                       code: "C",
                       title: "Opción C — Bordado de Alta Calidad",
                       desc: "Estola personalizada con bordado de alta resolución",
-                      price: PRICES.UNI_C,
                       payload: { kind: "B", variant: "uni_c" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "uni_c"
                     }
-                   ].map((opt) => {
+                  ] : [
+                    {
+                      id: "esencial",
+                      code: "E.1",
+                      title: "E.1 Clásica",
+                      desc: "Diseño elegante y discreto (2 impresiones 9x12 cm)",
+                      payload: { kind: "B", variant: "esencial" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "esencial"
+                    },
+                    {
+                      id: "hybrid",
+                      code: "E.2",
+                      title: "E.2 Combinada",
+                      desc: "Diseño híbrido y equilibrado (9x12 cm + 9x35 cm)",
+                      payload: { kind: "B", variant: "hybrid" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "hybrid"
+                    },
+                    {
+                      id: "max",
+                      code: "E.3",
+                      title: "E.3 Premium",
+                      desc: "Cobertura completa y temática personalizada (2 de 9x35 cm)",
+                      payload: { kind: "B", variant: "max" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "max"
+                    }
+                  ]).map((opt) => {
                     const originalPrice = unitOriginalPrice(opt.payload, level);
                     const netPrice = unitPrice(opt.payload, level);
                     const discount = getDiscountPercent(opt.payload, level);
@@ -691,7 +745,8 @@ export function StepConfig({
             </section>
 
             {/* Color de Toga */}
-            {((pkg?.kind === "A" && level === "preescolar") ||
+            {service !== "venta" &&
+              ((pkg?.kind === "A" && level === "preescolar") ||
               level === "primaria" ||
               level === "secundaria" ||
               level === "preparatoria" ||
@@ -732,6 +787,10 @@ export function StepConfig({
             {(() => {
               const visibleStolas = STOLA_COLORS.filter((s: any) => {
                 if (level === "preescolar") {
+                  if (service === "venta") {
+                    const ids = ["azul_pastel", "azul_turquesa", "azul_marino", "rosa_claro", "rosa_fiusha", "lila", "morado", "anaranjado", "verde_limon", "verde_esmeralda", "verde_bandera", "rojo", "blanco", "amarillo"];
+                    return ids.includes(s.id);
+                  }
                   if (pkg?.kind === "A") return s.isBasic;
                   return false;
                 }

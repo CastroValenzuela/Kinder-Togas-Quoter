@@ -1,11 +1,22 @@
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, CalendarIcon } from "lucide-react";
+import { ArrowRight, CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { format, addMonths, startOfDay } from "date-fns";
 import { es } from "date-fns/locale";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { MEXICO_STATES, MEXICO_CITIES_BY_STATE } from "@/lib/mexico-locations";
 
 type Props = {
   school: string;
@@ -15,6 +26,9 @@ type Props = {
   date: string;
   email: string;
   honeypot: string;
+  service?: "renta" | "venta";
+  stateSelected: string;
+  citySelected: string;
   onSchool: (s: string) => void;
   onSchoolAddress: (s: string) => void;
   onContact: (c: string) => void;
@@ -22,6 +36,8 @@ type Props = {
   onDate: (d: string) => void;
   onEmail: (e: string) => void;
   onHoneypot: (h: string) => void;
+  onStateSelected: (s: string) => void;
+  onCitySelected: (c: string) => void;
   onContinue: () => void;
 };
 
@@ -33,6 +49,9 @@ export function StepDetails({
   date,
   email,
   honeypot,
+  service,
+  stateSelected,
+  citySelected,
   onSchool,
   onSchoolAddress,
   onContact,
@@ -40,14 +59,22 @@ export function StepDetails({
   onDate,
   onEmail,
   onHoneypot,
+  onStateSelected,
+  onCitySelected,
   onContinue,
 }: Props) {
+  const [stateOpen, setStateOpen] = useState(false);
+  const [cityOpen, setCityOpen] = useState(false);
+
   const canContinue = 
     school.trim().length >= 3 && 
     contact.trim().length >= 3 && 
     phone.replace(/\D/g, '').length === 10 && 
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
-    date !== "";
+    date !== "" &&
+    (service === "venta"
+      ? !!stateSelected && !!citySelected
+      : true);
 
   return (
     <div className="mx-auto max-w-xl">
@@ -84,7 +111,10 @@ export function StepDetails({
             value={school}
             onChange={(e) => {
               onSchool(e.target.value);
-              onSchoolAddress(""); // Temporary clear since we reverted maps
+              // reset school address if rented, but if sales it will be handled by state/city effects
+              if (service !== "venta") {
+                onSchoolAddress("");
+              }
             }}
             className="h-12 text-base"
           />
@@ -92,6 +122,116 @@ export function StepDetails({
             Mínimo 3 caracteres
           </p>
         </div>
+
+        {/* Searchable State & City Autocomplete for Venta */}
+        {service === "venta" && (
+          <div className="space-y-5 border border-hairline rounded-2xl p-5 bg-cream/40 animate-in fade-in slide-in-from-top-3 duration-300">
+            <h3 className="text-xs uppercase tracking-wider font-bold text-navy mb-1">Dirección de Envío</h3>
+            
+            {/* Estado Selector */}
+            <div className="space-y-2 flex flex-col">
+              <Label>Estado de la República</Label>
+              <Popover open={stateOpen} onOpenChange={setStateOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={stateOpen}
+                    className="h-12 w-full justify-between text-base font-normal bg-background hover:bg-background border-input text-left px-3.5"
+                  >
+                    <span className="truncate">
+                      {stateSelected
+                        ? MEXICO_STATES.find((state) => state.id === stateSelected)?.name
+                        : "Seleccionar estado..."}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Buscar estado..." />
+                    <CommandList>
+                      <CommandEmpty>No se encontró el estado.</CommandEmpty>
+                      <CommandGroup>
+                        {MEXICO_STATES.map((state) => (
+                          <CommandItem
+                            key={state.id}
+                            value={state.name}
+                            onSelect={() => {
+                              onStateSelected(state.id);
+                              onCitySelected("");
+                              setStateOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                stateSelected === state.id ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {state.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Ciudad Selector */}
+            {stateSelected && (
+              <div className="space-y-2 flex flex-col animate-in fade-in slide-in-from-top-1 duration-200">
+                <Label>Ciudad o Municipio</Label>
+                <Popover open={cityOpen} onOpenChange={setCityOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={cityOpen}
+                      className="h-12 w-full justify-between text-base font-normal bg-background hover:bg-background border-input text-left px-3.5"
+                    >
+                      <span className="truncate">
+                        {citySelected
+                          ? citySelected
+                          : "Seleccionar ciudad..."}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[300px] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Buscar ciudad..." />
+                      <CommandList>
+                        <CommandEmpty>No se encontró la ciudad.</CommandEmpty>
+                        <CommandGroup>
+                          {(MEXICO_CITIES_BY_STATE[stateSelected] || []).map((city) => (
+                            <CommandItem
+                              key={city}
+                              value={city}
+                              onSelect={() => {
+                                onCitySelected(city);
+                                setCityOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  citySelected === city ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {city}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="space-y-2">
           <Label htmlFor="contact">Nombre del Solicitante</Label>
@@ -195,7 +335,7 @@ export function StepDetails({
           type="button"
           onClick={onContinue}
           disabled={!canContinue}
-          className="w-full mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-navy text-navy-foreground px-8 py-4 text-sm font-medium hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-navy text-navy-foreground px-8 py-4 text-sm font-medium hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         >
           Finalizar y Generar Folio <ArrowRight className="h-4 w-4" />
         </button>
