@@ -369,11 +369,11 @@ export function StepConfig({
 
                      const maskStyles = {
                        WebkitMaskImage: `url(${showcaseMedia.mask})`,
-                       WebkitMaskSize: "100% 100%",
+                       WebkitMaskSize: "contain",
                        WebkitMaskPosition: "center",
                        WebkitMaskRepeat: "no-repeat",
                        maskImage: `url(${showcaseMedia.mask})`,
-                       maskSize: "100% 100%",
+                       maskSize: "contain",
                        maskPosition: "center",
                        maskRepeat: "no-repeat"
                      };
