@@ -344,18 +344,29 @@ export function StepConfig({
 
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={showcaseMedia.src + (showcaseMedia.mask ? stolaColor : "")}
+                  key={showcaseMedia.src + (stolaColor !== "blanco" ? stolaColor : "")}
                   initial={{ opacity: 0, filter: "blur(8px)" }}
                   animate={{ opacity: 1, filter: "blur(0px)" }}
                   exit={{ opacity: 0, filter: "blur(8px)" }}
                   transition={{ duration: 0.4, ease: "easeInOut" }}
-                  className="relative max-h-full aspect-[816/1118] flex items-center justify-center z-10"
+                  className={cn(
+                    "relative max-h-full flex items-center justify-center z-10",
+                    service === "venta" ? "w-full h-full" : "aspect-[816/1118]"
+                  )}
                 >
                   <img
                     src={showcaseMedia.src}
                     alt="Toga de graduación premium"
-                    className="w-full h-full object-contain"
+                    className={cn(
+                      "w-full h-full object-contain"
+                    )}
                   />
+                  {service === "venta" && stolaColor !== "blanco" && (
+                    <div 
+                      className="absolute inset-0 mix-blend-multiply pointer-events-none" 
+                      style={{ backgroundColor: STOLA_COLORS.find(c => c.id === stolaColor)?.hex || "transparent" }} 
+                    />
+                  )}
                   {showcaseMedia.mask && stolaColor !== "blanco" && (() => {
                      const activeStola = STOLA_COLORS.find((c) => c.id === stolaColor);
                      const stolaBg = (activeStola as any)?.gradient || activeStola?.hex || "transparent";

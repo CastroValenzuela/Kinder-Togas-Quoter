@@ -44,9 +44,7 @@ export function StepService({ value, onChange, level }: Props) {
             ariaLabel="Venta"
             className="py-10"
           >
-            <span className="absolute top-4 right-4 text-[10px] uppercase tracking-[0.18em] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1 font-bold">
-              Disponible
-            </span>
+
             <ShoppingBag className="h-8 w-8 text-navy" strokeWidth={1.5} />
             <h3 className="font-display text-2xl mt-5">Venta</h3>
             <p className="mt-2 text-sm text-muted-foreground">
