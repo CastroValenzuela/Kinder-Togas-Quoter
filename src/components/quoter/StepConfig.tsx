@@ -36,10 +36,10 @@ const PREESCOLAR_PAQUETE_B: Record<string, string> = {
   max: getAsset('Renta/Preescolar/premium.jpg'),
 };
 
-const VENTA_PREESCOLAR_PAQUETE_B: Record<string, string> = {
-  esencial: getAsset('Venta/Preescolar/E1.jpg'),
-  hybrid: getAsset('Venta/Preescolar/E2.jpg'),
-  max: getAsset('Venta/Preescolar/E3.jpg'),
+const VENTA_PREESCOLAR_PAQUETE_B: Record<string, { src: string, mask?: string }> = {
+  esencial: { src: getAsset('Venta/Preescolar/E1.jpg'), mask: getAsset('Venta/Preescolar/E1-mask.png') },
+  hybrid: { src: getAsset('Venta/Preescolar/E2.jpg'), mask: getAsset('Venta/Preescolar/E2-mask.png') },
+  max: { src: getAsset('Venta/Preescolar/E3.jpg'), mask: getAsset('Venta/Preescolar/E3-mask.png') },
 };
 
 const PREESCOLAR_PAQUETE_A: Record<string, Record<string, string>> = {
@@ -361,12 +361,7 @@ export function StepConfig({
                       "w-full h-full object-contain"
                     )}
                   />
-                  {service === "venta" && stolaColor !== "blanco" && (
-                    <div 
-                      className="absolute inset-0 mix-blend-multiply pointer-events-none" 
-                      style={{ backgroundColor: STOLA_COLORS.find(c => c.id === stolaColor)?.hex || "transparent" }} 
-                    />
-                  )}
+
                   {showcaseMedia.mask && stolaColor !== "blanco" && (() => {
                      const activeStola = STOLA_COLORS.find((c) => c.id === stolaColor);
                      const stolaBg = (activeStola as any)?.gradient || activeStola?.hex || "transparent";
