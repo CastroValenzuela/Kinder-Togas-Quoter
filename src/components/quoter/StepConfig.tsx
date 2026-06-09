@@ -286,7 +286,7 @@ export function StepConfig({
     }
   }
 
-  const total = unitPrice(pkg, level) * quantity;
+  const total = unitPrice(pkg, level, service) * quantity;
 
   // Get dynamic image showcase based on level and selected configuration
   const showcaseMedia = useMemo(() => {
@@ -542,9 +542,9 @@ export function StepConfig({
                       isActive: pkg?.kind === "B" && pkg.variant === "max"
                     }
                   ]).map((opt) => {
-                    const originalPrice = unitOriginalPrice(opt.payload, level);
-                    const netPrice = unitPrice(opt.payload, level);
-                    const discount = getDiscountPercent(opt.payload, level);
+                    const originalPrice = unitOriginalPrice(opt.payload, level, service);
+                    const netPrice = unitPrice(opt.payload, level, service);
+                    const discount = getDiscountPercent(opt.payload, level, service);
                     
                     return (
                       <button
@@ -660,9 +660,9 @@ export function StepConfig({
                           {visibleVariants.map((v) => {
                             const active = (pkg?.kind === "B" || pkg?.kind === "C") && pkg.variant === v.id;
                             const currentPayload = { kind: pkg?.kind || "B", variant: v.id } as const;
-                            const originalPrice = unitOriginalPrice(currentPayload, level);
-                            const netPrice = unitPrice(currentPayload, level);
-                            const discount = getDiscountPercent(currentPayload, level);
+                            const originalPrice = unitOriginalPrice(currentPayload, level, service);
+                            const netPrice = unitPrice(currentPayload, level, service);
+                            const discount = getDiscountPercent(currentPayload, level, service);
 
                             return (
                               <button
@@ -711,9 +711,9 @@ export function StepConfig({
 
                   {/* Package price hint */}
                   {pkg?.kind === "A" && (() => {
-                    const originalPrice = unitOriginalPrice(pkg, level);
-                    const netPrice = unitPrice(pkg, level);
-                    const discount = getDiscountPercent(pkg, level);
+                    const originalPrice = unitOriginalPrice(pkg, level, service);
+                    const netPrice = unitPrice(pkg, level, service);
+                    const discount = getDiscountPercent(pkg, level, service);
                     
                     return (
                       <div className="pt-4 animate-in fade-in slide-in-from-top-1 duration-200">

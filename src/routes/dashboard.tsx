@@ -2551,6 +2551,9 @@ export function AdminDashboard() {
                   { key: "B_ESENCIAL_PREESCOLAR", title: "Paquete B — Esencial (Preescolar)", desc: "Estola con diseño compacto 9x12 cm en ambos lados (B.1) para Preescolar.", levels: ["preescolar"] },
                   { key: "B_BALANCE_PREESCOLAR", title: "Paquete B — Balance (Preescolar)", desc: "Estola con logo e impresión mixta mediana (B.2) para Preescolar.", levels: ["preescolar"] },
                   { key: "B_PREMIUM_PREESCOLAR", title: "Paquete B — Premium (Preescolar)", desc: "Estola con logo e impresión gigante completa (B.3) para Preescolar.", levels: ["preescolar"] },
+                  { key: "V_E1_PREESCOLAR", title: "Venta Preescolar — E.1 Clásica", desc: "Estola esencial para Venta en nivel preescolar.", levels: ["preescolar"] },
+                  { key: "V_E2_PREESCOLAR", title: "Venta Preescolar — E.2 Combinada", desc: "Estola híbrida para Venta en nivel preescolar.", levels: ["preescolar"] },
+                  { key: "V_E3_PREESCOLAR", title: "Venta Preescolar — E.3 Premium", desc: "Estola máxima cobertura para Venta en nivel preescolar.", levels: ["preescolar"] },
 
                   // Primaria (desacoplado)
                   { key: "A_PRIMARIA", title: "Paquete A — Básico (Primaria)", desc: "Toga y Estola Lisa estándar para ceremonias tradicionales de Primaria.", levels: ["primaria"] },

@@ -140,7 +140,7 @@ export function Quoter() {
     else localStorage.removeItem("kt-quote-number");
   }, [step, level, service, city, pkg, quantity, school, schoolAddress, contact, phone, date, email, quoteNumber, togaColor, stolaColor, stateSelected, citySelected]);
 
-  const total = useMemo(() => unitPrice(pkg, level) * quantity, [pkg, level, quantity, pricesLoaded]);
+  const total = useMemo(() => unitPrice(pkg, level, service) * quantity, [pkg, level, service, quantity, pricesLoaded]);
 
   // Save to Supabase
   useEffect(() => {
@@ -182,7 +182,7 @@ export function Quoter() {
             package_kind: pkg?.kind,
             package_variant: pkg?.kind === 'B' ? pkg.variant : null,
             student_count: quantity,
-            unit_price: unitPrice(pkg, level),
+            unit_price: unitPrice(pkg, level, service),
             total_price: total,
             toga_color: service === 'venta' ? null : togaColor,
             stola_color: stolaColor,

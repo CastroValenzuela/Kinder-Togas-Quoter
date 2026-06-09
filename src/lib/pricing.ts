@@ -125,6 +125,11 @@ export const PRICES = {
   B_ESENCIAL_PREESCOLAR: 450,
   B_BALANCE_PREESCOLAR: 480,
   B_PREMIUM_PREESCOLAR: 510,
+  
+  // Venta Preescolar
+  V_E1_PREESCOLAR: 180,
+  V_E2_PREESCOLAR: 190,
+  V_E3_PREESCOLAR: 200,
 
   // Primaria (desacoplado)
   A_PRIMARIA: 350,
@@ -158,6 +163,9 @@ export const DISCOUNTS = {
   B_ESENCIAL_PREESCOLAR: 0,
   B_BALANCE_PREESCOLAR: 0,
   B_PREMIUM_PREESCOLAR: 0,
+  V_E1_PREESCOLAR: 0,
+  V_E2_PREESCOLAR: 0,
+  V_E3_PREESCOLAR: 0,
 
   A_PRIMARIA: 0,
   B_BALANCE_PRIMARIA: 0,
@@ -262,7 +270,7 @@ export async function loadDynamicPrices(): Promise<boolean> {
 /**
  * Mapea un paquete o variante a su llave (key) de precios
  */
-export function getPriceKey(pkg?: PackageChoice, level?: Level): keyof typeof PRICES | undefined {
+export function getPriceKey(pkg?: PackageChoice, level?: Level, service?: string): keyof typeof PRICES | undefined {
   if (!pkg) return undefined;
   
   if (pkg.kind === "A") {
@@ -275,17 +283,20 @@ export function getPriceKey(pkg?: PackageChoice, level?: Level): keyof typeof PR
   }
   
   if (pkg.variant === "esencial") {
+    if (service === "venta" && level === "preescolar") return "V_E1_PREESCOLAR";
     if (level === "preescolar") return "B_ESENCIAL_PREESCOLAR";
     return "B_ESENCIAL_PREESCOLAR"; // fallback seguro
   }
   
   if (pkg.variant === "hybrid") {
+    if (service === "venta" && level === "preescolar") return "V_E2_PREESCOLAR";
     if (level === "preescolar") return "B_BALANCE_PREESCOLAR";
     if (level === "primaria") return "B_BALANCE_PRIMARIA";
     return "B_BALANCE_PRIMARIA"; // fallback seguro
   }
   
   if (pkg.variant === "max") {
+    if (service === "venta" && level === "preescolar") return "V_E3_PREESCOLAR";
     if (level === "preescolar") return "B_PREMIUM_PREESCOLAR";
     if (level === "primaria") return "B_PREMIUM_PRIMARIA";
     return "B_PREMIUM_PRIMARIA"; // fallback seguro
@@ -309,9 +320,9 @@ export function getPriceKey(pkg?: PackageChoice, level?: Level): keyof typeof PR
 /**
  * Obtiene el precio unitario original de un paquete sin aplicar descuento.
  */
-export function unitOriginalPrice(pkg?: PackageChoice, level?: Level): number {
+export function unitOriginalPrice(pkg?: PackageChoice, level?: Level, service?: string): number {
   if (!pkg) return 0;
-  const key = getPriceKey(pkg, level);
+  const key = getPriceKey(pkg, level, service);
   if (key && key in PRICES) {
     return PRICES[key];
   }
@@ -321,8 +332,8 @@ export function unitOriginalPrice(pkg?: PackageChoice, level?: Level): number {
 /**
  * Obtiene el porcentaje de descuento de un paquete.
  */
-export function getDiscountPercent(pkg?: PackageChoice, level?: Level): number {
-  const key = getPriceKey(pkg, level);
+export function getDiscountPercent(pkg?: PackageChoice, level?: Level, service?: string): number {
+  const key = getPriceKey(pkg, level, service);
   if (key && key in DISCOUNTS) {
     return DISCOUNTS[key];
   }
@@ -332,9 +343,9 @@ export function getDiscountPercent(pkg?: PackageChoice, level?: Level): number {
 /**
  * Retorna el precio unitario neto (aplicando descuento si existiera).
  */
-export function unitPrice(pkg?: PackageChoice, level?: Level): number {
-  const basePrice = unitOriginalPrice(pkg, level);
-  const discountPercent = getDiscountPercent(pkg, level);
+export function unitPrice(pkg?: PackageChoice, level?: Level, service?: string): number {
+  const basePrice = unitOriginalPrice(pkg, level, service);
+  const discountPercent = getDiscountPercent(pkg, level, service);
   if (discountPercent > 0) {
     return Math.round(basePrice * (1 - discountPercent / 100));
   }
