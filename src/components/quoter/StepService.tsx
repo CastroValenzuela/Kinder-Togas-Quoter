@@ -48,7 +48,7 @@ export function StepService({ value, onChange, level }: Props) {
             <ShoppingBag className="h-8 w-8 text-navy" strokeWidth={1.5} />
             <h3 className="font-display text-2xl mt-5">Venta</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Estolas personalizadas listas para comprar y conservar.
+              Estolas y birretes personalizados listos para comprar y conservar.
             </p>
           </SelectableCard>
         ) : (
@@ -59,7 +59,7 @@ export function StepService({ value, onChange, level }: Props) {
             <ShoppingBag className="h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
             <h3 className="font-display text-2xl mt-5 text-muted-foreground">Venta</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Venta de estolas disponible por ahora solo para Preescolar.
+              Venta disponible por ahora solo para Preescolar.
             </p>
           </SelectableCard>
         )}

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { AnimatePresence, motion, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem } from "lucide-react";
-const assets = import.meta.glob('@/assets/**/*.{jpg,png}', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
+import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem, Award } from "lucide-react";
+const assets = import.meta.glob('@/assets/**/*.{jpg,jpeg,png}', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 
 const getAsset = (path: string) => {
   const url = assets[`/src/assets/${path}`];
@@ -37,9 +37,9 @@ const PREESCOLAR_PAQUETE_B: Record<string, string> = {
 };
 
 const VENTA_PREESCOLAR_PAQUETE_B: Record<string, { src: string, mask?: string }> = {
-  esencial: { src: getAsset('Venta/Preescolar/E1.jpg'), mask: getAsset('Venta/Preescolar/E1-mask.png') },
-  hybrid: { src: getAsset('Venta/Preescolar/E2.jpg'), mask: getAsset('Venta/Preescolar/E2-mask.png') },
-  max: { src: getAsset('Venta/Preescolar/E3.jpg'), mask: getAsset('Venta/Preescolar/E3-mask.png') },
+  esencial: { src: getAsset('Venta/Preescolar/Estolas/E1.jpg'), mask: getAsset('Venta/Preescolar/Estolas/E1-mask.png') },
+  hybrid: { src: getAsset('Venta/Preescolar/Estolas/E2.jpg'), mask: getAsset('Venta/Preescolar/Estolas/E2-mask.png') },
+  max: { src: getAsset('Venta/Preescolar/Estolas/E3.jpg'), mask: getAsset('Venta/Preescolar/Estolas/E3-mask.png') },
 };
 
 const PREESCOLAR_PAQUETE_A: Record<string, Record<string, string>> = {
@@ -73,11 +73,13 @@ type Props = {
   service?: "renta" | "venta";
   city?: City;
   pkg?: PackageChoice;
+  productCategory?: "estolas" | "birretes";
   quantity: number;
   togaColor: string;
   stolaColor: string;
   onCity: (c: City) => void;
   onPkg: (p: PackageChoice) => void;
+  onProductCategory?: (cat: "estolas" | "birretes") => void;
   onQty: (n: number) => void;
   onTogaColor: (color: string) => void;
   onStolaColor: (color: string) => void;
@@ -125,6 +127,17 @@ const FEATURES_VENTA_PREESCOLAR: Record<"esencial" | "hybrid" | "max", { icon: t
     { icon: Sparkles, text: "Personalización total: Nombre, logo escolar y temática personalizada." },
     { icon: Layers, text: "Acabado premium: Tela satinada de alta calidad con impresión profesional." },
   ],
+};
+
+const FEATURES_VENTA_BIRRETES: Record<"birrete_decorado" | "birrete_liso", { icon: typeof Camera; text: string }[]> = {
+  birrete_decorado: [
+    { icon: Sparkles, text: "Birrete decorado personalizado (Nombre, Año y Temática)." },
+    { icon: Layers, text: "Máximo impacto visual para el evento." },
+  ],
+  birrete_liso: [
+    { icon: Layers, text: "Birrete liso en color de tu elección." },
+    { icon: GraduationCap, text: "Incluye borla del año." },
+  ]
 };
 
 const FEATURES_B_SEC: Record<"sec_a" | "sec_b", { icon: typeof Camera; text: string }[]> = {
@@ -211,8 +224,23 @@ const FEATURES_UNI_C = [
   { icon: Users, text: "Atención personalizada y asesoría" },
 ];
 
+const FEATURES_VENTA_BORLAS: Record<"borla_dije" | "borla_clasica", { icon: typeof Camera; text: string }[]> = {
+  borla_dije: [
+    { icon: Camera, text: "Personaliza el dije con foto del alumno, logo escolar, nombre, generación o temática especial." },
+    { icon: Shirt, text: "Amplia variedad de colores disponibles para combinar con tu graduación." },
+    { icon: Award, text: "Incluye charm 2026 dorado de alta calidad." },
+    { icon: Gem, text: "Material resistente y acabado premium." },
+    { icon: GraduationCap, text: "Ideal para preescolar, primaria y secundaria." },
+  ],
+  borla_clasica: [
+    { icon: Award, text: "Incluye charm 2026 dorado de alta calidad." },
+    { icon: Shirt, text: "Diseño clásico tradicional y elegante." },
+    { icon: Gem, text: "Acabado de primera y durabilidad garantizada." },
+  ],
+};
+
 export function StepConfig({
-  level, service, city, pkg, quantity, togaColor, stolaColor, onCity, onPkg, onQty, onTogaColor, onStolaColor, canContinue, onContinue,
+  level, service, city, pkg, productCategory, quantity, togaColor, stolaColor, onCity, onPkg, onProductCategory, onQty, onTogaColor, onStolaColor, canContinue, onContinue,
 }: Props) {
   const isB = pkg?.kind === "B";
   const isC = pkg?.kind === "C";
@@ -259,7 +287,11 @@ export function StepConfig({
 
   let features = FEATURES_A;
   if (service === "venta" && level === "preescolar") {
-    if (pkg?.kind === "B" && pkg.variant) {
+    if (productCategory === "birretes") {
+      features = FEATURES_VENTA_BIRRETES[(pkg?.variant as "birrete_decorado" | "birrete_liso") || "birrete_decorado"] || FEATURES_A;
+    } else if (productCategory === "borlas") {
+      features = FEATURES_VENTA_BORLAS[(pkg?.variant as "borla_dije" | "borla_clasica") || "borla_dije"] || FEATURES_A;
+    } else if (pkg?.kind === "B" && pkg.variant) {
       features = FEATURES_VENTA_PREESCOLAR[pkg.variant as "esencial" | "hybrid" | "max"] || FEATURES_A;
     }
   } else if (isUni) {
@@ -298,7 +330,36 @@ export function StepConfig({
         result = colorVariants[stolaColor] || colorVariants.default;
       } else if (pkg?.kind === "B" && pkg?.variant) {
         if (service === "venta") {
-          result = VENTA_PREESCOLAR_PAQUETE_B[pkg.variant] || getAsset('Venta/Preescolar/E2.jpg');
+          if (productCategory === "birretes") {
+            let colorSuffix = "negro"; // default
+            if (stolaColor === "azul") colorSuffix = "azul";
+            else if (stolaColor === "roja" || stolaColor === "rojo") colorSuffix = "rojo";
+            else if (stolaColor === "rosa_claro") colorSuffix = "rosa";
+            else if (stolaColor === "azul_cielo") colorSuffix = "cielo";
+
+            if (pkg.variant === "birrete_liso") {
+              result = getAsset(`Venta/Preescolar/Birretes/liso-${colorSuffix}.jpg`);
+            } else {
+              result = getAsset(`Venta/Preescolar/Birretes/decorado-${colorSuffix}.jpg`);
+            }
+          } else if (productCategory === "borlas") {
+            let colorSuffix = stolaColor;
+            if (stolaColor === "azul_cielo") colorSuffix = "azulbebe";
+            else if (stolaColor === "rosa_fiusha") colorSuffix = "fiusha";
+            else if (stolaColor === "verde_esmeralda") colorSuffix = "esmeralda";
+            else if (stolaColor === "verde_limon") colorSuffix = "limon";
+            else if (stolaColor === "dorada") colorSuffix = "dorado";
+            else if (stolaColor === "roja") colorSuffix = "rojo";
+
+            // Placeholder hasta que suban las imagenes de la clásica
+            if (pkg.variant === "borla_clasica") {
+              result = getAsset(`Venta/Preescolar/Borlas/clasica-${colorSuffix}.jpg`);
+            } else {
+              result = getAsset(`Venta/Preescolar/Borlas/dije-${colorSuffix}.jpg`);
+            }
+          } else {
+            result = VENTA_PREESCOLAR_PAQUETE_B[pkg.variant] || { src: getAsset('Venta/Preescolar/Estolas/E2.jpg') };
+          }
         } else {
           result = PREESCOLAR_PAQUETE_B[pkg.variant] || getAsset('Renta/Preescolar/balance.jpg');
         }
@@ -362,18 +423,18 @@ export function StepConfig({
                     )}
                   />
 
-                  {showcaseMedia.mask && stolaColor !== "blanco" && (() => {
+                  {showcaseMedia.mask && stolaColor !== "blanco" && productCategory !== "birretes" && productCategory !== "borlas" && (() => {
                      const activeStola = STOLA_COLORS.find((c) => c.id === stolaColor);
                      const stolaBg = (activeStola as any)?.gradient || activeStola?.hex || "transparent";
                      const isBlackStola = stolaColor === "negro";
 
                      const maskStyles = {
                        WebkitMaskImage: `url(${showcaseMedia.mask})`,
-                       WebkitMaskSize: "contain",
+                       WebkitMaskSize: (showcaseMedia as any).maskSize || "contain",
                        WebkitMaskPosition: "center",
                        WebkitMaskRepeat: "no-repeat",
                        maskImage: `url(${showcaseMedia.mask})`,
-                       maskSize: "contain",
+                       maskSize: (showcaseMedia as any).maskSize || "contain",
                        maskPosition: "center",
                        maskRepeat: "no-repeat"
                      };
@@ -485,8 +546,50 @@ export function StepConfig({
 
             {/* Paquete — segmented / direct options for University and Venta Preescolar */}
             <section>
+              {service === "venta" && level === "preescolar" && onProductCategory && (
+                <div className="mb-6">
+                  <div className="relative inline-flex w-full sm:w-auto rounded-full border border-hairline bg-muted/40 p-1">
+                    {["estolas", "birretes", "borlas"].map((cat) => {
+                      const active = productCategory === cat;
+                      return (
+                        <button
+                          key={cat}
+                          type="button"
+                          onClick={() => {
+                            if (!active) {
+                              onProductCategory(cat);
+                              if (cat === "birretes") {
+                                onPkg({ kind: "B", variant: "birrete_decorado" });
+                                onStolaColor("negro");
+                              } else if (cat === "borlas") {
+                                onPkg({ kind: "B", variant: "borla_dije" });
+                                onStolaColor("negro");
+                              } else {
+                                onPkg({ kind: "B", variant: "esencial" });
+                                onStolaColor("blanco");
+                              }
+                            }
+                          }}
+                          className="relative flex-1 sm:w-32 px-4 py-2 text-xs sm:text-sm font-medium rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          {active && (
+                            <motion.span
+                              layoutId="category-pill"
+                              className="absolute inset-0 rounded-full bg-navy"
+                              transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                            />
+                          )}
+                          <span className={cn("relative capitalize", active ? "text-navy-foreground" : "text-foreground/70")}>
+                            {cat}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                {(isUni || (service === "venta" && level === "preescolar")) ? "Opción de Estola" : "Paquete"}
+                {(isUni || (service === "venta" && level === "preescolar")) ? (productCategory === "birretes" ? "Tipo de Birrete" : productCategory === "borlas" ? "Tipo de Borla" : "Tipo de Estola") : "Paquete"}
               </p>
 
               {(isUni || (service === "venta" && level === "preescolar")) ? (
@@ -516,6 +619,44 @@ export function StepConfig({
                       payload: { kind: "B", variant: "uni_c" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "uni_c"
                     }
+                  ] : (productCategory === "birretes" ? [
+                    {
+                      id: "birrete_decorado",
+                      code: "B.1",
+                      title: "Birrete Decorado",
+                      desc: "Birrete con decoración temática personalizada",
+                      price: PRICES.V_B_DECORADO,
+                      payload: { kind: "B", variant: "birrete_decorado" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "birrete_decorado"
+                    },
+                    {
+                      id: "birrete_liso",
+                      code: "B.2",
+                      title: "Birrete Liso",
+                      desc: "Birrete liso en color de tu elección",
+                      price: PRICES.V_B_LISO,
+                      payload: { kind: "B", variant: "birrete_liso" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "birrete_liso"
+                    }
+                  ] : productCategory === "borlas" ? [
+                    {
+                      id: "borla_dije",
+                      code: "B.1",
+                      title: "Borla con Dije",
+                      desc: "Incluye dije conmemorativo de generación",
+                      price: PRICES.V_B_BORLA_DIJE,
+                      payload: { kind: "B", variant: "borla_dije" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "borla_dije"
+                    },
+                    {
+                      id: "borla_clasica",
+                      code: "B.2",
+                      title: "Borla Clásica",
+                      desc: "Diseño tradicional elegante",
+                      price: PRICES.V_B_BORLA_CLASICA,
+                      payload: { kind: "B", variant: "borla_clasica" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "borla_clasica"
+                    }
                   ] : [
                     {
                       id: "esencial",
@@ -541,7 +682,7 @@ export function StepConfig({
                       payload: { kind: "B", variant: "max" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "max"
                     }
-                  ]).map((opt) => {
+                  ])).map((opt) => {
                     const originalPrice = unitOriginalPrice(opt.payload, level, service);
                     const netPrice = unitPrice(opt.payload, level, service);
                     const discount = getDiscountPercent(opt.payload, level, service);
@@ -794,7 +935,14 @@ export function StepConfig({
               const visibleStolas = STOLA_COLORS.filter((s: any) => {
                 if (level === "preescolar") {
                   if (service === "venta") {
-                    const ids = ["azul_pastel", "azul_turquesa", "azul_marino", "rosa_claro", "rosa_fiusha", "lila", "morado", "anaranjado", "verde_limon", "verde_esmeralda", "verde_bandera", "rojo", "blanco", "amarillo"];
+                    if (productCategory === "birretes") {
+                      return ["negro", "azul", "roja", "rosa_claro", "azul_cielo"].includes(s.id);
+                    }
+                    if (productCategory === "borlas") {
+                      // Negro, Azul Rey, Azul Bebé, Fucsia, Lila, Rojo, Guinda, Verde Esmeralda, Verde Limón, Dorado, Blanco
+                      return ["negro", "azul", "azul_cielo", "rosa_fiusha", "lila", "roja", "guinda", "verde_esmeralda", "verde_limon", "dorada", "blanco"].includes(s.id);
+                    }
+                    const ids = ["azul_pastel", "azul_turquesa", "azul_marino", "rosa_claro", "rosa_fiusha", "lila", "morado", "anaranjado", "verde_limon", "verde_esmeralda", "verde_bandera", "roja", "blanco", "amarillo"];
                     return ids.includes(s.id);
                   }
                   if (pkg?.kind === "A") return s.isBasic;
@@ -809,7 +957,7 @@ export function StepConfig({
               return (
                 <section className="animate-in fade-in slide-in-from-top-2 duration-300">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                    Color de Estola
+                    {productCategory === "birretes" ? "Color de Birrete" : productCategory === "borlas" ? "Color de Borla" : "Color de Estola"}
                   </p>
                   <div className="flex flex-wrap gap-2.5">
                     {visibleStolas.map((s) => {

@@ -9,7 +9,7 @@ export type Level =
 
 export type ServiceType = "renta" | "venta";
 export type City = "tijuana" | "ensenada";
-export type PackageBVariant = "esencial" | "hybrid" | "max" | "sec_a" | "sec_b" | "pri_a" | "pri_b" | "pri_c" | "prep_a" | "prep_b" | "prep_c1" | "prep_c2" | "uni_b" | "uni_c";
+export type PackageBVariant = "esencial" | "hybrid" | "max" | "sec_a" | "sec_b" | "pri_a" | "pri_b" | "pri_c" | "prep_a" | "prep_b" | "prep_c1" | "prep_c2" | "uni_b" | "uni_c" | "birrete_decorado" | "birrete_liso" | "borla_dije" | "borla_clasica";
 export type PackageChoice =
   | { kind: "A" }
   | { kind: "B"; variant?: PackageBVariant }
@@ -62,8 +62,8 @@ export const STOLA_COLORS = [
   { id: "lila", label: "Lila", hex: "#D8B4E2" },
   { id: "morado", label: "Morado", hex: "#7E22CE" },
   { id: "blanco", label: "Blanco", hex: "#FFFFFF" },
-  { id: "naranja", label: "Naranja", hex: "#F97316" },
   { id: "cafe", label: "Café", hex: "#78350F" },
+  { id: "guinda", label: "Guinda", hex: "#7B1113" },
   { id: "gris_acero", label: "Gris Acero", hex: "#475569" },
   { id: "rosa_fiusha", label: "Rosa Fiusha", hex: "#D946EF" },
   { id: "rosa_claro", label: "Rosa Claro", hex: "#FBCFE8" },
@@ -74,7 +74,6 @@ export const STOLA_COLORS = [
   { id: "anaranjado", label: "Anaranjado", hex: "#F97316" },
   { id: "verde_limon", label: "Verde Limón", hex: "#A3E635" },
   { id: "amarillo", label: "Amarillo", hex: "#FDE047" },
-  { id: "rojo", label: "Rojo", hex: "#DC2626" },
 ];
 
 export function stolaLabel(stola?: string): string {
@@ -97,6 +96,7 @@ export function stolaLabel(stola?: string): string {
     naranja: "Naranja",
     anaranjado: "Anaranjado",
     cafe: "Café",
+    guinda: "Guinda",
     gris_acero: "Gris Acero",
     rosa_fiusha: "Rosa Fiusha",
     rosa_claro: "Rosa Claro",
@@ -130,6 +130,10 @@ export const PRICES = {
   V_E1_PREESCOLAR: 180,
   V_E2_PREESCOLAR: 190,
   V_E3_PREESCOLAR: 200,
+  V_B_DECORADO: 250,
+  V_B_LISO: 160,
+  V_B_BORLA_DIJE: 50,
+  V_B_BORLA_CLASICA: 25,
 
   // Primaria (desacoplado)
   A_PRIMARIA: 350,
@@ -166,6 +170,10 @@ export const DISCOUNTS = {
   V_E1_PREESCOLAR: 0,
   V_E2_PREESCOLAR: 0,
   V_E3_PREESCOLAR: 0,
+  V_B_DECORADO: 0,
+  V_B_LISO: 0,
+  V_B_BORLA_DIJE: 0,
+  V_B_BORLA_CLASICA: 0,
 
   A_PRIMARIA: 0,
   B_BALANCE_PRIMARIA: 0,
@@ -210,6 +218,10 @@ export const B_VARIANTS: {
   { id: "pri_a", code: "B.3", title: "Clásico Destacado", desc: "Impresión grande en ambos lados 9 x 28 cm", price: PRICES.PRI_A },
   { id: "uni_b", code: "U.B", title: "Opción B — Impresión de Alta Calidad", desc: "Estola personalizada con impresión digital de alta calidad", price: PRICES.UNI_B },
   { id: "uni_c", code: "U.C", title: "Opción C — Bordado de Alta Calidad", desc: "Estola personalizada con bordado de alta resolución", price: PRICES.UNI_C },
+  { id: "birrete_decorado", code: "B.1", title: "Birrete Decorado", desc: "Birrete con decoración temática personalizada", price: PRICES.V_B_DECORADO },
+  { id: "birrete_liso", code: "B.2", title: "Birrete Liso", desc: "Birrete liso en color de tu elección", price: PRICES.V_B_LISO },
+  { id: "borla_dije", code: "B.1", title: "Borla con Dije Sublimado", desc: "Personalización única para tu graduación.", price: PRICES.V_B_BORLA_DIJE },
+  { id: "borla_clasica", code: "B.2", title: "Borla Clásica 2026", desc: "Incluye charm 2026 dorado de alta calidad.", price: PRICES.V_B_BORLA_CLASICA },
 ];
 
 /**
@@ -255,6 +267,10 @@ export async function loadDynamicPrices(): Promise<boolean> {
         if (variant.id === "pri_a") variant.price = PRICES.PRI_A;
         if (variant.id === "uni_b") variant.price = PRICES.UNI_B;
         if (variant.id === "uni_c") variant.price = PRICES.UNI_C;
+        if (variant.id === "birrete_decorado") variant.price = PRICES.V_B_DECORADO;
+        if (variant.id === "birrete_liso") variant.price = PRICES.V_B_LISO;
+        if (variant.id === "borla_dije") variant.price = PRICES.V_B_BORLA_DIJE;
+        if (variant.id === "borla_clasica") variant.price = PRICES.V_B_BORLA_CLASICA;
       });
 
       console.log("Tarifas y descuentos cargados y aplicados desde Supabase correctamente.");
@@ -301,6 +317,11 @@ export function getPriceKey(pkg?: PackageChoice, level?: Level, service?: string
     if (level === "primaria") return "B_PREMIUM_PRIMARIA";
     return "B_PREMIUM_PRIMARIA"; // fallback seguro
   }
+
+  if (pkg.variant === "birrete_decorado") return "V_B_DECORADO";
+  if (pkg.variant === "birrete_liso") return "V_B_LISO";
+  if (pkg.variant === "borla_dije") return "V_B_BORLA_DIJE";
+  if (pkg.variant === "borla_clasica") return "V_B_BORLA_CLASICA";
 
   if (pkg.variant === "sec_b") return "SEC_B";
   if (pkg.variant === "sec_a") return "SEC_A";
@@ -356,6 +377,8 @@ export function packageLabel(pkg?: PackageChoice, level?: Level, service?: Servi
   if (!pkg) return "—";
   if (service === "venta") {
     if (level === "preescolar") {
+      if (pkg.variant === "birrete_decorado") return "Birrete Decorado";
+      if (pkg.variant === "birrete_liso") return "Birrete Liso";
       if (pkg.variant === "esencial") return "Estola E.1 Clásica";
       if (pkg.variant === "hybrid") return "Estola E.2 Combinada";
       if (pkg.variant === "max") return "Estola E.3 Premium";

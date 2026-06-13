@@ -74,6 +74,7 @@ export function Quoter() {
   const [quoteNumber, setQuoteNumber] = useState(() => ls("kt-quote-number") || "");
   const [togaColor, setTogaColor] = useState<string>(() => ls("kt-quote-toga-color") || "negro");
   const [stolaColor, setStolaColor] = useState<string>(() => ls("kt-quote-stola-color") || "dorada");
+  const [productCategory, setProductCategory] = useState<"estolas" | "birretes" | "borlas">(() => (ls("kt-quote-product-category") as "estolas" | "birretes" | "borlas") || "estolas");
   const [stateSelected, setStateSelected] = useState(() => ls("kt-quote-state-selected") || "");
   const [citySelected, setCitySelected] = useState(() => ls("kt-quote-city-selected") || "");
   const [honeypot, setHoneypot] = useState("");
@@ -134,11 +135,12 @@ export function Quoter() {
     localStorage.setItem("kt-quote-email", email);
     localStorage.setItem("kt-quote-toga-color", togaColor);
     localStorage.setItem("kt-quote-stola-color", stolaColor);
+    localStorage.setItem("kt-quote-product-category", productCategory);
     localStorage.setItem("kt-quote-state-selected", stateSelected);
     localStorage.setItem("kt-quote-city-selected", citySelected);
     if (quoteNumber) localStorage.setItem("kt-quote-number", quoteNumber);
     else localStorage.removeItem("kt-quote-number");
-  }, [step, level, service, city, pkg, quantity, school, schoolAddress, contact, phone, date, email, quoteNumber, togaColor, stolaColor, stateSelected, citySelected]);
+  }, [step, level, service, city, pkg, quantity, school, schoolAddress, contact, phone, date, email, quoteNumber, togaColor, stolaColor, productCategory, stateSelected, citySelected]);
 
   const total = useMemo(() => unitPrice(pkg, level, service) * quantity, [pkg, level, service, quantity, pricesLoaded]);
 
@@ -264,6 +266,7 @@ export function Quoter() {
     setQuoteNumber("");
     setTogaColor("negro");
     setStolaColor("dorada");
+    setProductCategory("estolas");
     setStateSelected("");
     setCitySelected("");
     setIsSaved(false);
@@ -434,6 +437,7 @@ export function Quoter() {
                 onChange={(s) => {
                   setService(s);
                   if (s === "venta" && level === "preescolar") {
+                    setProductCategory("estolas");
                     setPkg({ kind: "B", variant: "esencial" });
                     setStolaColor("blanco");
                   } else {
@@ -449,11 +453,13 @@ export function Quoter() {
                 service={service}
                 city={city}
                 pkg={pkg}
+                productCategory={productCategory}
                 quantity={quantity}
                 togaColor={togaColor}
                 stolaColor={stolaColor}
                 onCity={setCity}
                 onPkg={setPkg}
+                onProductCategory={setProductCategory}
                 onQty={setQuantity}
                 onTogaColor={setTogaColor}
                 onStolaColor={setStolaColor}
