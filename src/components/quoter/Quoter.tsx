@@ -121,6 +121,15 @@ export function Quoter() {
     }
   }, [level, pkg, togaColor, stolaColor]);
 
+  // Default to "azul" when graduation bear is selected and no valid color is set
+  useEffect(() => {
+    if (level === "preescolar" && service === "venta" && productCategory === "recuerdos" && pkg?.kind === "B" && pkg.variant === "oso_graduacion") {
+      if (stolaColor !== "azul" && stolaColor !== "rosa") {
+        setStolaColor("azul");
+      }
+    }
+  }, [level, service, productCategory, pkg, stolaColor]);
+
   // Persistence
   useEffect(() => {
     localStorage.setItem("kt-quote-step", String(step));

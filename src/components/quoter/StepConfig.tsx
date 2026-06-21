@@ -870,8 +870,12 @@ export function StepConfig({
                     return (
                       <button
                         key={opt.id}
-                        type="button"
-                        onClick={() => onPkg(opt.payload)}
+                        onClick={() => {
+                          onPkg(opt.payload);
+                          if (opt.id === "oso_graduacion") {
+                            onStolaColor("azul");
+                          }
+                        }}
                         className={cn(
                           "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
                           "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
