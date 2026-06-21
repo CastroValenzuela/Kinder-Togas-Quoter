@@ -41,6 +41,7 @@ export function buildSummaryText(q: QuoteData): string {
   const selectedToga = colorLabel(q.togaColor);
   const stolaVal = stolaLabel(q.stolaColor);
   const cityText = q.city === "tijuana" ? "Tijuana" : (q.city === "ensenada" ? "Ensenada" : cityLabel(q.city));
+  const variant = q.pkg && "variant" in q.pkg ? q.pkg.variant : undefined;
 
   const rows = [
     `Cotización Kinder Togas - Folio: ${q.quoteNumber || 'N/A'}`,
@@ -55,21 +56,21 @@ export function buildSummaryText(q: QuoteData): string {
   ];
 
   if (q.service === "venta") {
-    if (q.level === "preescolar" && (q.pkg?.variant === "toga_completa" || q.pkg?.variant === "toga_borla")) {
+    if (q.level === "preescolar" && (variant === "toga_completa" || variant === "toga_borla")) {
       rows.push(`Color Toga: ${selectedToga}`);
       if (q.togaSize) {
         rows.push(`Talla de Toga: ${q.togaSize}`);
       }
-      if (q.pkg.variant === "toga_completa") {
+      if (variant === "toga_completa") {
         rows.push(`Estola: ${stolaVal}`);
       }
-    } else if (q.pkg?.variant === "medalla_standard" || q.pkg?.variant === "medalla_personalizada") {
+    } else if (variant === "medalla_standard" || variant === "medalla_personalizada") {
       // Medallas no tienen color
-    } else if (q.pkg?.variant === "oso_graduacion") {
+    } else if (variant === "oso_graduacion") {
       rows.push(`Color del Oso: ${q.stolaColor === "azul" ? "Azul" : "Rosa"}`);
-    } else if (q.pkg?.variant?.startsWith("birrete_")) {
+    } else if (variant?.startsWith("birrete_")) {
       rows.push(`Color de Birrete: ${stolaVal}`);
-    } else if (q.pkg?.variant?.startsWith("borla_")) {
+    } else if (variant?.startsWith("borla_")) {
       rows.push(`Color de Borla: ${stolaVal}`);
     } else {
       rows.push(`Estola: ${stolaVal}`);
@@ -196,24 +197,25 @@ export function generateQuotePDF(q: QuoteData): void {
   const selectedToga = colorLabel(q.togaColor);
   const stolaVal = stolaLabel(q.stolaColor);
   const togaSizeStr = q.togaSize ? `\n• Talla: ${q.togaSize}` : "";
+  const variant = q.pkg && "variant" in q.pkg ? q.pkg.variant : undefined;
 
   let itemDescription = "";
   if (q.service === "venta") {
-    if (q.level === "preescolar" && (q.pkg?.variant === "toga_completa" || q.pkg?.variant === "toga_borla")) {
-      if (q.pkg.variant === "toga_completa") {
+    if (q.level === "preescolar" && (variant === "toga_completa" || variant === "toga_borla")) {
+      if (variant === "toga_completa") {
         itemDescription = `Paquete Toga Completa (Venta Preescolar):\n• Incluye Toga, Birrete y Estola\n• Color de Toga: ${selectedToga}${togaSizeStr}\n• Color de Estola: ${stolaVal}`;
       } else {
         itemDescription = `Paquete Toga y Birrete (Venta Preescolar):\n• Incluye Toga y Birrete con Borla del Año (Sin Estola)\n• Color de Toga: ${selectedToga}${togaSizeStr}`;
       }
-    } else if (q.pkg?.variant === "medalla_standard") {
+    } else if (variant === "medalla_standard") {
       itemDescription = `Medalla Estándar (Venta Preescolar):\n• Medalla conmemorativa clásica de graduación.`;
-    } else if (q.pkg?.variant === "medalla_personalizada") {
+    } else if (variant === "medalla_personalizada") {
       itemDescription = `Medalla Personalizada (Venta Preescolar):\n• Medalla grabada con nombre y detalles personalizados.`;
-    } else if (q.pkg?.variant === "oso_graduacion") {
+    } else if (variant === "oso_graduacion") {
       itemDescription = `Oso de Graduación (Venta Preescolar):\n• Oso de peluche de graduación con mini toga y birrete\n• Color del Oso: ${q.stolaColor === "azul" ? "Azul" : "Rosa"}`;
-    } else if (q.pkg?.variant?.startsWith("birrete_")) {
+    } else if (variant?.startsWith("birrete_")) {
       itemDescription = `Birrete de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Color de Birrete: ${stolaVal}`;
-    } else if (q.pkg?.variant?.startsWith("borla_")) {
+    } else if (variant?.startsWith("borla_")) {
       itemDescription = `Borla conmemorativa: ${packageLabel(q.pkg, q.level, q.service)}\n• Color de Borla: ${stolaVal}`;
     } else {
       itemDescription = `Estola personalizada de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Estola color: ${stolaVal}\n• Impresión/acabado premium.`;

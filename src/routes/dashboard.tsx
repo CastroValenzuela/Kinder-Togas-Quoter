@@ -168,8 +168,8 @@ export function AdminDashboard() {
   const [pricingFilterLevel, setPricingFilterLevel] = useState<string>("all");
 
   // Expanded rows
-  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
-  const [updatingStatusId, setUpdatingStatusId] = useState<number | null>(null);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
   
   // Sorting state
   const [sortField, setSortField] = useState<string>("created_at");
@@ -877,7 +877,7 @@ export function AdminDashboard() {
     }
   };
 
-  const toggleRow = (id: number) => {
+  const toggleRow = (id: string) => {
     const newExpanded = new Set(expandedRows);
     if (newExpanded.has(id)) {
       newExpanded.delete(id);

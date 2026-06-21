@@ -88,7 +88,7 @@ type Props = {
   level?: Level;
   service?: "renta" | "venta";
   city?: City;
-  pkg?: PackageChoice;
+  pkg?: PackageChoice & { variant?: PackageBVariant };
   productCategory?: "togas" | "estolas" | "birretes" | "borlas" | "recuerdos";
   quantity: number;
   togaColor: string;
@@ -322,6 +322,8 @@ export function StepConfig({
   const isSecundaria = level === "secundaria";
   const isPreparatoria = level === "preparatoria";
   const isUni = level === "universidad";
+  const isB = pkg?.kind === "B";
+  const isC = pkg?.kind === "C";
 
   // 3D Tilt Effect Logic
   const mouseX = useMotionValue(0);

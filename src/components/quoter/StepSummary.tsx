@@ -40,6 +40,7 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
   const originalUnit = unitOriginalPrice(pkg, level, service);
   const discountPercent = getDiscountPercent(pkg, level, service);
   const total = unit * quantity;
+  const pkgVariant = pkg && "variant" in pkg ? pkg.variant : undefined;
 
   const rows = [
     { label: "Folio de Cotización", value: quoteNumber || "Generando...", step: null },
@@ -69,28 +70,28 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
     const packageIndex = rows.findIndex(r => r.label === "Paquete");
     if (packageIndex !== -1) {
       if (service === "venta") {
-        if (pkg?.variant === "toga_completa") {
+        if (pkgVariant === "toga_completa") {
           rows.splice(packageIndex + 1, 0, 
             { label: "Color Toga", value: selectedToga, step: 3 },
             { label: "Talla de Toga", value: togaSize || "M", step: 3 },
             { label: "Estola", value: stolaVal, step: 3 }
           );
-        } else if (pkg?.variant === "toga_borla") {
+        } else if (pkgVariant === "toga_borla") {
           rows.splice(packageIndex + 1, 0, 
             { label: "Color Toga", value: selectedToga, step: 3 },
             { label: "Talla de Toga", value: togaSize || "M", step: 3 }
           );
-        } else if (pkg?.variant === "medalla_standard" || pkg?.variant === "medalla_personalizada") {
+        } else if (pkgVariant === "medalla_standard" || pkgVariant === "medalla_personalizada") {
           // Medallas no tienen color
-        } else if (pkg?.variant === "oso_graduacion") {
+        } else if (pkgVariant === "oso_graduacion") {
           rows.splice(packageIndex + 1, 0, 
             { label: "Color del Oso", value: stolaColor === "azul" ? "Azul" : "Rosa", step: 3 }
           );
-        } else if (pkg?.variant?.startsWith("birrete_")) {
+        } else if (pkgVariant?.startsWith("birrete_")) {
           rows.splice(packageIndex + 1, 0, 
             { label: "Color Birrete", value: stolaVal, step: 3 }
           );
-        } else if (pkg?.variant?.startsWith("borla_")) {
+        } else if (pkgVariant?.startsWith("borla_")) {
           rows.splice(packageIndex + 1, 0, 
             { label: "Color Borla", value: stolaVal, step: 3 }
           );
@@ -244,26 +245,26 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
           let includesText = "";
 
           if (service === "venta") {
-            if (level === "preescolar" && (pkg?.variant === "toga_completa" || pkg?.variant === "toga_borla")) {
+            if (level === "preescolar" && (pkgVariant === "toga_completa" || pkgVariant === "toga_borla")) {
               detailsLine += `🎨 *Color de Toga:* ${selectedToga}\n`;
               if (togaSize) {
                 detailsLine += `📏 *Talla:* ${togaSize}\n`;
               }
-              if (pkg.variant === "toga_completa") {
+              if (pkgVariant === "toga_completa") {
                 detailsLine += `🎗️ *Estola:* ${selectedStola}\n`;
                 includesText = "Toga, Birrete y Estola personalizada listos para comprar y conservar.";
               } else {
                 includesText = "Toga y Birrete con Borla del Año listos para comprar y conservar.";
               }
-            } else if (pkg?.variant === "medalla_standard" || pkg?.variant === "medalla_personalizada") {
-              includesText = pkg.variant === "medalla_standard" ? "Medalla conmemorativa clásica de graduación." : "Medalla grabada personalizada con nombre y detalles.";
-            } else if (pkg?.variant === "oso_graduacion") {
+            } else if (pkgVariant === "medalla_standard" || pkgVariant === "medalla_personalizada") {
+              includesText = pkgVariant === "medalla_standard" ? "Medalla conmemorativa clásica de graduación." : "Medalla grabada personalizada con nombre y detalles.";
+            } else if (pkgVariant === "oso_graduacion") {
               detailsLine += `🎨 *Color del Oso:* ${stolaColor === "azul" ? "Azul" : "Rosa"}\n`;
               includesText = "Oso de peluche con toga y birrete personalizado.";
-            } else if (pkg?.variant?.startsWith("birrete_")) {
+            } else if (pkgVariant?.startsWith("birrete_")) {
               detailsLine += `🎨 *Color de Birrete:* ${selectedStola}\n`;
               includesText = "Birrete personalizado listo para comprar y conservar.";
-            } else if (pkg?.variant?.startsWith("borla_")) {
+            } else if (pkgVariant?.startsWith("borla_")) {
               detailsLine += `🎨 *Color de Borla:* ${selectedStola}\n`;
               includesText = "Borla conmemorativa lista para comprar y conservar.";
             } else {

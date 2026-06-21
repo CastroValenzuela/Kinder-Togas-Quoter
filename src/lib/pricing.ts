@@ -400,18 +400,19 @@ export function unitPrice(pkg?: PackageChoice, level?: Level, service?: string):
 
 export function packageLabel(pkg?: PackageChoice, level?: Level, service?: ServiceType): string {
   if (!pkg) return "—";
+  const variant = pkg && "variant" in pkg ? pkg.variant : undefined;
   if (service === "venta") {
     if (level === "preescolar") {
-      if (pkg.variant === "toga_completa") return "Toga Completa (Toga, Birrete y Estola)";
-      if (pkg.variant === "toga_borla") return "Toga y Birrete con Borla del Año (Sin Estola)";
-      if (pkg.variant === "birrete_decorado") return "Birrete Decorado";
-      if (pkg.variant === "birrete_liso") return "Birrete Liso";
-      if (pkg.variant === "esencial") return "Estola E.1 Clásica";
-      if (pkg.variant === "hybrid") return "Estola E.2 Combinada";
-      if (pkg.variant === "max") return "Estola E.3 Premium";
-      if (pkg.variant === "medalla_standard") return "Medalla Estándar";
-      if (pkg.variant === "medalla_personalizada") return "Medalla Personalizada";
-      if (pkg.variant === "oso_graduacion") return "Oso de Graduación";
+      if (variant === "toga_completa") return "Toga Completa (Toga, Birrete y Estola)";
+      if (variant === "toga_borla") return "Toga y Birrete con Borla del Año (Sin Estola)";
+      if (variant === "birrete_decorado") return "Birrete Decorado";
+      if (variant === "birrete_liso") return "Birrete Liso";
+      if (variant === "esencial") return "Estola E.1 Clásica";
+      if (variant === "hybrid") return "Estola E.2 Combinada";
+      if (variant === "max") return "Estola E.3 Premium";
+      if (variant === "medalla_standard") return "Medalla Estándar";
+      if (variant === "medalla_personalizada") return "Medalla Personalizada";
+      if (variant === "oso_graduacion") return "Oso de Graduación";
       return "Estola Personalizada";
     }
   }
@@ -420,7 +421,7 @@ export function packageLabel(pkg?: PackageChoice, level?: Level, service?: Servi
     return "Paquete A — Básico";
   }
   if (level === "universidad") {
-    const v = B_VARIANTS.find((x) => x.id === pkg.variant);
+    const v = B_VARIANTS.find((x) => x.id === variant);
     if (!v) return "Opción B/C — Bordado";
     return v.title;
   }
