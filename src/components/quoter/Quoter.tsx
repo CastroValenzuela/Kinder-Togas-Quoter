@@ -74,7 +74,8 @@ export function Quoter() {
   const [quoteNumber, setQuoteNumber] = useState(() => ls("kt-quote-number") || "");
   const [togaColor, setTogaColor] = useState<string>(() => ls("kt-quote-toga-color") || "negro");
   const [stolaColor, setStolaColor] = useState<string>(() => ls("kt-quote-stola-color") || "dorada");
-  const [productCategory, setProductCategory] = useState<"estolas" | "birretes" | "borlas">(() => (ls("kt-quote-product-category") as "estolas" | "birretes" | "borlas") || "estolas");
+  const [togaSize, setTogaSize] = useState<string>(() => ls("kt-quote-toga-size") || "M");
+  const [productCategory, setProductCategory] = useState<"togas" | "estolas" | "birretes" | "borlas" | "recuerdos">(() => (ls("kt-quote-product-category") as "togas" | "estolas" | "birretes" | "borlas" | "recuerdos") || "togas");
   const [stateSelected, setStateSelected] = useState(() => ls("kt-quote-state-selected") || "");
   const [citySelected, setCitySelected] = useState(() => ls("kt-quote-city-selected") || "");
   const [honeypot, setHoneypot] = useState("");
@@ -135,6 +136,7 @@ export function Quoter() {
     localStorage.setItem("kt-quote-email", email);
     localStorage.setItem("kt-quote-toga-color", togaColor);
     localStorage.setItem("kt-quote-stola-color", stolaColor);
+    localStorage.setItem("kt-quote-toga-size", togaSize);
     localStorage.setItem("kt-quote-product-category", productCategory);
     localStorage.setItem("kt-quote-state-selected", stateSelected);
     localStorage.setItem("kt-quote-city-selected", citySelected);
@@ -186,10 +188,11 @@ export function Quoter() {
             student_count: quantity,
             unit_price: unitPrice(pkg, level, service),
             total_price: total,
-            toga_color: service === 'venta' ? null : togaColor,
+            toga_color: service === 'venta' ? (productCategory === 'togas' ? togaColor : (productCategory === 'recuerdos' ? togaColor : null)) : togaColor,
             stola_color: stolaColor,
-            discount_percent: getDiscountPercent(pkg, level),
-            original_unit_price: unitOriginalPrice(pkg, level),
+            discount_percent: getDiscountPercent(pkg, level, service),
+            original_unit_price: unitOriginalPrice(pkg, level, service),
+            toga_size: service === 'venta' && productCategory === 'togas' ? togaSize : null,
           };
           
           const res = await fetch('https://qqfqwvxmhiacoyqwobjd.supabase.co/functions/v1/submit-quote', {
@@ -213,7 +216,7 @@ export function Quoter() {
       }
     }
     save();
-  }, [step, quoteNumber, isSaved, isSaving, school, contact, phone, email, level, city, pkg, quantity, date, total, service, honeypot, startTime, togaColor, stolaColor, turnstileToken, stateSelected, citySelected]);
+  }, [step, quoteNumber, isSaved, isSaving, school, contact, phone, email, level, city, pkg, quantity, date, total, service, honeypot, startTime, togaColor, stolaColor, turnstileToken, stateSelected, citySelected, productCategory, togaSize]);
   void total;
 
   const canNext: Record<Step, boolean> = {
@@ -266,7 +269,8 @@ export function Quoter() {
     setQuoteNumber("");
     setTogaColor("negro");
     setStolaColor("dorada");
-    setProductCategory("estolas");
+    setTogaSize("M");
+    setProductCategory("togas");
     setStateSelected("");
     setCitySelected("");
     setIsSaved(false);
@@ -437,9 +441,10 @@ export function Quoter() {
                 onChange={(s) => {
                   setService(s);
                   if (s === "venta" && level === "preescolar") {
-                    setProductCategory("estolas");
-                    setPkg({ kind: "B", variant: "esencial" });
-                    setStolaColor("blanco");
+                    setProductCategory("togas");
+                    setPkg({ kind: "B", variant: "toga_completa" });
+                    setTogaColor("negro");
+                    setStolaColor("dorada");
                   } else {
                     setPkg({ kind: "A" });
                   }
@@ -457,12 +462,14 @@ export function Quoter() {
                 quantity={quantity}
                 togaColor={togaColor}
                 stolaColor={stolaColor}
+                togaSize={togaSize}
                 onCity={setCity}
                 onPkg={setPkg}
                 onProductCategory={setProductCategory}
                 onQty={setQuantity}
                 onTogaColor={setTogaColor}
                 onStolaColor={setStolaColor}
+                onTogaSize={setTogaSize}
                 canContinue={canNext[3]}
                 onContinue={goNext}
               />
@@ -506,6 +513,7 @@ export function Quoter() {
                 quoteNumber={quoteNumber}
                 togaColor={togaColor}
                 stolaColor={stolaColor}
+                togaSize={togaSize}
                 onEditStep={(targetStep) => {
                   if (isSaved) {
                     setIsSaved(false);

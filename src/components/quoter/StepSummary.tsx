@@ -30,11 +30,12 @@ type Props = {
   quoteNumber?: string;
   togaColor?: string;
   stolaColor?: string;
+  togaSize?: string;
   onEditStep?: (step: 1 | 2 | 3 | 4 | 5) => void;
   service?: "renta" | "venta";
 };
 
-export function StepSummary({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor, onEditStep }: Props) {
+export function StepSummary({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor, togaSize, onEditStep }: Props) {
   const unit = unitPrice(pkg, level, service);
   const originalUnit = unitOriginalPrice(pkg, level, service);
   const discountPercent = getDiscountPercent(pkg, level, service);
@@ -60,20 +61,49 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
   ];
   if (date) rows.splice(3, 0, { label: "Fecha evento", value: formatDate(date), step: 4 });
 
-  // Add Toga Color and Estola Design details for all levels
+  // Add Toga Color, Toga Size, and Estola Design details for all levels
   if (level) {
-    const selectedToga = (level !== "preescolar" || pkg?.kind === "A") ? colorLabel(togaColor) : "Negro";
+    const selectedToga = colorLabel(togaColor);
     const stolaVal = stolaLabel(stolaColor);
 
     const packageIndex = rows.findIndex(r => r.label === "Paquete");
     if (packageIndex !== -1) {
       if (service === "venta") {
-        rows.splice(packageIndex + 1, 0, 
-          { label: "Estola", value: stolaVal, step: 3 }
-        );
+        if (pkg?.variant === "toga_completa") {
+          rows.splice(packageIndex + 1, 0, 
+            { label: "Color Toga", value: selectedToga, step: 3 },
+            { label: "Talla de Toga", value: togaSize || "M", step: 3 },
+            { label: "Estola", value: stolaVal, step: 3 }
+          );
+        } else if (pkg?.variant === "toga_borla") {
+          rows.splice(packageIndex + 1, 0, 
+            { label: "Color Toga", value: selectedToga, step: 3 },
+            { label: "Talla de Toga", value: togaSize || "M", step: 3 }
+          );
+        } else if (pkg?.variant === "medalla_standard" || pkg?.variant === "medalla_personalizada") {
+          // Medallas no tienen color
+        } else if (pkg?.variant === "oso_graduacion") {
+          rows.splice(packageIndex + 1, 0, 
+            { label: "Color del Oso", value: stolaColor === "azul" ? "Azul" : "Rosa", step: 3 }
+          );
+        } else if (pkg?.variant?.startsWith("birrete_")) {
+          rows.splice(packageIndex + 1, 0, 
+            { label: "Color Birrete", value: stolaVal, step: 3 }
+          );
+        } else if (pkg?.variant?.startsWith("borla_")) {
+          rows.splice(packageIndex + 1, 0, 
+            { label: "Color Borla", value: stolaVal, step: 3 }
+          );
+        } else {
+          rows.splice(packageIndex + 1, 0, 
+            { label: "Estola", value: stolaVal, step: 3 }
+          );
+        }
       } else {
+        // service === "renta"
+        const togaColorText = (level !== "preescolar" || pkg?.kind === "A") ? selectedToga : "Negro";
         rows.splice(packageIndex + 1, 0, 
-          { label: "Color Toga", value: selectedToga, step: (pkg?.kind === "A" || level !== "preescolar") ? 3 : null },
+          { label: "Color Toga", value: togaColorText, step: (pkg?.kind === "A" || level !== "preescolar") ? 3 : null },
           { label: "Estola", value: stolaVal, step: 3 }
         );
       }
@@ -206,14 +236,47 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
       {/* 3. Action Buttons (Download & Share) */}
       {(() => {
         const handleShareWhatsApp = () => {
-          const selectedToga = (level !== "preescolar" || pkg?.kind === "A") ? colorLabel(togaColor) : "Negro";
+          const selectedToga = colorLabel(togaColor);
           const selectedStola = stolaLabel(stolaColor);
           const serviceLabel = service === "renta" ? "Renta" : "Venta";
 
-          const togaLine = service === "venta" ? "" : `🎨 *Toga:* Color ${selectedToga}\n`;
-          const includesText = service === "venta"
-            ? "Estola personalizada de graduación."
-            : "Toga, Birrete, Borla del año, Estola personalizada y logística coordinada.";
+          let detailsLine = "";
+          let includesText = "";
+
+          if (service === "venta") {
+            if (level === "preescolar" && (pkg?.variant === "toga_completa" || pkg?.variant === "toga_borla")) {
+              detailsLine += `🎨 *Color de Toga:* ${selectedToga}\n`;
+              if (togaSize) {
+                detailsLine += `📏 *Talla:* ${togaSize}\n`;
+              }
+              if (pkg.variant === "toga_completa") {
+                detailsLine += `🎗️ *Estola:* ${selectedStola}\n`;
+                includesText = "Toga, Birrete y Estola personalizada listos para comprar y conservar.";
+              } else {
+                includesText = "Toga y Birrete con Borla del Año listos para comprar y conservar.";
+              }
+            } else if (pkg?.variant === "medalla_standard" || pkg?.variant === "medalla_personalizada") {
+              includesText = pkg.variant === "medalla_standard" ? "Medalla conmemorativa clásica de graduación." : "Medalla grabada personalizada con nombre y detalles.";
+            } else if (pkg?.variant === "oso_graduacion") {
+              detailsLine += `🎨 *Color del Oso:* ${stolaColor === "azul" ? "Azul" : "Rosa"}\n`;
+              includesText = "Oso de peluche con toga y birrete personalizado.";
+            } else if (pkg?.variant?.startsWith("birrete_")) {
+              detailsLine += `🎨 *Color de Birrete:* ${selectedStola}\n`;
+              includesText = "Birrete personalizado listo para comprar y conservar.";
+            } else if (pkg?.variant?.startsWith("borla_")) {
+              detailsLine += `🎨 *Color de Borla:* ${selectedStola}\n`;
+              includesText = "Borla conmemorativa lista para comprar y conservar.";
+            } else {
+              detailsLine += `🎗️ *Estola:* ${selectedStola}\n`;
+              includesText = "Estola personalizada de graduación lista para comprar y conservar.";
+            }
+          } else {
+            // service === "renta"
+            const togaValText = (level !== "preescolar" || pkg?.kind === "A") ? selectedToga : "Negro";
+            detailsLine += `🎨 *Color Toga:* ${togaValText}\n`;
+            detailsLine += `🎗️ *Estola:* ${selectedStola}\n`;
+            includesText = "Toga, Birrete, Borla del año, Estola personalizada y logística coordinada.";
+          }
 
           const text = `🎓 *¡Hola a todos!* Les comparto la propuesta oficial de *Kinder Togas* para la graduación de nuestros hijos:
 
@@ -221,8 +284,7 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
 🏛️ *Nivel:* ${levelLabel(level)}
 📋 *Servicio:* ${serviceLabel}
 🏷️ *Paquete:* ${packageLabel(pkg, level, service)}
-${togaLine}🎗️ *Estola:* ${selectedStola}
-📦 *Cantidad:* ${quantity} graduados
+${detailsLine}📦 *Cantidad:* ${quantity} graduados
 💰 *Precio Unitario:* ${formatMXN(unit)}
 💵 *Inversión Total:* ${formatMXN(total)}
 
@@ -239,7 +301,7 @@ ${togaLine}🎗️ *Estola:* ${selectedStola}
           <div className="order-2 lg:order-3 lg:col-span-2 pt-8 pb-4 flex flex-col sm:flex-row justify-center items-center gap-6 lg:mt-4 lg:border-t border-hairline">
             <button
               type="button"
-              onClick={() => generateQuotePDF({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor })}
+              onClick={() => generateQuotePDF({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor, togaSize })}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-full bg-navy text-navy-foreground px-10 py-4.5 text-base font-semibold hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               <Download className="h-5 w-5" /> Descargar mi Cotización (PDF)

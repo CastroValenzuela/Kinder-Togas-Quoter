@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem, Award } from "lucide-react";
+import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem, Award, Ruler, Palette, User, Gift } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 const assets = import.meta.glob('@/assets/**/*.{jpg,jpeg,png}', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 
 const getAsset = (path: string) => {
@@ -42,6 +43,21 @@ const VENTA_PREESCOLAR_PAQUETE_B: Record<string, { src: string, mask?: string }>
   max: { src: getAsset('Venta/Preescolar/Estolas/E3.jpg'), mask: getAsset('Venta/Preescolar/Estolas/E3-mask.png') },
 };
 
+const VENTA_PREESCOLAR_TOGAS: Record<string, string> = {
+  azul: getAsset('Venta/Preescolar/Togas/azul.jpeg'),
+  rojo: getAsset('Venta/Preescolar/Togas/rojo.jpeg'),
+  negro: getAsset('Venta/Preescolar/Togas/negro.jpeg'),
+  rosa: getAsset('Venta/Preescolar/Togas/rosa.jpeg'),
+  azul_cielo: getAsset('Venta/Preescolar/Togas/azul-cielo.jpeg'),
+};
+
+const VENTA_PREESCOLAR_RECUERDOS: Record<string, string> = {
+  medalla_standard: getAsset('Venta/Preescolar/Recuerdos/Medallas/medalla.jpeg'),
+  medalla_personalizada: getAsset('Venta/Preescolar/Recuerdos/Medallas/medalla_personalizada.jpeg'),
+  oso_graduacion_azul: getAsset('Venta/Preescolar/Recuerdos/Osos/oso_azul.jpeg'),
+  oso_graduacion_rosa: getAsset('Venta/Preescolar/Recuerdos/Osos/oso_rosa.jpeg'),
+};
+
 const PREESCOLAR_PAQUETE_A: Record<string, Record<string, string>> = {
   negro: { dorada: getAsset('Renta/Preescolar/Paquete A/negro-dorado.jpg'), plateada: getAsset('Renta/Preescolar/Paquete A/negro-plata.jpg'), azul: getAsset('Renta/Preescolar/Paquete A/negro-azul.jpg'), roja: getAsset('Renta/Preescolar/Paquete A/negro-rojo.jpg'), default: getAsset('Renta/Preescolar/Paquete A/negro-dorado.jpg') },
   azul: { dorada: getAsset('Renta/Preescolar/Paquete A/azul-dorado.jpg'), plateada: getAsset('Renta/Preescolar/Paquete A/azul-plata.jpg'), azul: getAsset('Renta/Preescolar/Paquete A/azul-azul.jpg'), roja: getAsset('Renta/Preescolar/Paquete A/azul-rojo.jpg'), default: getAsset('Renta/Preescolar/Paquete A/azul-dorado.jpg') },
@@ -73,16 +89,18 @@ type Props = {
   service?: "renta" | "venta";
   city?: City;
   pkg?: PackageChoice;
-  productCategory?: "estolas" | "birretes";
+  productCategory?: "togas" | "estolas" | "birretes" | "borlas" | "recuerdos";
   quantity: number;
   togaColor: string;
   stolaColor: string;
+  togaSize?: string;
   onCity: (c: City) => void;
   onPkg: (p: PackageChoice) => void;
-  onProductCategory?: (cat: "estolas" | "birretes") => void;
+  onProductCategory?: (cat: "togas" | "estolas" | "birretes" | "borlas" | "recuerdos") => void;
   onQty: (n: number) => void;
   onTogaColor: (color: string) => void;
   onStolaColor: (color: string) => void;
+  onTogaSize?: (size: string) => void;
   canContinue: boolean;
   onContinue: () => void;
 };
@@ -126,6 +144,20 @@ const FEATURES_VENTA_PREESCOLAR: Record<"esencial" | "hybrid" | "max", { icon: t
     { icon: Camera, text: "Cobertura completa: Diseño en ambos lados de la estola." },
     { icon: Sparkles, text: "Personalización total: Nombre, logo escolar y temática personalizada." },
     { icon: Layers, text: "Acabado premium: Tela satinada de alta calidad con impresión profesional." },
+  ],
+};
+
+const FEATURES_VENTA_TOGAS: Record<"toga_completa" | "toga_borla", { icon: typeof Camera; text: string }[]> = {
+  toga_completa: [
+    { icon: Shirt, text: "Incluye Toga de poliéster brillante de alta calidad." },
+    { icon: GraduationCap, text: "Incluye Birrete clásico forrado con botón y listón reforzado." },
+    { icon: Award, text: "Incluye Borla del año con charm 2026 dorado." },
+    { icon: Layers, text: "Incluye Estola de graduación premium." },
+  ],
+  toga_borla: [
+    { icon: Shirt, text: "Incluye Toga de poliéster brillante de alta calidad." },
+    { icon: GraduationCap, text: "Incluye Birrete clásico forrado con botón y listón reforzado." },
+    { icon: Award, text: "Incluye Borla del año con charm 2026 dorado." },
   ],
 };
 
@@ -224,6 +256,14 @@ const FEATURES_UNI_C = [
   { icon: Users, text: "Atención personalizada y asesoría" },
 ];
 
+const VENTA_PREESCOLAR_TOGA_COLORS = [
+  { id: "azul", label: "Azul Rey", hex: "#1E40AF" },
+  { id: "rojo", label: "Rojo", hex: "#DC2626" },
+  { id: "negro", label: "Negro", hex: "#1A1A1A" },
+  { id: "rosa", label: "Rosa", hex: "#FBCFE8" },
+  { id: "azul_cielo", label: "Azul Cielo", hex: "#7DD3FC" },
+];
+
 const FEATURES_VENTA_BORLAS: Record<"borla_dije" | "borla_clasica", { icon: typeof Camera; text: string }[]> = {
   borla_dije: [
     { icon: Camera, text: "Personaliza el dije con foto del alumno, logo escolar, nombre, generación o temática especial." },
@@ -239,13 +279,47 @@ const FEATURES_VENTA_BORLAS: Record<"borla_dije" | "borla_clasica", { icon: type
   ],
 };
 
+const FEATURES_VENTA_RECUERDOS: Record<"medalla_standard" | "medalla_personalizada" | "oso_graduacion", { icon: typeof Award; text: string }[]> = {
+  medalla_standard: [
+    { icon: Award, text: "Medalla conmemorativa clásica de graduación." },
+    { icon: Gem, text: "Listón satinado de alta calidad." },
+    { icon: Sparkles, text: "Excelente detalle para el recuerdo." }
+  ],
+  medalla_personalizada: [
+    { icon: Award, text: "Medalla personalizada con grabado de alta calidad." },
+    { icon: User, text: "Nombre del alumno y año de graduación grabados." },
+    { icon: Sparkles, text: "Acabado metálico premium." }
+  ],
+  oso_graduacion: [
+    { icon: Shirt, text: "Oso de peluche de graduación con mini toga y birrete." },
+    { icon: Palette, text: "Color de vestimenta a elegir (Azul o Rosa)." }
+  ]
+};
+
 export function StepConfig({
-  level, service, city, pkg, productCategory, quantity, togaColor, stolaColor, onCity, onPkg, onProductCategory, onQty, onTogaColor, onStolaColor, canContinue, onContinue,
+  level,
+  service,
+  city,
+  pkg,
+  productCategory,
+  quantity,
+  togaColor,
+  stolaColor,
+  togaSize,
+  onCity,
+  onPkg,
+  onProductCategory,
+  onQty,
+  onTogaColor,
+  onStolaColor,
+  onTogaSize,
+  canContinue,
+  onContinue,
 }: Props) {
-  const isB = pkg?.kind === "B";
-  const isC = pkg?.kind === "C";
-  const isSecundaria = level === "secundaria";
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const isPreescolar = level === "preescolar";
   const isPrimaria = level === "primaria";
+  const isSecundaria = level === "secundaria";
   const isPreparatoria = level === "preparatoria";
   const isUni = level === "universidad";
 
@@ -287,10 +361,14 @@ export function StepConfig({
 
   let features = FEATURES_A;
   if (service === "venta" && level === "preescolar") {
-    if (productCategory === "birretes") {
+    if (productCategory === "togas") {
+      features = FEATURES_VENTA_TOGAS[(pkg?.variant as "toga_completa" | "toga_borla") || "toga_completa"] || FEATURES_A;
+    } else if (productCategory === "birretes") {
       features = FEATURES_VENTA_BIRRETES[(pkg?.variant as "birrete_decorado" | "birrete_liso") || "birrete_decorado"] || FEATURES_A;
     } else if (productCategory === "borlas") {
       features = FEATURES_VENTA_BORLAS[(pkg?.variant as "borla_dije" | "borla_clasica") || "borla_dije"] || FEATURES_A;
+    } else if (productCategory === "recuerdos") {
+      features = FEATURES_VENTA_RECUERDOS[(pkg?.variant as "medalla_standard" | "medalla_personalizada" | "oso_graduacion") || "medalla_standard"] || FEATURES_A;
     } else if (pkg?.kind === "B" && pkg.variant) {
       features = FEATURES_VENTA_PREESCOLAR[pkg.variant as "esencial" | "hybrid" | "max"] || FEATURES_A;
     }
@@ -330,7 +408,10 @@ export function StepConfig({
         result = colorVariants[stolaColor] || colorVariants.default;
       } else if (pkg?.kind === "B" && pkg?.variant) {
         if (service === "venta") {
-          if (productCategory === "birretes") {
+          if (productCategory === "togas") {
+            const colorKey = togaColor === "roja" ? "rojo" : togaColor;
+            result = VENTA_PREESCOLAR_TOGAS[colorKey] || VENTA_PREESCOLAR_TOGAS.negro;
+          } else if (productCategory === "birretes") {
             let colorSuffix = "negro"; // default
             if (stolaColor === "azul") colorSuffix = "azul";
             else if (stolaColor === "roja" || stolaColor === "rojo") colorSuffix = "rojo";
@@ -356,6 +437,15 @@ export function StepConfig({
               result = getAsset(`Venta/Preescolar/Borlas/clasica-${colorSuffix}.jpg`);
             } else {
               result = getAsset(`Venta/Preescolar/Borlas/dije-${colorSuffix}.jpg`);
+            }
+          } else if (productCategory === "recuerdos") {
+            if (pkg.variant === "oso_graduacion") {
+              const isPink = stolaColor === "rosa";
+              result = isPink ? VENTA_PREESCOLAR_RECUERDOS.oso_graduacion_rosa : VENTA_PREESCOLAR_RECUERDOS.oso_graduacion_azul;
+            } else if (pkg.variant === "medalla_personalizada") {
+              result = VENTA_PREESCOLAR_RECUERDOS.medalla_personalizada;
+            } else {
+              result = VENTA_PREESCOLAR_RECUERDOS.medalla_standard;
             }
           } else {
             result = VENTA_PREESCOLAR_PAQUETE_B[pkg.variant] || { src: getAsset('Venta/Preescolar/Estolas/E2.jpg') };
@@ -546,50 +636,91 @@ export function StepConfig({
 
             {/* Paquete — segmented / direct options for University and Venta Preescolar */}
             <section>
-              {service === "venta" && level === "preescolar" && onProductCategory && (
-                <div className="mb-6">
-                  <div className="relative inline-flex w-full sm:w-auto rounded-full border border-hairline bg-muted/40 p-1">
-                    {["estolas", "birretes", "borlas"].map((cat) => {
-                      const active = productCategory === cat;
+              {service === "venta" && level === "preescolar" && onProductCategory && (() => {
+                const categories = [
+                  { id: "togas", label: "Togas", icon: Shirt, desc: "Toga Completa" },
+                  { id: "estolas", label: "Estolas", icon: Layers, desc: "E1, E2, E3" },
+                  { id: "birretes", label: "Birretes", icon: GraduationCap, desc: "Decorado / Liso" },
+                  { id: "borlas", label: "Borlas", icon: Sparkles, desc: "Dije / Clásica" },
+                  { id: "recuerdos", label: "Recuerdos", icon: Gift, desc: "Oso / Medalla" },
+                ] as const;
+
+                return (
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 w-full mb-8">
+                    {categories.map((cat) => {
+                      const active = productCategory === cat.id;
+                      const Icon = cat.icon;
                       return (
                         <button
-                          key={cat}
+                          key={cat.id}
                           type="button"
                           onClick={() => {
                             if (!active) {
-                              onProductCategory(cat);
-                              if (cat === "birretes") {
+                              onProductCategory(cat.id);
+                              if (cat.id === "togas") {
+                                onPkg({ kind: "B", variant: "toga_completa" });
+                                onTogaColor("negro");
+                                onStolaColor("dorada");
+                              } else if (cat.id === "birretes") {
                                 onPkg({ kind: "B", variant: "birrete_decorado" });
                                 onStolaColor("negro");
-                              } else if (cat === "borlas") {
+                              } else if (cat.id === "borlas") {
                                 onPkg({ kind: "B", variant: "borla_dije" });
                                 onStolaColor("negro");
+                              } else if (cat.id === "recuerdos") {
+                                onPkg({ kind: "B", variant: "medalla_standard" });
+                                onStolaColor("dorada");
+                                onTogaColor("negro");
                               } else {
                                 onPkg({ kind: "B", variant: "esencial" });
                                 onStolaColor("blanco");
                               }
                             }
                           }}
-                          className="relative flex-1 sm:w-32 px-4 py-2 text-xs sm:text-sm font-medium rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        >
-                          {active && (
-                            <motion.span
-                              layoutId="category-pill"
-                              className="absolute inset-0 rounded-full bg-navy"
-                              transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                            />
+                          className={cn(
+                            "relative flex flex-col items-center justify-center p-3.5 rounded-2xl border text-center transition-all duration-300 cursor-pointer group shadow-[0_1px_2px_rgba(0,0,0,0.02)]",
+                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                            active
+                              ? "border-navy bg-cream/90 text-foreground font-semibold shadow-md scale-[1.03] -translate-y-0.5"
+                              : "border-hairline bg-card/40 hover:bg-card hover:border-navy/30 text-muted-foreground hover:text-foreground",
+                            cat.id === "recuerdos" ? "col-span-2 md:col-span-1" : "col-span-1"
                           )}
-                          <span className={cn("relative capitalize", active ? "text-navy-foreground" : "text-foreground/70")}>
-                            {cat}
+                        >
+                          {/* Background Glow on Active */}
+                          {active && (
+                            <div className="absolute inset-0 rounded-2xl bg-navy/[0.01] blur-md pointer-events-none" />
+                          )}
+
+                          {/* Icon Wrapper */}
+                          <div className={cn(
+                            "h-9 w-9 rounded-full flex items-center justify-center mb-2 transition-all duration-300",
+                            active 
+                              ? "bg-navy text-navy-foreground" 
+                              : "bg-muted group-hover:bg-muted/80 text-muted-foreground group-hover:text-foreground"
+                          )}>
+                            <Icon className="h-4.5 w-4.5" strokeWidth={1.5} />
+                          </div>
+
+                          {/* Label */}
+                          <span className={cn(
+                            "text-xs sm:text-sm font-medium tracking-wide block transition-colors duration-300",
+                            active ? "text-navy" : "text-foreground/80"
+                          )}>
+                            {cat.label}
+                          </span>
+
+                          {/* Subtext description */}
+                          <span className="text-[10px] text-muted-foreground mt-0.5 block opacity-85 font-normal">
+                            {cat.desc}
                           </span>
                         </button>
                       );
                     })}
                   </div>
-                </div>
-              )}
+                );
+              })()}
               <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                {(isUni || (service === "venta" && level === "preescolar")) ? (productCategory === "birretes" ? "Tipo de Birrete" : productCategory === "borlas" ? "Tipo de Borla" : "Tipo de Estola") : "Paquete"}
+                {(isUni || (service === "venta" && level === "preescolar")) ? (productCategory === "birretes" ? "Tipo de Birrete" : productCategory === "borlas" ? "Tipo de Borla" : (productCategory === "recuerdos" ? "Tipo de Recuerdo" : "Tipo de Estola")) : "Paquete"}
               </p>
 
               {(isUni || (service === "venta" && level === "preescolar")) ? (
@@ -619,7 +750,26 @@ export function StepConfig({
                       payload: { kind: "B", variant: "uni_c" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "uni_c"
                     }
-                  ] : (productCategory === "birretes" ? [
+                  ] : (productCategory === "togas" ? [
+                    {
+                      id: "toga_completa",
+                      code: "T.1",
+                      title: "Toga Completa",
+                      desc: "Incluye Toga, Birrete y Estola",
+                      price: PRICES.V_TOGA_BIRRETE_ESTOLA,
+                      payload: { kind: "B", variant: "toga_completa" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "toga_completa"
+                    },
+                    {
+                      id: "toga_borla",
+                      code: "T.2",
+                      title: "Toga y Birrete con Borla",
+                      desc: "Toga y birrete con borla del año (sin estola)",
+                      price: PRICES.V_TOGA_BIRRETE_BORLA,
+                      payload: { kind: "B", variant: "toga_borla" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "toga_borla"
+                    }
+                  ] : productCategory === "birretes" ? [
                     {
                       id: "birrete_decorado",
                       code: "B.1",
@@ -656,6 +806,34 @@ export function StepConfig({
                       price: PRICES.V_B_BORLA_CLASICA,
                       payload: { kind: "B", variant: "borla_clasica" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "borla_clasica"
+                    }
+                  ] : productCategory === "recuerdos" ? [
+                    {
+                      id: "medalla_standard",
+                      code: "M.1",
+                      title: "Medalla Estándar",
+                      desc: "Medalla conmemorativa clásica de graduación",
+                      price: PRICES.V_MEDALLA_STANDARD,
+                      payload: { kind: "B", variant: "medalla_standard" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "medalla_standard"
+                    },
+                    {
+                      id: "medalla_personalizada",
+                      code: "M.2",
+                      title: "Medalla Personalizada",
+                      desc: "Medalla grabada con nombre y detalles personalizados",
+                      price: PRICES.V_MEDALLA_PERSONALIZADA,
+                      payload: { kind: "B", variant: "medalla_personalizada" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "medalla_personalizada"
+                    },
+                    {
+                      id: "oso_graduacion",
+                      code: "O.1",
+                      title: "Oso de Graduación",
+                      desc: "Oso de peluche con toga y birrete, color a elegir (Azul o Rosa)",
+                      price: PRICES.V_OSO_GRADUACION,
+                      payload: { kind: "B", variant: "oso_graduacion" } as const,
+                      isActive: pkg?.kind === "B" && pkg.variant === "oso_graduacion"
                     }
                   ] : [
                     {
@@ -892,18 +1070,19 @@ export function StepConfig({
             </section>
 
             {/* Color de Toga */}
-            {service !== "venta" &&
+            {((service === "venta" && level === "preescolar" && productCategory === "togas") ||
+              (service !== "venta" &&
               ((pkg?.kind === "A" && level === "preescolar") ||
               level === "primaria" ||
               level === "secundaria" ||
               level === "preparatoria" ||
-              level === "universidad") && (
+              level === "universidad"))) && (
               <section className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
                   Color de Toga
                 </p>
                 <div className="flex flex-wrap gap-2.5">
-                  {TOGA_COLORS.filter((c) => level === "preescolar" || c.id === "negro").map((c) => {
+                  {(service === "venta" ? VENTA_PREESCOLAR_TOGA_COLORS : TOGA_COLORS.filter((c) => level === "preescolar" || c.id === "negro")).map((c) => {
                     const active = togaColor === c.id;
                     return (
                       <button
@@ -932,32 +1111,48 @@ export function StepConfig({
 
             {/* Color de Estola */}
             {(() => {
-              const visibleStolas = STOLA_COLORS.filter((s: any) => {
-                if (level === "preescolar") {
-                  if (service === "venta") {
-                    if (productCategory === "birretes") {
-                      return ["negro", "azul", "roja", "rosa_claro", "azul_cielo"].includes(s.id);
-                    }
-                    if (productCategory === "borlas") {
-                      // Negro, Azul Rey, Azul Bebé, Fucsia, Lila, Rojo, Guinda, Verde Esmeralda, Verde Limón, Dorado, Blanco
-                      return ["negro", "azul", "azul_cielo", "rosa_fiusha", "lila", "roja", "guinda", "verde_esmeralda", "verde_limon", "dorada", "blanco"].includes(s.id);
-                    }
-                    const ids = ["azul_pastel", "azul_turquesa", "azul_marino", "rosa_claro", "rosa_fiusha", "lila", "morado", "anaranjado", "verde_limon", "verde_esmeralda", "verde_bandera", "roja", "blanco", "amarillo"];
-                    return ids.includes(s.id);
+              const visibleStolas = (() => {
+                if (level === "preescolar" && service === "venta" && productCategory === "recuerdos") {
+                  if (pkg?.variant === "oso_graduacion") {
+                    return [
+                      { id: "azul", label: "Color Azul", hex: "#1D4ED8" },
+                      { id: "rosa", label: "Color Rosa", hex: "#FBCFE8" }
+                    ];
                   }
-                  if (pkg?.kind === "A") return s.isBasic;
-                  return false;
+                  return [];
                 }
-                if (pkg?.kind === "B" || pkg?.kind === "C") return true;
-                return s.id === "dorada";
-              });
+                return STOLA_COLORS.filter((s: any) => {
+                  if (level === "preescolar") {
+                    if (service === "venta") {
+                      if (productCategory === "togas") {
+                        if (pkg?.variant === "toga_borla") return false;
+                        const ids = ["azul_pastel", "azul_turquesa", "azul_marino", "rosa_claro", "rosa_fiusha", "lila", "morado", "anaranjado", "verde_limon", "verde_esmeralda", "verde_bandera", "roja", "blanco", "amarillo"];
+                        return ids.includes(s.id);
+                      }
+                      if (productCategory === "birretes") {
+                        return ["negro", "azul", "roja", "rosa_claro", "azul_cielo"].includes(s.id);
+                      }
+                      if (productCategory === "borlas") {
+                        // Negro, Azul Rey, Azul Bebé, Fucsia, Lila, Rojo, Guinda, Verde Esmeralda, Verde Limón, Dorado, Blanco
+                        return ["negro", "azul", "azul_cielo", "rosa_fiusha", "lila", "roja", "guinda", "verde_esmeralda", "verde_limon", "dorada", "blanco"].includes(s.id);
+                      }
+                      const ids = ["azul_pastel", "azul_turquesa", "azul_marino", "rosa_claro", "rosa_fiusha", "lila", "morado", "anaranjado", "verde_limon", "verde_esmeralda", "verde_bandera", "roja", "blanco", "amarillo"];
+                      return ids.includes(s.id);
+                    }
+                    if (pkg?.kind === "A") return s.isBasic;
+                    return false;
+                  }
+                  if (pkg?.kind === "B" || pkg?.kind === "C") return true;
+                  return s.id === "dorada";
+                });
+              })();
 
               if (visibleStolas.length === 0) return null;
 
               return (
                 <section className="animate-in fade-in slide-in-from-top-2 duration-300">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                    {productCategory === "birretes" ? "Color de Birrete" : productCategory === "borlas" ? "Color de Borla" : "Color de Estola"}
+                    {productCategory === "birretes" ? "Color de Birrete" : productCategory === "borlas" ? "Color de Borla" : (productCategory === "recuerdos" ? "Color del Oso" : "Color de Estola")}
                   </p>
                   <div className="flex flex-wrap gap-2.5">
                     {visibleStolas.map((s) => {
@@ -987,6 +1182,53 @@ export function StepConfig({
                 </section>
               );
             })()}
+
+            {/* Talla de Toga (Solo Venta Preescolar Togas) */}
+            {service === "venta" && level === "preescolar" && productCategory === "togas" && onTogaSize && (
+              <section className="animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                    Talla de Toga
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsSizeGuideOpen(true)}
+                    className="text-[10px] uppercase tracking-wider text-navy font-semibold flex items-center gap-1 hover:underline cursor-pointer focus:outline-none"
+                  >
+                    <Ruler className="h-3.5 w-3.5 text-navy" strokeWidth={1.5} /> Ver guía de medidas
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {["XS", "S", "M", "L", "XL"].map((sz) => {
+                    const active = togaSize === sz;
+                    const heightHelper: Record<string, string> = {
+                      XS: "91-97 cm",
+                      S: "99-105 cm",
+                      M: "106-112 cm",
+                      L: "114-119 cm",
+                      XL: "122-127 cm",
+                    };
+                    return (
+                      <button
+                        key={sz}
+                        type="button"
+                        onClick={() => onTogaSize(sz)}
+                        className={cn(
+                          "flex flex-col items-center justify-center px-4 py-2.5 rounded-xl border text-sm font-medium transition-all cursor-pointer relative min-w-[75px]",
+                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                          active
+                            ? "border-navy bg-cream text-foreground font-semibold"
+                            : "border-hairline text-foreground/80 hover:border-navy/40",
+                        )}
+                      >
+                        <span>{sz}</span>
+                        <span className="text-[9px] text-muted-foreground font-normal">{heightHelper[sz]}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             {/* Features */}
             <section>
@@ -1063,6 +1305,64 @@ export function StepConfig({
           </div>
         </div>
       </div>
+
+      <Dialog open={isSizeGuideOpen} onOpenChange={setIsSizeGuideOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl">Guía de Medidas (Preescolar)</DialogTitle>
+            <DialogDescription>
+              Encuentra la talla ideal de la toga de tu pequeño según su estatura.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 border border-hairline rounded-xl overflow-hidden bg-card">
+            <table className="w-full text-left border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr className="bg-muted/40 border-b border-hairline">
+                  <th className="p-3 font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">Talla</th>
+                  <th className="p-3 font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">Medida</th>
+                  <th className="p-3 font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">Estatura (cm)</th>
+                  <th className="p-3 font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">Estatura (Pies)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-hairline">
+                <tr className="hover:bg-muted/20">
+                  <td className="p-3 font-bold">XS</td>
+                  <td className="p-3">21"</td>
+                  <td className="p-3 font-sans">91 - 97 cm</td>
+                  <td className="p-3 font-sans">3'0" - 3'2"</td>
+                </tr>
+                <tr className="hover:bg-muted/20">
+                  <td className="p-3 font-bold">S</td>
+                  <td className="p-3">24"</td>
+                  <td className="p-3 font-sans">99 - 105 cm</td>
+                  <td className="p-3 font-sans">3'3" - 3'5"</td>
+                </tr>
+                <tr className="hover:bg-muted/20">
+                  <td className="p-3 font-bold">M</td>
+                  <td className="p-3">27"</td>
+                  <td className="p-3 font-sans">106 - 112 cm</td>
+                  <td className="p-3 font-sans">3'6" - 3'8"</td>
+                </tr>
+                <tr className="hover:bg-muted/20">
+                  <td className="p-3 font-bold">L</td>
+                  <td className="p-3">30"</td>
+                  <td className="p-3 font-sans">114 - 119 cm</td>
+                  <td className="p-3 font-sans">3'9" - 3'11"</td>
+                </tr>
+                <tr className="hover:bg-muted/20">
+                  <td className="p-3 font-bold">XL</td>
+                  <td className="p-3">33"</td>
+                  <td className="p-3 font-sans">122 - 127 cm</td>
+                  <td className="p-3 font-sans">4'0" - 4'2"</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-2 text-[10px] text-muted-foreground leading-relaxed">
+            * Se recomienda medir desde el hombro hasta los tobillos para asegurar el largo de la toga.
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

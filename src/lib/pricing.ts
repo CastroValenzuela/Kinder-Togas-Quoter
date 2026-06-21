@@ -9,7 +9,7 @@ export type Level =
 
 export type ServiceType = "renta" | "venta";
 export type City = "tijuana" | "ensenada";
-export type PackageBVariant = "esencial" | "hybrid" | "max" | "sec_a" | "sec_b" | "pri_a" | "pri_b" | "pri_c" | "prep_a" | "prep_b" | "prep_c1" | "prep_c2" | "uni_b" | "uni_c" | "birrete_decorado" | "birrete_liso" | "borla_dije" | "borla_clasica";
+export type PackageBVariant = "esencial" | "hybrid" | "max" | "sec_a" | "sec_b" | "pri_a" | "pri_b" | "pri_c" | "prep_a" | "prep_b" | "prep_c1" | "prep_c2" | "uni_b" | "uni_c" | "birrete_decorado" | "birrete_liso" | "borla_dije" | "borla_clasica" | "toga_completa" | "toga_borla" | "medalla_standard" | "medalla_personalizada" | "oso_graduacion";
 export type PackageChoice =
   | { kind: "A" }
   | { kind: "B"; variant?: PackageBVariant }
@@ -134,6 +134,11 @@ export const PRICES = {
   V_B_LISO: 160,
   V_B_BORLA_DIJE: 50,
   V_B_BORLA_CLASICA: 25,
+  V_TOGA_BIRRETE_ESTOLA: 450,
+  V_TOGA_BIRRETE_BORLA: 380,
+  V_MEDALLA_STANDARD: 35,
+  V_MEDALLA_PERSONALIZADA: 45,
+  V_OSO_GRADUACION: 150,
 
   // Primaria (desacoplado)
   A_PRIMARIA: 350,
@@ -174,6 +179,11 @@ export const DISCOUNTS = {
   V_B_LISO: 0,
   V_B_BORLA_DIJE: 0,
   V_B_BORLA_CLASICA: 0,
+  V_TOGA_BIRRETE_ESTOLA: 0,
+  V_TOGA_BIRRETE_BORLA: 0,
+  V_MEDALLA_STANDARD: 0,
+  V_MEDALLA_PERSONALIZADA: 0,
+  V_OSO_GRADUACION: 0,
 
   A_PRIMARIA: 0,
   B_BALANCE_PRIMARIA: 0,
@@ -222,6 +232,11 @@ export const B_VARIANTS: {
   { id: "birrete_liso", code: "B.2", title: "Birrete Liso", desc: "Birrete liso en color de tu elección", price: PRICES.V_B_LISO },
   { id: "borla_dije", code: "B.1", title: "Borla con Dije Sublimado", desc: "Personalización única para tu graduación.", price: PRICES.V_B_BORLA_DIJE },
   { id: "borla_clasica", code: "B.2", title: "Borla Clásica 2026", desc: "Incluye charm 2026 dorado de alta calidad.", price: PRICES.V_B_BORLA_CLASICA },
+  { id: "toga_completa", code: "T.1", title: "Toga Completa", desc: "Incluye Toga, Birrete y Estola", price: PRICES.V_TOGA_BIRRETE_ESTOLA },
+  { id: "toga_borla", code: "T.2", title: "Toga y Birrete con Borla", desc: "Toga y birrete con borla del año, sin estola", price: PRICES.V_TOGA_BIRRETE_BORLA },
+  { id: "medalla_standard", code: "M.1", title: "Medalla Estándar", desc: "Medalla conmemorativa clásica de graduación", price: PRICES.V_MEDALLA_STANDARD },
+  { id: "medalla_personalizada", code: "M.2", title: "Medalla Personalizada", desc: "Medalla grabada con nombre y detalles personalizados", price: PRICES.V_MEDALLA_PERSONALIZADA },
+  { id: "oso_graduacion", code: "O.1", title: "Oso de Graduación", desc: "Oso de peluche con toga y birrete, color a elegir", price: PRICES.V_OSO_GRADUACION },
 ];
 
 /**
@@ -271,6 +286,11 @@ export async function loadDynamicPrices(): Promise<boolean> {
         if (variant.id === "birrete_liso") variant.price = PRICES.V_B_LISO;
         if (variant.id === "borla_dije") variant.price = PRICES.V_B_BORLA_DIJE;
         if (variant.id === "borla_clasica") variant.price = PRICES.V_B_BORLA_CLASICA;
+        if (variant.id === "toga_completa") variant.price = PRICES.V_TOGA_BIRRETE_ESTOLA;
+        if (variant.id === "toga_borla") variant.price = PRICES.V_TOGA_BIRRETE_BORLA;
+        if (variant.id === "medalla_standard") variant.price = PRICES.V_MEDALLA_STANDARD;
+        if (variant.id === "medalla_personalizada") variant.price = PRICES.V_MEDALLA_PERSONALIZADA;
+        if (variant.id === "oso_graduacion") variant.price = PRICES.V_OSO_GRADUACION;
       });
 
       console.log("Tarifas y descuentos cargados y aplicados desde Supabase correctamente.");
@@ -322,6 +342,11 @@ export function getPriceKey(pkg?: PackageChoice, level?: Level, service?: string
   if (pkg.variant === "birrete_liso") return "V_B_LISO";
   if (pkg.variant === "borla_dije") return "V_B_BORLA_DIJE";
   if (pkg.variant === "borla_clasica") return "V_B_BORLA_CLASICA";
+  if (pkg.variant === "toga_completa") return "V_TOGA_BIRRETE_ESTOLA";
+  if (pkg.variant === "toga_borla") return "V_TOGA_BIRRETE_BORLA";
+  if (pkg.variant === "medalla_standard") return "V_MEDALLA_STANDARD";
+  if (pkg.variant === "medalla_personalizada") return "V_MEDALLA_PERSONALIZADA";
+  if (pkg.variant === "oso_graduacion") return "V_OSO_GRADUACION";
 
   if (pkg.variant === "sec_b") return "SEC_B";
   if (pkg.variant === "sec_a") return "SEC_A";
@@ -377,11 +402,16 @@ export function packageLabel(pkg?: PackageChoice, level?: Level, service?: Servi
   if (!pkg) return "—";
   if (service === "venta") {
     if (level === "preescolar") {
+      if (pkg.variant === "toga_completa") return "Toga Completa (Toga, Birrete y Estola)";
+      if (pkg.variant === "toga_borla") return "Toga y Birrete con Borla del Año (Sin Estola)";
       if (pkg.variant === "birrete_decorado") return "Birrete Decorado";
       if (pkg.variant === "birrete_liso") return "Birrete Liso";
       if (pkg.variant === "esencial") return "Estola E.1 Clásica";
       if (pkg.variant === "hybrid") return "Estola E.2 Combinada";
       if (pkg.variant === "max") return "Estola E.3 Premium";
+      if (pkg.variant === "medalla_standard") return "Medalla Estándar";
+      if (pkg.variant === "medalla_personalizada") return "Medalla Personalizada";
+      if (pkg.variant === "oso_graduacion") return "Oso de Graduación";
       return "Estola Personalizada";
     }
   }

@@ -83,6 +83,8 @@ interface QuoteRecord {
   status: string | null;
   discount_percent?: number;
   original_unit_price?: number;
+  oso_foto_1?: string | null;
+  oso_foto_2?: string | null;
 }
 
 const BRAND_COLORS = {
@@ -318,6 +320,11 @@ export function AdminDashboard() {
         { key: "V_B_LISO", price: 160, discount_percent: 0 },
         { key: "V_B_BORLA_DIJE", price: 50, discount_percent: 0 },
         { key: "V_B_BORLA_CLASICA", price: 25, discount_percent: 0 },
+        { key: "V_TOGA_BIRRETE_ESTOLA", price: 450, discount_percent: 0 },
+        { key: "V_TOGA_BIRRETE_BORLA", price: 380, discount_percent: 0 },
+        { key: "V_MEDALLA_STANDARD", price: 35, discount_percent: 0 },
+        { key: "V_MEDALLA_PERSONALIZADA", price: 45, discount_percent: 0 },
+        { key: "V_OSO_GRADUACION", price: 150, discount_percent: 0 },
         { key: "A_PRIMARIA", price: 350, discount_percent: 0 },
         { key: "B_BALANCE_PRIMARIA", price: 480, discount_percent: 0 },
         { key: "B_PREMIUM_PRIMARIA", price: 510, discount_percent: 0 },
@@ -612,6 +619,9 @@ export function AdminDashboard() {
       pri_a: "Paquete B — B.3 Clásico Destacado",
       uni_b: "Opción B — Bordado Sencillo",
       uni_c: "Opción C — Bordado Premium",
+      medalla_standard: "Recuerdos — Medalla Estándar",
+      medalla_personalizada: "Recuerdos — Medalla Personalizada",
+      oso_graduacion: "Recuerdos — Oso de Graduación",
     };
     return (variant && labels[variant]) || (kind === 'C' ? "Paquete C — Bordado" : "Paquete B — Personalizado");
   };
@@ -2101,12 +2111,20 @@ export function AdminDashboard() {
                                 <div className="space-y-2">
                                   <h4 className="font-bold text-navy text-xs uppercase tracking-wider">Colores Seleccionados</h4>
                                   <div className="space-y-1 text-xs">
-                                    <p><span className="text-muted-foreground">Color Toga:</span> <span className="font-semibold text-foreground uppercase tracking-wide">{q.toga_color || "Predeterminado"}</span></p>
-                                    <p><span className="text-muted-foreground">Color Estola:</span> <span className="font-semibold text-foreground uppercase tracking-wide">{q.stola_color || "Predeterminado"}</span></p>
+                                    {q.package_variant === "oso_graduacion" ? (
+                                      <p><span className="text-muted-foreground">Color del Oso:</span> <span className="font-semibold text-foreground uppercase tracking-wide">{q.stola_color === "azul" ? "Azul" : "Rosa"}</span></p>
+                                    ) : (
+                                      <>
+                                        <p><span className="text-muted-foreground">Color Toga:</span> <span className="font-semibold text-foreground uppercase tracking-wide">{q.toga_color || "Predeterminado"}</span></p>
+                                        <p><span className="text-muted-foreground">Color Estola:</span> <span className="font-semibold text-foreground uppercase tracking-wide">{q.stola_color || "Predeterminado"}</span></p>
+                                      </>
+                                    )}
                                     {q.package_kind === "A" && <p className="text-muted-foreground/60 italic text-[11px]">* Paquete A incluye Toga y Estola Lisa por defecto.</p>}
                                   </div>
                                 </div>
                               </div>
+
+
 
                               {/* 📅 Event Countdown and Logistics Timeline */}
                               {(() => {
@@ -2565,6 +2583,11 @@ export function AdminDashboard() {
                   { key: "V_B_LISO", title: "Venta Preescolar — Birrete Liso (B.2)", desc: "Birrete liso de preescolar para Venta.", levels: ["preescolar"] },
                   { key: "V_B_BORLA_DIJE", title: "Venta Preescolar — Borla con Dije (B.1)", desc: "Borla con dije de preescolar para Venta.", levels: ["preescolar"] },
                   { key: "V_B_BORLA_CLASICA", title: "Venta Preescolar — Borla Clásica (B.2)", desc: "Borla clásica de preescolar para Venta.", levels: ["preescolar"] },
+                  { key: "V_TOGA_BIRRETE_ESTOLA", title: "Venta Preescolar — Toga Completa", desc: "Incluye Toga, Birrete y Estola para Venta.", levels: ["preescolar"] },
+                  { key: "V_TOGA_BIRRETE_BORLA", title: "Venta Preescolar — Toga y Birrete con Borla", desc: "Toga y birrete con borla del año, sin estola para Venta.", levels: ["preescolar"] },
+                  { key: "V_MEDALLA_STANDARD", title: "Venta Preescolar — Medalla Estándar", desc: "Medalla conmemorativa clásica para Venta en nivel preescolar.", levels: ["preescolar"] },
+                  { key: "V_MEDALLA_PERSONALIZADA", title: "Venta Preescolar — Medalla Personalizada", desc: "Medalla grabada personalizada con nombre y detalles para Venta.", levels: ["preescolar"] },
+                  { key: "V_OSO_GRADUACION", title: "Venta Preescolar — Oso de Graduación", desc: "Oso de peluche con toga y birrete, color a elegir para Venta.", levels: ["preescolar"] },
 
                   // Primaria (desacoplado)
                   { key: "A_PRIMARIA", title: "Paquete A — Básico (Primaria)", desc: "Toga y Estola Lisa estándar para ceremonias tradicionales de Primaria.", levels: ["primaria"] },
