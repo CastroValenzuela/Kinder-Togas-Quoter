@@ -373,7 +373,7 @@ const FEATURES_VENTA_BORLAS: Record<
   ],
 };
 
-export function StepConfig({
+export function StepConfigHidden({
   level,
   service,
   city,

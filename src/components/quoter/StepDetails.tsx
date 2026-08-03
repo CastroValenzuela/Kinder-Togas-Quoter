@@ -66,15 +66,13 @@ export function StepDetails({
   const [stateOpen, setStateOpen] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
 
-  const canContinue = 
-    school.trim().length >= 3 && 
-    contact.trim().length >= 3 && 
-    phone.replace(/\D/g, '').length === 10 && 
+  const canContinue =
+    school.trim().length >= 3 &&
+    contact.trim().length >= 3 &&
+    phone.replace(/\D/g, "").length === 10 &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
     date !== "" &&
-    (service === "venta"
-      ? !!stateSelected && !!citySelected
-      : true);
+    (service === "venta" ? !!stateSelected && !!citySelected : true);
 
   return (
     <div className="mx-auto max-w-xl">
@@ -90,14 +88,18 @@ export function StepDetails({
 
       <div className="space-y-6">
         {/* Honeypot field (hidden from users, but filled by bots) */}
-        <div className="sr-only" aria-hidden="true" style={{ position: 'absolute', left: '-9999px' }}>
+        <div
+          className="sr-only"
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-9999px" }}
+        >
           <Label htmlFor="website">Website</Label>
-          <input 
-            id="website" 
-            name="website" 
-            type="text" 
-            tabIndex={-1} 
-            autoComplete="off" 
+          <input
+            id="website"
+            name="website"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
             value={honeypot}
             onChange={(e) => onHoneypot(e.target.value)}
           />
@@ -118,16 +120,16 @@ export function StepDetails({
             }}
             className="h-12 text-base"
           />
-          <p className="text-[10px] text-muted-foreground mt-1.5 ml-1">
-            Mínimo 3 caracteres
-          </p>
+          <p className="text-[10px] text-muted-foreground mt-1.5 ml-1">Mínimo 3 caracteres</p>
         </div>
 
         {/* Searchable State & City Autocomplete for Venta */}
         {service === "venta" && (
           <div className="space-y-5 border border-hairline rounded-2xl p-5 bg-cream/40 animate-in fade-in slide-in-from-top-3 duration-300">
-            <h3 className="text-xs uppercase tracking-wider font-bold text-navy mb-1">Dirección de Envío</h3>
-            
+            <h3 className="text-xs uppercase tracking-wider font-bold text-navy mb-1">
+              Dirección de Envío
+            </h3>
+
             {/* Estado Selector */}
             <div className="space-y-2 flex flex-col">
               <Label>Estado de la República</Label>
@@ -166,7 +168,7 @@ export function StepDetails({
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                stateSelected === state.id ? "opacity-100" : "opacity-0"
+                                stateSelected === state.id ? "opacity-100" : "opacity-0",
                               )}
                             />
                             {state.name}
@@ -192,9 +194,7 @@ export function StepDetails({
                       className="h-12 w-full justify-between text-base font-normal bg-background hover:bg-background border-input text-left px-3.5"
                     >
                       <span className="truncate">
-                        {citySelected
-                          ? citySelected
-                          : "Seleccionar ciudad..."}
+                        {citySelected ? citySelected : "Seleccionar ciudad..."}
                       </span>
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -217,7 +217,7 @@ export function StepDetails({
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
-                                  citySelected === city ? "opacity-100" : "opacity-0"
+                                  citySelected === city ? "opacity-100" : "opacity-0",
                                 )}
                               />
                               {city}
@@ -242,9 +242,7 @@ export function StepDetails({
             onChange={(e) => onContact(e.target.value)}
             className="h-12 text-base"
           />
-          <p className="text-[10px] text-muted-foreground mt-1.5 ml-1">
-            Mínimo 3 caracteres
-          </p>
+          <p className="text-[10px] text-muted-foreground mt-1.5 ml-1">Mínimo 3 caracteres</p>
         </div>
 
         <div className="space-y-2">
@@ -255,7 +253,7 @@ export function StepDetails({
             placeholder="Ej. (646) 123-4567"
             value={phone}
             onChange={(e) => {
-              const digits = e.target.value.replace(/\D/g, '').substring(0, 10);
+              const digits = e.target.value.replace(/\D/g, "").substring(0, 10);
               let formatted = "";
               if (digits.length > 0) {
                 if (digits.length <= 3) {
@@ -270,12 +268,13 @@ export function StepDetails({
             }}
             className="h-12 text-base"
           />
-          {phone.length > 0 && phone.replace(/\D/g, '').length < 10 && (
+          {phone.length > 0 && phone.replace(/\D/g, "").length < 10 && (
             <p className="text-[10px] text-destructive mt-1.5 ml-1 font-medium animate-pulse">
-              El teléfono debe tener exactamente 10 dígitos (llevas {phone.replace(/\D/g, '').length} de 10).
+              El teléfono debe tener exactamente 10 dígitos (llevas{" "}
+              {phone.replace(/\D/g, "").length} de 10).
             </p>
           )}
-          {phone.replace(/\D/g, '').length === 10 && (
+          {phone.replace(/\D/g, "").length === 10 && (
             <p className="text-[10px] text-emerald-600 mt-1.5 ml-1 font-semibold flex items-center gap-1">
               <span>✓ Teléfono de 10 dígitos válido</span>
             </p>
@@ -308,7 +307,7 @@ export function StepDetails({
                 type="button"
                 className={cn(
                   "flex h-12 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-                  (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) && "text-muted-foreground"
+                  (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) && "text-muted-foreground",
                 )}
               >
                 {date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? (
@@ -322,7 +321,11 @@ export function StepDetails({
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? new Date(date + "T12:00:00") : undefined}
+                selected={
+                  date && /^\d{4}-\d{2}-\d{2}$/.test(date)
+                    ? new Date(date + "T12:00:00")
+                    : undefined
+                }
                 onSelect={(d) => onDate(d ? format(d, "yyyy-MM-dd") : "")}
                 disabled={(d) => d < startOfDay(new Date()) || d > addMonths(new Date(), 18)}
                 initialFocus

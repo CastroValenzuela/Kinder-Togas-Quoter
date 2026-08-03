@@ -1,5 +1,5 @@
-import fs from 'fs';
-import zlib from 'zlib';
+import fs from "fs";
+import zlib from "zlib";
 
 function testMaskPixels(path) {
   try {
@@ -8,16 +8,16 @@ function testMaskPixels(path) {
     let idatBuffers = [];
     while (pos < buf.length) {
       const length = buf.readUInt32BE(pos);
-      const type = buf.toString('ascii', pos + 4, pos + 8);
+      const type = buf.toString("ascii", pos + 4, pos + 8);
       const data = buf.subarray(pos + 8, pos + 8 + length);
-      if (type === 'IDAT') {
+      if (type === "IDAT") {
         idatBuffers.push(data);
       }
       pos += 12 + length;
     }
     const idatBuf = Buffer.concat(idatBuffers);
     const decompressed = zlib.inflateSync(idatBuf);
-    
+
     // Check alpha values of all pixels
     let opaqueCount = 0;
     let transparentCount = 0;
@@ -31,13 +31,13 @@ function testMaskPixels(path) {
       }
     }
     console.log(`${path}:`);
-    console.log('Opaque pixels (>10 alpha):', opaqueCount);
-    console.log('Transparent pixels (<=10 alpha):', transparentCount);
+    console.log("Opaque pixels (>10 alpha):", opaqueCount);
+    console.log("Transparent pixels (<=10 alpha):", transparentCount);
   } catch (e) {
     console.error(e);
   }
 }
 
-testMaskPixels('src/assets/Primaria/B1/B1-estola-base.png');
-testMaskPixels('src/assets/Primaria/B2/B2-estola-base.png');
-testMaskPixels('src/assets/Primaria/B3/B3-estola-base.png');
+testMaskPixels("src/assets/Primaria/B1/B1-estola-base.png");
+testMaskPixels("src/assets/Primaria/B2/B2-estola-base.png");
+testMaskPixels("src/assets/Primaria/B3/B3-estola-base.png");

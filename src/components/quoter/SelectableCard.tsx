@@ -11,7 +11,14 @@ type Props = {
   ariaLabel?: string;
 };
 
-export function SelectableCard({ selected, disabled, onClick, children, className, ariaLabel }: Props) {
+export function SelectableCard({
+  selected,
+  disabled,
+  onClick,
+  children,
+  className,
+  ariaLabel,
+}: Props) {
   return (
     <motion.button
       type="button"

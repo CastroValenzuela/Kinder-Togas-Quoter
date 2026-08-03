@@ -13,7 +13,7 @@ Experiencia de cotización en 4 pasos con estética minimalista (blanco, serif s
 - Tokens oklch: fondo blanco puro, texto gris carbón, mutados grises suaves, acento azul marino profundo (~`oklch(0.28 0.09 265)`), crema sutil para estados seleccionados.
 - Import Google Fonts: **Fraunces** (display serif) + **Inter** (cuerpo). Tracking amplio en labels uppercase.
 - Bordes hairline, sin sombras pesadas.
-- `lang="es"` en `__root.tsx` + metadata SEO en español (title, description, og:*).
+- `lang="es"` en `__root.tsx` + metadata SEO en español (title, description, og:\*).
 
 ## Archivos a crear / modificar
 
@@ -39,15 +39,13 @@ src/components/quoter/SelectableCard.tsx   -> tarjeta reutilizable
 Todo el estado vive en `Quoter.tsx` con `useState` y se pasa por props:
 
 ```ts
-type Level = 'preescolar'|'primaria'|'secundaria'|'preparatoria'|'universidad'|'posgrado';
-type ServiceType = 'renta'|'venta';
-type City = 'tijuana'|'ensenada';
-type PackageChoice =
-  | { kind: 'A' }
-  | { kind: 'B', variant: 'standard'|'hybrid'|'max' };
+type Level = "preescolar" | "primaria" | "secundaria" | "preparatoria" | "universidad" | "posgrado";
+type ServiceType = "renta" | "venta";
+type City = "tijuana" | "ensenada";
+type PackageChoice = { kind: "A" } | { kind: "B"; variant: "standard" | "hybrid" | "max" };
 
 type QuoteState = {
-  step: 1|2|3|4;
+  step: 1 | 2 | 3 | 4;
   level?: Level;
   service?: ServiceType;
   city?: City;
@@ -65,6 +63,7 @@ Total con `useMemo`: `precioUnitario(pkg) * quantity`.
 **2 — Servicio:** dos tarjetas grandes. Renta activa. Venta `opacity-40`, `cursor-not-allowed`, `aria-disabled`, badge "Próximamente".
 
 **3 — Configuración:** tres bloques separados por divisores hairline:
+
 - Ciudad: dos pill buttons (Tijuana / Ensenada), seleccionado se llena de azul marino.
 - Paquete: radio cards A y B con precio. B expande con `AnimatePresence` (height auto + fade) sub-opciones B.1 Estándar Duo, B.2 Híbrido, B.3 Max Duo, cada una con precio.
 - Cantidad: stepper − / número grande / +, input editable, mínimo 1.
@@ -85,8 +84,8 @@ Visible **solo en paso 3**. Fija abajo, ancho del contenedor, fondo blanco, bord
 export const PRICES = {
   A: 350,
   B_STANDARD: 450, // B.1 9x12 ambos lados
-  B_HYBRID: 550,   // B.2 9x12 + 9x35
-  B_MAX: 650,      // B.3 9x35 ambos lados
+  B_HYBRID: 550, // B.2 9x12 + 9x35
+  B_MAX: 650, // B.3 9x35 ambos lados
 } as const;
 ```
 

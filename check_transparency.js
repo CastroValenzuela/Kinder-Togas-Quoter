@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from "fs";
 
 // Simple PNG chunk reader to inspect transparency or alpha values
 function checkPngTransparency(path) {
@@ -10,12 +10,14 @@ function checkPngTransparency(path) {
     // Color type 6 is RGBA (has alpha channel).
     // Color type 2 is RGB (no alpha channel).
     const colorType = buf[25];
-    console.log(`${path} Color Type: ${colorType} (${colorType === 6 ? 'RGBA' : colorType === 2 ? 'RGB' : 'Other'})`);
+    console.log(
+      `${path} Color Type: ${colorType} (${colorType === 6 ? "RGBA" : colorType === 2 ? "RGB" : "Other"})`,
+    );
   } catch (e) {
     console.error(e);
   }
 }
 
-checkPngTransparency('src/assets/Primaria/B1/B1-estola-base.png');
-checkPngTransparency('src/assets/Primaria/B2/B2-estola-base.png');
-checkPngTransparency('src/assets/Primaria/B3/B3-estola-base.png');
+checkPngTransparency("src/assets/Primaria/B1/B1-estola-base.png");
+checkPngTransparency("src/assets/Primaria/B2/B2-estola-base.png");
+checkPngTransparency("src/assets/Primaria/B3/B3-estola-base.png");

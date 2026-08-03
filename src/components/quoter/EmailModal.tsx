@@ -1,4 +1,10 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
@@ -36,7 +42,10 @@ export function EmailModal({ open, onOpenChange, quote }: Props) {
 
         <form onSubmit={submit} className="space-y-4 mt-2">
           <div className="space-y-2">
-            <Label htmlFor="q-name" className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <Label
+              htmlFor="q-name"
+              className="text-xs uppercase tracking-[0.18em] text-muted-foreground"
+            >
               Nombre
             </Label>
             <Input
@@ -48,7 +57,10 @@ export function EmailModal({ open, onOpenChange, quote }: Props) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="q-email" className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <Label
+              htmlFor="q-email"
+              className="text-xs uppercase tracking-[0.18em] text-muted-foreground"
+            >
               Correo
             </Label>
             <Input

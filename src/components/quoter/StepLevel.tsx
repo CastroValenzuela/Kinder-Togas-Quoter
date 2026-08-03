@@ -28,10 +28,7 @@ export function StepLevel({ value, onChange }: Props) {
             ariaLabel={label}
           >
             <div className="flex items-center gap-4">
-              <Icon
-                className="h-7 w-7 text-navy"
-                strokeWidth={1.5}
-              />
+              <Icon className="h-7 w-7 text-navy" strokeWidth={1.5} />
               <span className="font-display text-xl text-foreground">{label}</span>
             </div>
           </SelectableCard>

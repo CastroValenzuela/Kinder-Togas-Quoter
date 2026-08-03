@@ -5,137 +5,137 @@ export interface StateOption {
 
 export const MEXICO_STATES: StateOption[] = [
   {
-    "id": "aguascalientes",
-    "name": "Aguascalientes"
+    id: "aguascalientes",
+    name: "Aguascalientes",
   },
   {
-    "id": "baja_california",
-    "name": "Baja California"
+    id: "baja_california",
+    name: "Baja California",
   },
   {
-    "id": "baja_california_sur",
-    "name": "Baja California Sur"
+    id: "baja_california_sur",
+    name: "Baja California Sur",
   },
   {
-    "id": "campeche",
-    "name": "Campeche"
+    id: "campeche",
+    name: "Campeche",
   },
   {
-    "id": "coahuila_de_zaragoza",
-    "name": "Coahuila de Zaragoza"
+    id: "coahuila_de_zaragoza",
+    name: "Coahuila de Zaragoza",
   },
   {
-    "id": "colima",
-    "name": "Colima"
+    id: "colima",
+    name: "Colima",
   },
   {
-    "id": "chiapas",
-    "name": "Chiapas"
+    id: "chiapas",
+    name: "Chiapas",
   },
   {
-    "id": "chihuahua",
-    "name": "Chihuahua"
+    id: "chihuahua",
+    name: "Chihuahua",
   },
   {
-    "id": "ciudad_de_mexico",
-    "name": "Ciudad de México"
+    id: "ciudad_de_mexico",
+    name: "Ciudad de México",
   },
   {
-    "id": "durango",
-    "name": "Durango"
+    id: "durango",
+    name: "Durango",
   },
   {
-    "id": "guanajuato",
-    "name": "Guanajuato"
+    id: "guanajuato",
+    name: "Guanajuato",
   },
   {
-    "id": "guerrero",
-    "name": "Guerrero"
+    id: "guerrero",
+    name: "Guerrero",
   },
   {
-    "id": "hidalgo",
-    "name": "Hidalgo"
+    id: "hidalgo",
+    name: "Hidalgo",
   },
   {
-    "id": "jalisco",
-    "name": "Jalisco"
+    id: "jalisco",
+    name: "Jalisco",
   },
   {
-    "id": "mexico",
-    "name": "México"
+    id: "mexico",
+    name: "México",
   },
   {
-    "id": "michoacan_de_ocampo",
-    "name": "Michoacán de Ocampo"
+    id: "michoacan_de_ocampo",
+    name: "Michoacán de Ocampo",
   },
   {
-    "id": "morelos",
-    "name": "Morelos"
+    id: "morelos",
+    name: "Morelos",
   },
   {
-    "id": "nayarit",
-    "name": "Nayarit"
+    id: "nayarit",
+    name: "Nayarit",
   },
   {
-    "id": "nuevo_leon",
-    "name": "Nuevo León"
+    id: "nuevo_leon",
+    name: "Nuevo León",
   },
   {
-    "id": "oaxaca",
-    "name": "Oaxaca"
+    id: "oaxaca",
+    name: "Oaxaca",
   },
   {
-    "id": "puebla",
-    "name": "Puebla"
+    id: "puebla",
+    name: "Puebla",
   },
   {
-    "id": "queretaro",
-    "name": "Querétaro"
+    id: "queretaro",
+    name: "Querétaro",
   },
   {
-    "id": "quintana_roo",
-    "name": "Quintana Roo"
+    id: "quintana_roo",
+    name: "Quintana Roo",
   },
   {
-    "id": "san_luis_potosi",
-    "name": "San Luis Potosí"
+    id: "san_luis_potosi",
+    name: "San Luis Potosí",
   },
   {
-    "id": "sinaloa",
-    "name": "Sinaloa"
+    id: "sinaloa",
+    name: "Sinaloa",
   },
   {
-    "id": "sonora",
-    "name": "Sonora"
+    id: "sonora",
+    name: "Sonora",
   },
   {
-    "id": "tabasco",
-    "name": "Tabasco"
+    id: "tabasco",
+    name: "Tabasco",
   },
   {
-    "id": "tamaulipas",
-    "name": "Tamaulipas"
+    id: "tamaulipas",
+    name: "Tamaulipas",
   },
   {
-    "id": "tlaxcala",
-    "name": "Tlaxcala"
+    id: "tlaxcala",
+    name: "Tlaxcala",
   },
   {
-    "id": "veracruz_de_ignacio_de_la_llave",
-    "name": "Veracruz de Ignacio de la Llave"
+    id: "veracruz_de_ignacio_de_la_llave",
+    name: "Veracruz de Ignacio de la Llave",
   },
   {
-    "id": "yucatan",
-    "name": "Yucatán"
+    id: "yucatan",
+    name: "Yucatán",
   },
   {
-    "id": "zacatecas",
-    "name": "Zacatecas"
-  }
+    id: "zacatecas",
+    name: "Zacatecas",
+  },
 ];
 
 export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
-  "aguascalientes": [
+  aguascalientes: [
     "Aguascalientes",
     "Asientos",
     "Calvillo",
@@ -146,25 +146,19 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Rincón de Romos",
     "San Francisco de los Romo",
     "San José de Gracia",
-    "Tepezalá"
+    "Tepezalá",
   ],
-  "baja_california": [
+  baja_california: [
     "Ensenada",
     "Mexicali",
     "Playas de Rosarito",
     "San Felipe",
     "San Quintín",
     "Tecate",
-    "Tijuana"
+    "Tijuana",
   ],
-  "baja_california_sur": [
-    "Comondú",
-    "La Paz",
-    "Loreto",
-    "Los Cabos",
-    "Mulegé"
-  ],
-  "campeche": [
+  baja_california_sur: ["Comondú", "La Paz", "Loreto", "Los Cabos", "Mulegé"],
+  campeche: [
     "Calakmul",
     "Calkiní",
     "Campeche",
@@ -177,9 +171,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Hopelchén",
     "Palizada",
     "Seybaplaya",
-    "Tenabo"
+    "Tenabo",
   ],
-  "coahuila_de_zaragoza": [
+  coahuila_de_zaragoza: [
     "Abasolo",
     "Acuña",
     "Allende",
@@ -217,9 +211,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Torreón",
     "Viesca",
     "Villa Unión",
-    "Zaragoza"
+    "Zaragoza",
   ],
-  "colima": [
+  colima: [
     "Armería",
     "Colima",
     "Comala",
@@ -229,9 +223,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Manzanillo",
     "Minatitlán",
     "Tecomán",
-    "Villa de Álvarez"
+    "Villa de Álvarez",
   ],
-  "chiapas": [
+  chiapas: [
     "Acacoyagua",
     "Acala",
     "Acapetahua",
@@ -355,9 +349,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Villaflores",
     "Yajalón",
     "Zinacantán",
-    "Ángel Albino Corzo"
+    "Ángel Albino Corzo",
   ],
-  "chihuahua": [
+  chihuahua: [
     "Ahumada",
     "Aldama",
     "Allende",
@@ -424,9 +418,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Urique",
     "Uruachi",
     "Valle de Zaragoza",
-    "Valle del Rosario"
+    "Valle del Rosario",
   ],
-  "ciudad_de_mexico": [
+  ciudad_de_mexico: [
     "Azcapotzalco",
     "Benito Juárez",
     "Coyoacán",
@@ -442,9 +436,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Tláhuac",
     "Venustiano Carranza",
     "Xochimilco",
-    "Álvaro Obregón"
+    "Álvaro Obregón",
   ],
-  "durango": [
+  durango: [
     "Canatlán",
     "Canelas",
     "Coneto de Comonfort",
@@ -483,9 +477,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Tepehuanes",
     "Tlahualilo",
     "Topia",
-    "Vicente Guerrero"
+    "Vicente Guerrero",
   ],
-  "guanajuato": [
+  guanajuato: [
     "Abasolo",
     "Acámbaro",
     "Apaseo el Alto",
@@ -531,9 +525,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Victoria",
     "Villagrán",
     "Xichú",
-    "Yuriria"
+    "Yuriria",
   ],
-  "guerrero": [
+  guerrero: [
     "Acapulco de Juárez",
     "Acatepec",
     "Ahuacuotzingo",
@@ -618,9 +612,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Zihuatanejo de Azueta",
     "Zirándaro",
     "Zitlala",
-    "Ñuu Savi"
+    "Ñuu Savi",
   ],
-  "hidalgo": [
+  hidalgo: [
     "Acatlán",
     "Acaxochitlán",
     "Actopan",
@@ -704,9 +698,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Zacualtipán de Ángeles",
     "Zapotlán de Juárez",
     "Zempoala",
-    "Zimapán"
+    "Zimapán",
   ],
-  "jalisco": [
+  jalisco: [
     "Acatic",
     "Acatlán de Juárez",
     "Ahualulco de Mercado",
@@ -831,9 +825,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Zapotitlán de Vadillo",
     "Zapotlanejo",
     "Zapotlán del Rey",
-    "Zapotlán el Grande"
+    "Zapotlán el Grande",
   ],
-  "mexico": [
+  mexico: [
     "Acambay de Ruíz Castañeda",
     "Acolman",
     "Aculco",
@@ -958,9 +952,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Zacualpan",
     "Zinacantepec",
     "Zumpahuacán",
-    "Zumpango"
+    "Zumpango",
   ],
-  "michoacan_de_ocampo": [
+  michoacan_de_ocampo: [
     "Acuitzio",
     "Aguililla",
     "Angamacutiro",
@@ -1073,9 +1067,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Zináparo",
     "Ziracuaretiro",
     "Zitácuaro",
-    "Álvaro Obregón"
+    "Álvaro Obregón",
   ],
-  "morelos": [
+  morelos: [
     "Amacuzac",
     "Atlatlahucan",
     "Axochiapan",
@@ -1111,9 +1105,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Yautepec",
     "Yecapixtla",
     "Zacatepec",
-    "Zacualpan de Amilpas"
+    "Zacualpan de Amilpas",
   ],
-  "nayarit": [
+  nayarit: [
     "Acaponeta",
     "Ahuacatlán",
     "Amatlán de Cañas",
@@ -1133,9 +1127,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Tecuala",
     "Tepic",
     "Tuxpan",
-    "Xalisco"
+    "Xalisco",
   ],
-  "nuevo_leon": [
+  nuevo_leon: [
     "Abasolo",
     "Agualeguas",
     "Allende",
@@ -1186,9 +1180,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Santa Catarina",
     "Santiago",
     "Vallecillo",
-    "Villaldama"
+    "Villaldama",
   ],
-  "oaxaca": [
+  oaxaca: [
     "Abejones",
     "Acatlán de Pérez Figueroa",
     "Asunción Cacalotepec",
@@ -1758,9 +1752,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Zapotitlán Lagunas",
     "Zapotitlán Palmas",
     "Zimatlán de Álvarez",
-    "Ánimas Trujano"
+    "Ánimas Trujano",
   ],
-  "puebla": [
+  puebla: [
     "Acajete",
     "Acateno",
     "Acatlán",
@@ -1977,9 +1971,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Zinacatepec",
     "Zongozotla",
     "Zoquiapan",
-    "Zoquitlán"
+    "Zoquitlán",
   ],
-  "queretaro": [
+  queretaro: [
     "Amealco de Bonfil",
     "Arroyo Seco",
     "Cadereyta de Montes",
@@ -1997,9 +1991,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "San Joaquín",
     "San Juan del Río",
     "Tequisquiapan",
-    "Tolimán"
+    "Tolimán",
   ],
-  "quintana_roo": [
+  quintana_roo: [
     "Bacalar",
     "Benito Juárez",
     "Cozumel",
@@ -2010,9 +2004,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Othón P. Blanco",
     "Playa del Carmen",
     "Puerto Morelos",
-    "Tulum"
+    "Tulum",
   ],
-  "san_luis_potosi": [
+  san_luis_potosi: [
     "Ahualulco del Sonido 13",
     "Alaquines",
     "Aquismón",
@@ -2071,9 +2065,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Villa de Reyes",
     "Villa de la Paz",
     "Xilitla",
-    "Zaragoza"
+    "Zaragoza",
   ],
-  "sinaloa": [
+  sinaloa: [
     "Ahome",
     "Angostura",
     "Badiraguato",
@@ -2093,9 +2087,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Rosario",
     "Salvador Alvarado",
     "San Ignacio",
-    "Sinaloa"
+    "Sinaloa",
   ],
-  "sonora": [
+  sonora: [
     "Aconchi",
     "Agua Prieta",
     "Altar",
@@ -2167,9 +2161,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Villa Pesqueira",
     "Yécora",
     "Álamos",
-    "Ónavas"
+    "Ónavas",
   ],
-  "tabasco": [
+  tabasco: [
     "Balancán",
     "Centla",
     "Centro",
@@ -2186,9 +2180,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Paraíso",
     "Tacotalpa",
     "Teapa",
-    "Tenosique"
+    "Tenosique",
   ],
-  "tamaulipas": [
+  tamaulipas: [
     "Abasolo",
     "Aldama",
     "Altamira",
@@ -2231,9 +2225,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Valle Hermoso",
     "Victoria",
     "Villagrán",
-    "Xicoténcatl"
+    "Xicoténcatl",
   ],
-  "tlaxcala": [
+  tlaxcala: [
     "Acuamanala de Miguel Hidalgo",
     "Amaxac de Guerrero",
     "Apetatitlán de Antonio Carvajal",
@@ -2293,9 +2287,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Xicohtzinco",
     "Yauhquemehcan",
     "Zacatelco",
-    "Ziltlaltépec de Trinidad Sánchez Santos"
+    "Ziltlaltépec de Trinidad Sánchez Santos",
   ],
-  "veracruz_de_ignacio_de_la_llave": [
+  veracruz_de_ignacio_de_la_llave: [
     "Acajete",
     "Acatlán",
     "Acayucan",
@@ -2507,9 +2501,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Zongolica",
     "Zontecomatlán de López y Fuentes",
     "Zozocolco de Hidalgo",
-    "Álamo Temapache"
+    "Álamo Temapache",
   ],
-  "yucatan": [
+  yucatan: [
     "Abalá",
     "Acanceh",
     "Akil",
@@ -2615,9 +2609,9 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Xocchel",
     "Yaxcabá",
     "Yaxkukul",
-    "Yobaín"
+    "Yobaín",
   ],
-  "zacatecas": [
+  zacatecas: [
     "Apozol",
     "Apulco",
     "Atolinga",
@@ -2675,6 +2669,6 @@ export const MEXICO_CITIES_BY_STATE: Record<string, string[]> = {
     "Villa Hidalgo",
     "Villa de Cos",
     "Villanueva",
-    "Zacatecas"
-  ]
+    "Zacatecas",
+  ],
 };

@@ -24,7 +24,8 @@ export function FloatingTotal({ total, canContinue, onContinue }: Props) {
               Total estimado
             </p>
             <p className="font-display text-lg sm:text-xl text-foreground tabular-nums truncate">
-              {formatMXN(total)} <span className="text-xs text-muted-foreground font-sans">MXN</span>
+              {formatMXN(total)}{" "}
+              <span className="text-xs text-muted-foreground font-sans">MXN</span>
             </p>
           </div>
           <button

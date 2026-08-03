@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from "fs";
 
 // Simple JPEG reader to find the pixel color is not easy, but we can write a script
 // that reads the file. Or we can just use the powershell command to get pixel color!

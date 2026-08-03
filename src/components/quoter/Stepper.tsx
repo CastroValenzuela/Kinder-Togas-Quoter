@@ -19,8 +19,7 @@ export function StepperBar({ step }: { step: number }) {
 export function StepperLabel({ step }: { step: number }) {
   return (
     <p className="text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
-      Paso {step} de 5
-      <span className="mx-2 text-muted-foreground/50">·</span>
+      Paso {step} de 5<span className="mx-2 text-muted-foreground/50">·</span>
       <span className="text-foreground/80">{LABELS[step - 1]}</span>
     </p>
   );

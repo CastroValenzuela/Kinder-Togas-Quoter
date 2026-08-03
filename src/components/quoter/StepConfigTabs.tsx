@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import {
   Minus,
@@ -373,7 +373,7 @@ const FEATURES_VENTA_BORLAS: Record<
   ],
 };
 
-export function StepConfig({
+export function StepConfigTabs({
   level,
   service,
   city,
@@ -397,6 +397,7 @@ export function StepConfig({
   const isPrimaria = level === "primaria";
   const isPreparatoria = level === "preparatoria";
   const isUni = level === "universidad";
+  const [activeTab, setActiveTab] = useState<"paquetes" | "colores" | "incluye">("paquetes");
 
   // 3D Tilt Effect Logic
   const mouseX = useMotionValue(0);
@@ -673,317 +674,392 @@ export function StepConfig({
           </div>
 
           {/* RIGHT - Control panel */}
-          <div className="p-5 sm:p-8 space-y-8 overflow-y-auto custom-scrollbar">
-            {/* Ciudad — Only for Renta */}
-            {service === "renta" && (
-              <section>
-                <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                  Ciudad
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {CITIES.map((c) => {
-                    const active = city === c.id;
-                    return (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => {
-                          onCity(c.id);
-                          if (!pkg) {
-                            onPkg({ kind: "A" });
-                          }
-                        }}
-                        className={cn(
-                          "px-5 py-2 rounded-full border text-sm transition-all cursor-pointer",
-                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                          active
-                            ? "bg-navy text-navy-foreground border-navy"
-                            : "border-hairline text-foreground hover:border-navy/40",
-                        )}
-                      >
-                        {c.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
-
-            {/* Paquete - segmented / direct options for University and Venta Preescolar */}
-            <section>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                {isUni || (service === "venta" && level === "preescolar")
-                  ? productCategory === "birretes"
-                    ? "Tipo de Birrete"
-                    : productCategory === "borlas"
-                      ? "Tipo de Borla"
-                      : "Tipo de Estola"
-                  : "Paquete"}
-              </p>
-
-              {isUni || (service === "venta" && level === "preescolar") ? (
-                <div className="space-y-2.5">
-                  {(isUni
-                    ? [
-                        {
-                          id: "uni_a",
-                          code: "A",
-                          title: "Opción A — Estola Lisa",
-                          desc: "Estola lisa sin estampado ni bordado",
-                          payload: { kind: "A" } as const,
-                          isActive: pkg?.kind === "A",
-                        },
-                        {
-                          id: "uni_b",
-                          code: "B",
-                          title: "Opción B — Impresión de Alta Calidad",
-                          desc: "Estola personalizada con impresión digital de alta calidad",
-                          payload: { kind: "B", variant: "uni_b" } as const,
-                          isActive: pkg?.kind === "B" && pkg.variant === "uni_b",
-                        },
-                        {
-                          id: "uni_c",
-                          code: "C",
-                          title: "Opción C — Bordado de Alta Calidad",
-                          desc: "Estola personalizada con bordado de alta resolución",
-                          payload: { kind: "B", variant: "uni_c" } as const,
-                          isActive: pkg?.kind === "B" && pkg.variant === "uni_c",
-                        },
-                      ]
-                    : productCategory === "birretes"
-                      ? [
-                          {
-                            id: "birrete_decorado",
-                            code: "B.1",
-                            title: "Birrete Decorado",
-                            desc: "Birrete con decoración temática personalizada",
-                            price: PRICES.V_B_DECORADO,
-                            payload: { kind: "B", variant: "birrete_decorado" } as const,
-                            isActive: pkg?.kind === "B" && pkg.variant === "birrete_decorado",
-                          },
-                          {
-                            id: "birrete_liso",
-                            code: "B.2",
-                            title: "Birrete Liso",
-                            desc: "Birrete liso en color de tu elección",
-                            price: PRICES.V_B_LISO,
-                            payload: { kind: "B", variant: "birrete_liso" } as const,
-                            isActive: pkg?.kind === "B" && pkg.variant === "birrete_liso",
-                          },
-                        ]
-                      : productCategory === "borlas"
-                        ? [
-                            {
-                              id: "borla_dije",
-                              code: "B.1",
-                              title: "Borla con Dije",
-                              desc: "Incluye dije conmemorativo de generación",
-                              price: PRICES.V_B_BORLA_DIJE,
-                              payload: { kind: "B", variant: "borla_dije" } as const,
-                              isActive: pkg?.kind === "B" && pkg.variant === "borla_dije",
-                            },
-                            {
-                              id: "borla_clasica",
-                              code: "B.2",
-                              title: "Borla Clásica",
-                              desc: "Diseño tradicional elegante",
-                              price: PRICES.V_B_BORLA_CLASICA,
-                              payload: { kind: "B", variant: "borla_clasica" } as const,
-                              isActive: pkg?.kind === "B" && pkg.variant === "borla_clasica",
-                            },
-                          ]
-                        : [
-                            {
-                              id: "esencial",
-                              code: "E.1",
-                              title: "E.1 Clásica",
-                              desc: "Diseño elegante y discreto (2 impresiones 9x12 cm)",
-                              payload: { kind: "B", variant: "esencial" } as const,
-                              isActive: pkg?.kind === "B" && pkg.variant === "esencial",
-                            },
-                            {
-                              id: "hybrid",
-                              code: "E.2",
-                              title: "E.2 Combinada",
-                              desc: "Diseño híbrido y equilibrado (9x12 cm + 9x35 cm)",
-                              payload: { kind: "B", variant: "hybrid" } as const,
-                              isActive: pkg?.kind === "B" && pkg.variant === "hybrid",
-                            },
-                            {
-                              id: "max",
-                              code: "E.3",
-                              title: "E.3 Premium",
-                              desc: "Cobertura completa y temática personalizada (2 de 9x35 cm)",
-                              payload: { kind: "B", variant: "max" } as const,
-                              isActive: pkg?.kind === "B" && pkg.variant === "max",
-                            },
-                          ]
-                  ).map((opt) => {
-                    const originalPrice = unitOriginalPrice(opt.payload, level, service);
-                    const netPrice = unitPrice(opt.payload, level, service);
-                    const discount = getDiscountPercent(opt.payload, level, service);
-
-                    return (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => onPkg(opt.payload)}
-                        className={cn(
-                          "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
-                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                          opt.isActive
-                            ? "border-navy bg-cream"
-                            : "border-hairline hover:border-navy/40",
-                        )}
-                      >
-                        <div className="flex items-baseline gap-3 min-w-0">
-                          <span className="text-[10px] tracking-[0.18em] text-navy font-semibold w-8 shrink-0">
-                            {opt.code}
-                          </span>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-foreground">{opt.title}</p>
-                            <p className="text-xs text-muted-foreground truncate">{opt.desc}</p>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end shrink-0 select-none">
-                          <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
-                            {formatMXN(netPrice)}
-                          </span>
-                          {discount > 0 && (
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="text-[10px] line-through text-muted-foreground tabular-nums">
-                                {formatMXN(originalPrice)}
-                              </span>
-                              <span className="text-[9px] font-bold text-white bg-[#C5A85A] px-1.5 py-0.5 rounded-md tracking-wider">
-                                -{discount}%
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <>
-                  <div className="relative inline-flex w-full rounded-full border border-hairline bg-muted/40 p-1">
-                    {(level === "preparatoria"
-                      ? (["A", "B", "C"] as const)
-                      : (["A", "B"] as const)
-                    ).map((k) => {
-                      const active = pkg?.kind === k;
-                      let label = "";
-                      if (k === "A") label = "Paquete A — Básico";
-                      else if (k === "B") label = "Paquete B — Personalizado";
-                      else label = "Paquete C — Bordado";
-
-                      return (
-                        <button
-                          key={k}
-                          type="button"
-                          onClick={() => {
-                            if (k === "C") {
-                              const hasValidCVariant =
-                                pkg?.kind === "C" &&
-                                pkg?.variant &&
-                                (pkg.variant === "prep_c1" || pkg.variant === "prep_c2");
-                              const variant = hasValidCVariant ? pkg.variant : "prep_c1";
-                              onPkg({ kind: "C", variant });
-                            } else if (k === "B") {
-                              let defaultVariant: PackageBVariant | undefined = undefined;
-                              if (level === "preescolar") defaultVariant = "esencial";
-                              else if (level === "primaria") defaultVariant = "pri_c";
-                              else if (level === "secundaria") defaultVariant = "sec_b";
-                              else if (level === "preparatoria") defaultVariant = "prep_b";
-
-                              const hasValidBVariant =
-                                pkg?.kind === "B" &&
-                                pkg?.variant &&
-                                ((level === "preescolar" &&
-                                  (pkg.variant === "esencial" ||
-                                    pkg.variant === "hybrid" ||
-                                    pkg.variant === "max")) ||
-                                  (level === "primaria" &&
-                                    (pkg.variant === "pri_c" ||
-                                      pkg.variant === "pri_b" ||
-                                      pkg.variant === "pri_a")) ||
-                                  (level === "secundaria" &&
-                                    (pkg.variant === "sec_b" || pkg.variant === "sec_a")) ||
-                                  (level === "preparatoria" &&
-                                    (pkg.variant === "prep_b" || pkg.variant === "prep_a")));
-
-                              const variant = hasValidBVariant ? pkg.variant : defaultVariant;
-                              onPkg({ kind: "B", variant });
-                            } else {
-                              onPkg({ kind: "A" });
-                            }
-                          }}
-                          className="relative flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        >
-                          {active && (
-                            <motion.span
-                              layoutId="segmented-pill"
-                              className="absolute inset-0 rounded-full bg-navy"
-                              transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                            />
-                          )}
-                          <span
+          <div className="p-5 sm:p-8 overflow-y-auto custom-scrollbar flex flex-col h-full">
+            <div className="flex border-b border-border mb-6 shrink-0 gap-2">
+              <button
+                onClick={() => setActiveTab("paquetes")}
+                className={`pb-2 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === "paquetes" ? "border-navy text-navy" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+              >
+                Paquetes
+              </button>
+              <button
+                onClick={() => setActiveTab("colores")}
+                className={`pb-2 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === "colores" ? "border-navy text-navy" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+              >
+                Colores
+              </button>
+              <button
+                onClick={() => setActiveTab("incluye")}
+                className={`pb-2 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === "incluye" ? "border-navy text-navy" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+              >
+                Incluye
+              </button>
+            </div>
+            <div className="space-y-8 flex-1">
+              <div
+                style={{ display: activeTab === "paquetes" ? "block" : "none" }}
+                className="space-y-8"
+              >
+                {/* Ciudad — Only for Renta */}
+                {service === "renta" && (
+                  <section>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
+                      Ciudad
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {CITIES.map((c) => {
+                        const active = city === c.id;
+                        return (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => {
+                              onCity(c.id);
+                              if (!pkg) {
+                                onPkg({ kind: "A" });
+                              }
+                            }}
                             className={cn(
-                              "relative",
-                              active ? "text-navy-foreground" : "text-foreground/70",
+                              "px-5 py-2 rounded-full border text-sm transition-all cursor-pointer",
+                              "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                              active
+                                ? "bg-navy text-navy-foreground border-navy"
+                                : "border-hairline text-foreground hover:border-navy/40",
                             )}
                           >
-                            {label}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                            {c.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
 
-                  {/* Variants */}
-                  <AnimatePresence initial={false} mode="wait">
-                    {(isB || isC) && (
-                      <motion.div
-                        key={pkg?.kind === "C" ? "c-variants" : "b-variants"}
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: "easeOut" }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pt-4 space-y-2.5">
-                          {visibleVariants.map((v) => {
-                            const active =
-                              (pkg?.kind === "B" || pkg?.kind === "C") && pkg.variant === v.id;
-                            const currentPayload = {
-                              kind: pkg?.kind || "B",
-                              variant: v.id,
-                            } as const;
-                            const originalPrice = unitOriginalPrice(currentPayload, level, service);
-                            const netPrice = unitPrice(currentPayload, level, service);
-                            const discount = getDiscountPercent(currentPayload, level, service);
+                {/* Paquete - segmented / direct options for University and Venta Preescolar */}
+                <section>
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
+                    {isUni || (service === "venta" && level === "preescolar")
+                      ? productCategory === "birretes"
+                        ? "Tipo de Birrete"
+                        : productCategory === "borlas"
+                          ? "Tipo de Borla"
+                          : "Tipo de Estola"
+                      : "Paquete"}
+                  </p>
 
-                            return (
-                              <button
-                                key={v.id}
-                                type="button"
-                                onClick={() => onPkg({ kind: pkg?.kind || "B", variant: v.id })}
+                  {isUni || (service === "venta" && level === "preescolar") ? (
+                    <div className="space-y-2.5">
+                      {(isUni
+                        ? [
+                            {
+                              id: "uni_a",
+                              code: "A",
+                              title: "Opción A — Estola Lisa",
+                              desc: "Estola lisa sin estampado ni bordado",
+                              payload: { kind: "A" } as const,
+                              isActive: pkg?.kind === "A",
+                            },
+                            {
+                              id: "uni_b",
+                              code: "B",
+                              title: "Opción B — Impresión de Alta Calidad",
+                              desc: "Estola personalizada con impresión digital de alta calidad",
+                              payload: { kind: "B", variant: "uni_b" } as const,
+                              isActive: pkg?.kind === "B" && pkg.variant === "uni_b",
+                            },
+                            {
+                              id: "uni_c",
+                              code: "C",
+                              title: "Opción C — Bordado de Alta Calidad",
+                              desc: "Estola personalizada con bordado de alta resolución",
+                              payload: { kind: "B", variant: "uni_c" } as const,
+                              isActive: pkg?.kind === "B" && pkg.variant === "uni_c",
+                            },
+                          ]
+                        : productCategory === "birretes"
+                          ? [
+                              {
+                                id: "birrete_decorado",
+                                code: "B.1",
+                                title: "Birrete Decorado",
+                                desc: "Birrete con decoración temática personalizada",
+                                price: PRICES.V_B_DECORADO,
+                                payload: { kind: "B", variant: "birrete_decorado" } as const,
+                                isActive: pkg?.kind === "B" && pkg.variant === "birrete_decorado",
+                              },
+                              {
+                                id: "birrete_liso",
+                                code: "B.2",
+                                title: "Birrete Liso",
+                                desc: "Birrete liso en color de tu elección",
+                                price: PRICES.V_B_LISO,
+                                payload: { kind: "B", variant: "birrete_liso" } as const,
+                                isActive: pkg?.kind === "B" && pkg.variant === "birrete_liso",
+                              },
+                            ]
+                          : productCategory === "borlas"
+                            ? [
+                                {
+                                  id: "borla_dije",
+                                  code: "B.1",
+                                  title: "Borla con Dije",
+                                  desc: "Incluye dije conmemorativo de generación",
+                                  price: PRICES.V_B_BORLA_DIJE,
+                                  payload: { kind: "B", variant: "borla_dije" } as const,
+                                  isActive: pkg?.kind === "B" && pkg.variant === "borla_dije",
+                                },
+                                {
+                                  id: "borla_clasica",
+                                  code: "B.2",
+                                  title: "Borla Clásica",
+                                  desc: "Diseño tradicional elegante",
+                                  price: PRICES.V_B_BORLA_CLASICA,
+                                  payload: { kind: "B", variant: "borla_clasica" } as const,
+                                  isActive: pkg?.kind === "B" && pkg.variant === "borla_clasica",
+                                },
+                              ]
+                            : [
+                                {
+                                  id: "esencial",
+                                  code: "E.1",
+                                  title: "E.1 Clásica",
+                                  desc: "Diseño elegante y discreto (2 impresiones 9x12 cm)",
+                                  payload: { kind: "B", variant: "esencial" } as const,
+                                  isActive: pkg?.kind === "B" && pkg.variant === "esencial",
+                                },
+                                {
+                                  id: "hybrid",
+                                  code: "E.2",
+                                  title: "E.2 Combinada",
+                                  desc: "Diseño híbrido y equilibrado (9x12 cm + 9x35 cm)",
+                                  payload: { kind: "B", variant: "hybrid" } as const,
+                                  isActive: pkg?.kind === "B" && pkg.variant === "hybrid",
+                                },
+                                {
+                                  id: "max",
+                                  code: "E.3",
+                                  title: "E.3 Premium",
+                                  desc: "Cobertura completa y temática personalizada (2 de 9x35 cm)",
+                                  payload: { kind: "B", variant: "max" } as const,
+                                  isActive: pkg?.kind === "B" && pkg.variant === "max",
+                                },
+                              ]
+                      ).map((opt) => {
+                        const originalPrice = unitOriginalPrice(opt.payload, level, service);
+                        const netPrice = unitPrice(opt.payload, level, service);
+                        const discount = getDiscountPercent(opt.payload, level, service);
+
+                        return (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => onPkg(opt.payload)}
+                            className={cn(
+                              "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
+                              "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                              opt.isActive
+                                ? "border-navy bg-cream"
+                                : "border-hairline hover:border-navy/40",
+                            )}
+                          >
+                            <div className="flex items-baseline gap-3 min-w-0">
+                              <span className="text-[10px] tracking-[0.18em] text-navy font-semibold w-8 shrink-0">
+                                {opt.code}
+                              </span>
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-foreground">{opt.title}</p>
+                                <p className="text-xs text-muted-foreground truncate">{opt.desc}</p>
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-end shrink-0 select-none">
+                              <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
+                                {formatMXN(netPrice)}
+                              </span>
+                              {discount > 0 && (
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  <span className="text-[10px] line-through text-muted-foreground tabular-nums">
+                                    {formatMXN(originalPrice)}
+                                  </span>
+                                  <span className="text-[9px] font-bold text-white bg-[#C5A85A] px-1.5 py-0.5 rounded-md tracking-wider">
+                                    -{discount}%
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="relative inline-flex w-full rounded-full border border-hairline bg-muted/40 p-1">
+                        {(level === "preparatoria"
+                          ? (["A", "B", "C"] as const)
+                          : (["A", "B"] as const)
+                        ).map((k) => {
+                          const active = pkg?.kind === k;
+                          let label = "";
+                          if (k === "A") label = "Paquete A — Básico";
+                          else if (k === "B") label = "Paquete B — Personalizado";
+                          else label = "Paquete C — Bordado";
+
+                          return (
+                            <button
+                              key={k}
+                              type="button"
+                              onClick={() => {
+                                if (k === "C") {
+                                  const hasValidCVariant =
+                                    pkg?.kind === "C" &&
+                                    pkg?.variant &&
+                                    (pkg.variant === "prep_c1" || pkg.variant === "prep_c2");
+                                  const variant = hasValidCVariant ? pkg.variant : "prep_c1";
+                                  onPkg({ kind: "C", variant });
+                                } else if (k === "B") {
+                                  let defaultVariant: PackageBVariant | undefined = undefined;
+                                  if (level === "preescolar") defaultVariant = "esencial";
+                                  else if (level === "primaria") defaultVariant = "pri_c";
+                                  else if (level === "secundaria") defaultVariant = "sec_b";
+                                  else if (level === "preparatoria") defaultVariant = "prep_b";
+
+                                  const hasValidBVariant =
+                                    pkg?.kind === "B" &&
+                                    pkg?.variant &&
+                                    ((level === "preescolar" &&
+                                      (pkg.variant === "esencial" ||
+                                        pkg.variant === "hybrid" ||
+                                        pkg.variant === "max")) ||
+                                      (level === "primaria" &&
+                                        (pkg.variant === "pri_c" ||
+                                          pkg.variant === "pri_b" ||
+                                          pkg.variant === "pri_a")) ||
+                                      (level === "secundaria" &&
+                                        (pkg.variant === "sec_b" || pkg.variant === "sec_a")) ||
+                                      (level === "preparatoria" &&
+                                        (pkg.variant === "prep_b" || pkg.variant === "prep_a")));
+
+                                  const variant = hasValidBVariant ? pkg.variant : defaultVariant;
+                                  onPkg({ kind: "B", variant });
+                                } else {
+                                  onPkg({ kind: "A" });
+                                }
+                              }}
+                              className="relative flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            >
+                              {active && (
+                                <motion.span
+                                  layoutId="segmented-pill"
+                                  className="absolute inset-0 rounded-full bg-navy"
+                                  transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                                />
+                              )}
+                              <span
                                 className={cn(
-                                  "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
-                                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                                  active
-                                    ? "border-navy bg-cream"
-                                    : "border-hairline hover:border-navy/40",
+                                  "relative",
+                                  active ? "text-navy-foreground" : "text-foreground/70",
                                 )}
                               >
+                                {label}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Variants */}
+                      <AnimatePresence initial={false} mode="wait">
+                        {(isB || isC) && (
+                          <motion.div
+                            key={pkg?.kind === "C" ? "c-variants" : "b-variants"}
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pt-4 space-y-2.5">
+                              {visibleVariants.map((v) => {
+                                const active =
+                                  (pkg?.kind === "B" || pkg?.kind === "C") && pkg.variant === v.id;
+                                const currentPayload = {
+                                  kind: pkg?.kind || "B",
+                                  variant: v.id,
+                                } as const;
+                                const originalPrice = unitOriginalPrice(
+                                  currentPayload,
+                                  level,
+                                  service,
+                                );
+                                const netPrice = unitPrice(currentPayload, level, service);
+                                const discount = getDiscountPercent(currentPayload, level, service);
+
+                                return (
+                                  <button
+                                    key={v.id}
+                                    type="button"
+                                    onClick={() => onPkg({ kind: pkg?.kind || "B", variant: v.id })}
+                                    className={cn(
+                                      "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
+                                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                      active
+                                        ? "border-navy bg-cream"
+                                        : "border-hairline hover:border-navy/40",
+                                    )}
+                                  >
+                                    <div className="flex items-baseline gap-3 min-w-0">
+                                      <span className="text-[10px] tracking-[0.18em] text-navy font-semibold w-8 shrink-0">
+                                        {v.code}
+                                      </span>
+                                      <div className="min-w-0">
+                                        <p className="text-sm font-medium text-foreground">
+                                          {v.title}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground truncate">
+                                          {v.desc}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="flex flex-col items-end shrink-0 select-none">
+                                      <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
+                                        {formatMXN(netPrice)}
+                                      </span>
+                                      {discount > 0 && (
+                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                          <span className="text-[10px] line-through text-muted-foreground tabular-nums">
+                                            {formatMXN(originalPrice)}
+                                          </span>
+                                          <span className="text-[9px] font-bold text-white bg-[#C5A85A] px-1.5 py-0.5 rounded-md tracking-wider">
+                                            -{discount}%
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Package price hint */}
+                      {pkg?.kind === "A" &&
+                        (() => {
+                          const originalPrice = unitOriginalPrice(pkg, level, service);
+                          const netPrice = unitPrice(pkg, level, service);
+                          const discount = getDiscountPercent(pkg, level, service);
+
+                          return (
+                            <div className="pt-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                              <div className="w-full flex items-center justify-between gap-4 rounded-xl border border-navy bg-cream px-4 py-3.5 text-left">
                                 <div className="flex items-baseline gap-3 min-w-0">
                                   <span className="text-[10px] tracking-[0.18em] text-navy font-semibold w-8 shrink-0">
-                                    {v.code}
+                                    A
                                   </span>
                                   <div className="min-w-0">
-                                    <p className="text-sm font-medium text-foreground">{v.title}</p>
-                                    <p className="text-xs text-muted-foreground truncate">
-                                      {v.desc}
+                                    <p className="text-sm font-medium text-foreground">Básico</p>
+                                    <p className="text-xs text-muted-foreground truncate font-sans">
+                                      Estola Lisa
                                     </p>
                                   </div>
                                 </div>
@@ -1002,206 +1078,174 @@ export function StepConfig({
                                     </div>
                                   )}
                                 </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Package price hint */}
-                  {pkg?.kind === "A" &&
-                    (() => {
-                      const originalPrice = unitOriginalPrice(pkg, level, service);
-                      const netPrice = unitPrice(pkg, level, service);
-                      const discount = getDiscountPercent(pkg, level, service);
-
-                      return (
-                        <div className="pt-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                          <div className="w-full flex items-center justify-between gap-4 rounded-xl border border-navy bg-cream px-4 py-3.5 text-left">
-                            <div className="flex items-baseline gap-3 min-w-0">
-                              <span className="text-[10px] tracking-[0.18em] text-navy font-semibold w-8 shrink-0">
-                                A
-                              </span>
-                              <div className="min-w-0">
-                                <p className="text-sm font-medium text-foreground">Básico</p>
-                                <p className="text-xs text-muted-foreground truncate font-sans">
-                                  Estola Lisa
-                                </p>
                               </div>
                             </div>
-                            <div className="flex flex-col items-end shrink-0 select-none">
-                              <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
-                                {formatMXN(netPrice)}
-                              </span>
-                              {discount > 0 && (
-                                <div className="flex items-center gap-1.5 mt-0.5">
-                                  <span className="text-[10px] line-through text-muted-foreground tabular-nums">
-                                    {formatMXN(originalPrice)}
-                                  </span>
-                                  <span className="text-[9px] font-bold text-white bg-[#C5A85A] px-1.5 py-0.5 rounded-md tracking-wider">
-                                    -{discount}%
-                                  </span>
-                                </div>
+                          );
+                        })()}
+                    </>
+                  )}
+                </section>
+              </div>
+              <div
+                style={{ display: activeTab === "colores" ? "block" : "none" }}
+                className="space-y-8"
+              >
+                {/* Color de Toga */}
+                {service !== "venta" &&
+                  ((pkg?.kind === "A" && level === "preescolar") ||
+                    level === "primaria" ||
+                    level === "secundaria" ||
+                    level === "preparatoria" ||
+                    level === "universidad") && (
+                    <section className="animate-in fade-in slide-in-from-top-2 duration-300">
+                      <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
+                        Color de Toga
+                      </p>
+                      <div className="flex flex-wrap gap-2.5">
+                        {TOGA_COLORS.filter((c) => level === "preescolar" || c.id === "negro").map(
+                          (c) => {
+                            const active = togaColor === c.id;
+                            return (
+                              <button
+                                key={c.id}
+                                type="button"
+                                onClick={() => onTogaColor(c.id)}
+                                className={cn(
+                                  "flex items-center gap-2.5 px-4 py-2.5 rounded-full border text-xs sm:text-sm font-medium transition-all cursor-pointer relative",
+                                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                  active
+                                    ? "border-navy bg-cream text-foreground"
+                                    : "border-hairline text-foreground/80 hover:border-navy/40",
+                                )}
+                              >
+                                <span
+                                  className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
+                                  style={{ backgroundColor: c.hex }}
+                                />
+                                <span>{c.label}</span>
+                              </button>
+                            );
+                          },
+                        )}
+                      </div>
+                    </section>
+                  )}
+
+                {/* Color de Estola */}
+                {(() => {
+                  const visibleStolas = STOLA_COLORS.filter((s: any) => {
+                    if (level === "preescolar") {
+                      if (service === "venta") {
+                        if (productCategory === "birretes") {
+                          return ["negro", "azul", "roja", "rosa_claro", "azul_cielo"].includes(
+                            s.id,
+                          );
+                        }
+                        if (productCategory === "borlas") {
+                          // Negro, Azul Rey, Azul Bebé, Fucsia, Lila, Rojo, Guinda, Verde Esmeralda, Verde Limón, Dorado, Blanco
+                          return [
+                            "negro",
+                            "azul",
+                            "azul_cielo",
+                            "rosa_fiusha",
+                            "lila",
+                            "roja",
+                            "guinda",
+                            "verde_esmeralda",
+                            "verde_limon",
+                            "dorada",
+                            "blanco",
+                          ].includes(s.id);
+                        }
+                        const ids = [
+                          "azul_pastel",
+                          "azul_turquesa",
+                          "azul_marino",
+                          "rosa_claro",
+                          "rosa_fiusha",
+                          "lila",
+                          "morado",
+                          "anaranjado",
+                          "verde_limon",
+                          "verde_esmeralda",
+                          "verde_bandera",
+                          "roja",
+                          "blanco",
+                          "amarillo",
+                        ];
+                        return ids.includes(s.id);
+                      }
+                      if (pkg?.kind === "A") return s.isBasic;
+                      return false;
+                    }
+                    if (pkg?.kind === "B" || pkg?.kind === "C") return true;
+                    return s.id === "dorada";
+                  });
+
+                  if (visibleStolas.length === 0) return null;
+
+                  return (
+                    <section className="animate-in fade-in slide-in-from-top-2 duration-300">
+                      <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
+                        {productCategory === "birretes"
+                          ? "Color de Birrete"
+                          : productCategory === "borlas"
+                            ? "Color de Borla"
+                            : "Color de Estola"}
+                      </p>
+                      <div className="flex flex-wrap gap-2.5">
+                        {visibleStolas.map((s) => {
+                          const active = stolaColor === s.id;
+                          return (
+                            <button
+                              key={s.id}
+                              type="button"
+                              onClick={() => onStolaColor(s.id)}
+                              className={cn(
+                                "flex items-center gap-2.5 px-4 py-2.5 rounded-full border text-xs sm:text-sm font-medium transition-all cursor-pointer relative",
+                                "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                active
+                                  ? "border-navy bg-cream text-foreground"
+                                  : "border-hairline text-foreground/80 hover:border-navy/40",
                               )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                </>
-              )}
-            </section>
-
-            {/* Color de Toga */}
-            {service !== "venta" &&
-              ((pkg?.kind === "A" && level === "preescolar") ||
-                level === "primaria" ||
-                level === "secundaria" ||
-                level === "preparatoria" ||
-                level === "universidad") && (
-                <section className="animate-in fade-in slide-in-from-top-2 duration-300">
+                            >
+                              <span
+                                className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
+                                style={{ background: (s as any).gradient || s.hex }}
+                              />
+                              <span>{s.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  );
+                })()}
+              </div>
+              <div
+                style={{ display: activeTab === "incluye" ? "block" : "none" }}
+                className="space-y-8"
+              >
+                {/* Features */}
+                <section>
                   <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                    Color de Toga
+                    Incluye
                   </p>
-                  <div className="flex flex-wrap gap-2.5">
-                    {TOGA_COLORS.filter((c) => level === "preescolar" || c.id === "negro").map(
-                      (c) => {
-                        const active = togaColor === c.id;
-                        return (
-                          <button
-                            key={c.id}
-                            type="button"
-                            onClick={() => onTogaColor(c.id)}
-                            className={cn(
-                              "flex items-center gap-2.5 px-4 py-2.5 rounded-full border text-xs sm:text-sm font-medium transition-all cursor-pointer relative",
-                              "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                              active
-                                ? "border-navy bg-cream text-foreground"
-                                : "border-hairline text-foreground/80 hover:border-navy/40",
-                            )}
-                          >
-                            <span
-                              className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
-                              style={{ backgroundColor: c.hex }}
-                            />
-                            <span>{c.label}</span>
-                          </button>
-                        );
-                      },
-                    )}
-                  </div>
+                  <ul className="space-y-3">
+                    {features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <span className="mt-0.5 h-8 w-8 rounded-full border border-hairline flex items-center justify-center shrink-0">
+                          <f.icon className="h-4 w-4 text-navy" strokeWidth={1.5} />
+                        </span>
+                        <span className="text-sm text-foreground/80 leading-relaxed pt-1">
+                          {f.text}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </section>
-              )}
-
-            {/* Color de Estola */}
-            {(() => {
-              const visibleStolas = STOLA_COLORS.filter((s: any) => {
-                if (level === "preescolar") {
-                  if (service === "venta") {
-                    if (productCategory === "birretes") {
-                      return ["negro", "azul", "roja", "rosa_claro", "azul_cielo"].includes(s.id);
-                    }
-                    if (productCategory === "borlas") {
-                      // Negro, Azul Rey, Azul Bebé, Fucsia, Lila, Rojo, Guinda, Verde Esmeralda, Verde Limón, Dorado, Blanco
-                      return [
-                        "negro",
-                        "azul",
-                        "azul_cielo",
-                        "rosa_fiusha",
-                        "lila",
-                        "roja",
-                        "guinda",
-                        "verde_esmeralda",
-                        "verde_limon",
-                        "dorada",
-                        "blanco",
-                      ].includes(s.id);
-                    }
-                    const ids = [
-                      "azul_pastel",
-                      "azul_turquesa",
-                      "azul_marino",
-                      "rosa_claro",
-                      "rosa_fiusha",
-                      "lila",
-                      "morado",
-                      "anaranjado",
-                      "verde_limon",
-                      "verde_esmeralda",
-                      "verde_bandera",
-                      "roja",
-                      "blanco",
-                      "amarillo",
-                    ];
-                    return ids.includes(s.id);
-                  }
-                  if (pkg?.kind === "A") return s.isBasic;
-                  return false;
-                }
-                if (pkg?.kind === "B" || pkg?.kind === "C") return true;
-                return s.id === "dorada";
-              });
-
-              if (visibleStolas.length === 0) return null;
-
-              return (
-                <section className="animate-in fade-in slide-in-from-top-2 duration-300">
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                    {productCategory === "birretes"
-                      ? "Color de Birrete"
-                      : productCategory === "borlas"
-                        ? "Color de Borla"
-                        : "Color de Estola"}
-                  </p>
-                  <div className="flex flex-wrap gap-2.5">
-                    {visibleStolas.map((s) => {
-                      const active = stolaColor === s.id;
-                      return (
-                        <button
-                          key={s.id}
-                          type="button"
-                          onClick={() => onStolaColor(s.id)}
-                          className={cn(
-                            "flex items-center gap-2.5 px-4 py-2.5 rounded-full border text-xs sm:text-sm font-medium transition-all cursor-pointer relative",
-                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                            active
-                              ? "border-navy bg-cream text-foreground"
-                              : "border-hairline text-foreground/80 hover:border-navy/40",
-                          )}
-                        >
-                          <span
-                            className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
-                            style={{ background: (s as any).gradient || s.hex }}
-                          />
-                          <span>{s.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </section>
-              );
-            })()}
-
-            {/* Features */}
-            <section>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                Incluye
-              </p>
-              <ul className="space-y-3">
-                {features.map((f, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="mt-0.5 h-8 w-8 rounded-full border border-hairline flex items-center justify-center shrink-0">
-                      <f.icon className="h-4 w-4 text-navy" strokeWidth={1.5} />
-                    </span>
-                    <span className="text-sm text-foreground/80 leading-relaxed pt-1">
-                      {f.text}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </section>
+              </div>
+            </div>
           </div>
         </div>
 

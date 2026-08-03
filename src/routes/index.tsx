@@ -13,8 +13,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Kinder Togas — Cotizador" },
       {
         property: "og:description",
-        content:
-          "Cotiza tu paquete de graduación en 4 pasos. Descarga tu cotización en PDF.",
+        content: "Cotiza tu paquete de graduación en 4 pasos. Descarga tu cotización en PDF.",
       },
     ],
   }),

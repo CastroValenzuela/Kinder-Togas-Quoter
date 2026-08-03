@@ -4,19 +4,19 @@ import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { formatMXN } from "@/lib/pricing";
 import { generateQuotePDF } from "@/lib/quote-pdf";
-import { 
-  Search, 
-  Filter, 
-  Download, 
-  TrendingUp, 
-  Users, 
-  DollarSign, 
-  FileText, 
-  MessageSquare, 
-  ChevronDown, 
-  ChevronUp, 
-  Lock, 
-  Eye, 
+import {
+  Search,
+  Filter,
+  Download,
+  TrendingUp,
+  Users,
+  DollarSign,
+  FileText,
+  MessageSquare,
+  ChevronDown,
+  ChevronUp,
+  Lock,
+  Eye,
   EyeOff,
   Calendar,
   LogOut,
@@ -33,7 +33,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import adminHeroImg from "@/assets/brand/admin-hero.png";
 import logoImg from "@/assets/logo.png";
@@ -47,14 +47,14 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend
+  Legend,
 } from "recharts";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
       { title: "Panel de Administración — Kinder Togas" },
-      { name: "robots", content: "noindex, nofollow" }
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: AdminDashboard,
@@ -91,7 +91,7 @@ const BRAND_COLORS = {
   gold: "#C5A85A",
   green: "#25D366",
   slate: "#64748B",
-  border: "#E2E8F0"
+  border: "#E2E8F0",
 };
 
 const CHART_PIE_COLORS = ["#1E2346", "#C5A85A", "#3B82F6", "#10B981", "#EC4899", "#8B5CF6"];
@@ -100,7 +100,7 @@ const ADMIN_EMAILS = [
   "castrovalenzuela@hotmail.com",
   "kindertogas@gmail.com",
   "admin@kindertogas.com",
-  "crm_admin@kindertogas.com"
+  "crm_admin@kindertogas.com",
 ];
 
 export function AdminDashboard() {
@@ -112,7 +112,7 @@ export function AdminDashboard() {
   const [password, setPassword] = useState<string>("");
   const [authError, setAuthError] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register' | 'forgot' | 'reset'>('login');
+  const [authMode, setAuthMode] = useState<"login" | "register" | "forgot" | "reset">("login");
   const [regName, setRegName] = useState<string>("");
   const [regEmail, setRegEmail] = useState<string>("");
   const [regPhone, setRegPhone] = useState<string>("");
@@ -126,7 +126,7 @@ export function AdminDashboard() {
     setLoginEmail(localStorage.getItem("kt_remember_email") || "");
     setRememberMe(localStorage.getItem("kt_remember_me") !== "false");
   }, []);
-  
+
   // Password Recovery / Reset States
   const [resetPassword, setResetPassword] = useState<string>("");
   const [resetConfirmPassword, setResetConfirmPassword] = useState<string>("");
@@ -151,31 +151,38 @@ export function AdminDashboard() {
   const [monthFilter, setMonthFilter] = useState<string>("all");
 
   // CRM vs Pricing Tabs
-  const [activeTab, setActiveTab] = useState<'crm' | 'stats' | 'pricing' | 'calendar'>('crm');
+  const [activeTab, setActiveTab] = useState<"crm" | "stats" | "pricing" | "calendar">("crm");
 
   // Calendar states
   const [currentCalendarDate, setCurrentCalendarDate] = useState<Date>(new Date());
   const [selectedCalendarDay, setSelectedCalendarDay] = useState<Date | null>(new Date());
-  const [calendarView, setCalendarView] = useState<'month' | 'week' | 'day'>('month');
-  
+  const [calendarView, setCalendarView] = useState<"month" | "week" | "day">("month");
+
   // Pricing states
-  const [pricingList, setPricingList] = useState<{ key: string; price: number; discount_percent: number }[]>([]);
+  const [pricingList, setPricingList] = useState<
+    { key: string; price: number; discount_percent: number }[]
+  >([]);
   const [loadingPricing, setLoadingPricing] = useState<boolean>(false);
   const [savingPrices, setSavingPrices] = useState<boolean>(false);
-  const [pricingMessage, setPricingMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [pricingMessage, setPricingMessage] = useState<{
+    text: string;
+    type: "success" | "error";
+  } | null>(null);
   const [pricingFilterLevel, setPricingFilterLevel] = useState<string>("all");
+  const [pricingServiceFilter, setPricingServiceFilter] = useState<"all" | "renta" | "venta">("all");
+  const [pricingSearchQuery, setPricingSearchQuery] = useState<string>("");
 
   // Expanded rows
-  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
-  const [updatingStatusId, setUpdatingStatusId] = useState<number | null>(null);
-  
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+
   // Sorting state
   const [sortField, setSortField] = useState<string>("created_at");
   const [sortAsc, setSortAsc] = useState<boolean>(false);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [rowsPerPage, setRowsPerPage] = useState<number | 'all'>(10);
+  const [rowsPerPage, setRowsPerPage] = useState<number | "all">(10);
 
   // Reset page when filters change to avoid showing empty pages
   useEffect(() => {
@@ -187,7 +194,7 @@ export function AdminDashboard() {
     const hash = window.location.hash;
     const searchParams = new URLSearchParams(window.location.search);
     if (hash.includes("type=recovery") || searchParams.get("reset") === "true") {
-      setAuthMode('reset');
+      setAuthMode("reset");
       setAuthError("");
     }
   }, []);
@@ -195,7 +202,8 @@ export function AdminDashboard() {
   // Check auth session
   useEffect(() => {
     // 1. Check legacy sessionStorage or localStorage backup
-    const session = sessionStorage.getItem("kt_admin_session") || localStorage.getItem("kt_admin_session");
+    const session =
+      sessionStorage.getItem("kt_admin_session") || localStorage.getItem("kt_admin_session");
     if (session === "authorized") {
       setIsAuthenticated(true);
       return;
@@ -222,7 +230,9 @@ export function AdminDashboard() {
     });
 
     // 3. Listen to auth state changes (crucial for Google OAuth redirection callback)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, activeSession) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, activeSession) => {
       if (activeSession?.user?.email) {
         if (ADMIN_EMAILS.includes(activeSession.user.email.toLowerCase())) {
           setIsAuthenticated(true);
@@ -230,7 +240,7 @@ export function AdminDashboard() {
         } else {
           handleUnauthorizedUser();
         }
-      } else if (event === 'SIGNED_OUT') {
+      } else if (event === "SIGNED_OUT") {
         setIsAuthenticated(false);
       }
     });
@@ -249,7 +259,7 @@ export function AdminDashboard() {
   const fetchQuotes = async (showRefreshed = false) => {
     if (showRefreshed) setRefreshing(true);
     else setLoading(true);
-    
+
     setError(null);
     try {
       const { data, error: fetchErr } = await supabase
@@ -281,9 +291,7 @@ export function AdminDashboard() {
 
       // Update in local memory state instantly
       setQuotes((prevQuotes) =>
-        prevQuotes.map((q) =>
-          q.id === quoteId ? { ...q, status: newStatus } : q
-        )
+        prevQuotes.map((q) => (q.id === quoteId ? { ...q, status: newStatus } : q)),
       );
     } catch (err: any) {
       console.error("Error updating quote status:", err);
@@ -334,7 +342,7 @@ export function AdminDashboard() {
         { key: "PREP_C2", price: 720, discount_percent: 0 },
         { key: "UNI_A", price: 350, discount_percent: 0 },
         { key: "UNI_B", price: 600, discount_percent: 0 },
-        { key: "UNI_C", price: 720, discount_percent: 0 }
+        { key: "UNI_C", price: 720, discount_percent: 0 },
       ];
 
       // Merge Supabase active rows into our static templates to ensure all exist
@@ -344,14 +352,17 @@ export function AdminDashboard() {
         return {
           key: item.key,
           price: match ? Number(match.price) : item.price,
-          discount_percent: match ? Number(match.discount_percent || 0) : item.discount_percent
+          discount_percent: match ? Number(match.discount_percent || 0) : item.discount_percent,
         };
       });
 
       setPricingList(mergedList);
     } catch (err: any) {
       console.error("Error fetching pricing table:", err);
-      setPricingMessage({ text: "No se pudieron obtener las tarifas de la base de datos.", type: "error" });
+      setPricingMessage({
+        text: "No se pudieron obtener las tarifas de la base de datos.",
+        type: "error",
+      });
     } finally {
       setLoadingPricing(false);
     }
@@ -364,21 +375,22 @@ export function AdminDashboard() {
     setPricingMessage(null);
     try {
       // Execute upsert into 'pricing' table by matching the 'key' constraint
-      const { error: upsertErr } = await supabase
-        .from("pricing")
-        .upsert(
-          pricingList.map((item) => ({
-            key: item.key,
-            price: item.price,
-            discount_percent: item.discount_percent
-          })),
-          { onConflict: "key" }
-        );
+      const { error: upsertErr } = await supabase.from("pricing").upsert(
+        pricingList.map((item) => ({
+          key: item.key,
+          price: item.price,
+          discount_percent: item.discount_percent,
+        })),
+        { onConflict: "key" },
+      );
 
       if (upsertErr) throw upsertErr;
 
-      setPricingMessage({ text: "¡Tarifas y descuentos actualizados en caliente con éxito!", type: "success" });
-      
+      setPricingMessage({
+        text: "¡Tarifas y descuentos actualizados en caliente con éxito!",
+        type: "success",
+      });
+
       // Reload pricing inside pricing.ts dynamic cache imports immediately
       const { loadDynamicPrices } = await import("@/lib/pricing");
       await loadDynamicPrices();
@@ -404,7 +416,7 @@ export function AdminDashboard() {
       return;
     }
     setAuthError("");
-    
+
     // 1. Backdoor for legacy static password
     if (password === "adminKT2026") {
       if (rememberMe) {
@@ -426,13 +438,13 @@ export function AdminDashboard() {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginEmail.trim(),
-        password: password
+        password: password,
       });
 
       if (error) throw error;
 
       const email = data.user?.email;
-      if (email && ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email.toLowerCase())) {
+      if (email && ADMIN_EMAILS.map((e) => e.toLowerCase()).includes(email.toLowerCase())) {
         if (rememberMe) {
           localStorage.setItem("kt_remember_email", loginEmail.trim());
           localStorage.setItem("kt_remember_me", "true");
@@ -456,14 +468,14 @@ export function AdminDashboard() {
     try {
       setAuthError("");
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
-          redirectTo: window.location.origin + '/login',
-        }
+          redirectTo: window.location.origin + "/login",
+        },
       });
       if (error) throw error;
     } catch (err: any) {
-      setAuthError(err.message || 'Error al conectar con Google.');
+      setAuthError(err.message || "Error al conectar con Google.");
     }
   };
 
@@ -476,7 +488,7 @@ export function AdminDashboard() {
     setAuthError("");
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(loginEmail.trim(), {
-        redirectTo: window.location.origin + '/login?reset=true',
+        redirectTo: window.location.origin + "/login?reset=true",
       });
       if (error) throw error;
       setForgotSuccess(true);
@@ -499,12 +511,12 @@ export function AdminDashboard() {
     setAuthError("");
     try {
       const { error } = await supabase.auth.updateUser({
-        password: resetPassword
+        password: resetPassword,
       });
       if (error) throw error;
       setResetSuccessState(true);
       setTimeout(() => {
-        setAuthMode('login');
+        setAuthMode("login");
         setResetSuccessState(false);
         setResetPassword("");
         setResetConfirmPassword("");
@@ -533,14 +545,17 @@ export function AdminDashboard() {
 
     const startInactivityTimer = () => {
       if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        setInactivityCountdown(60);
-        setShowInactivityModal(true);
-      }, 14 * 60 * 1000); // 14 minutes in milliseconds
+      timeoutId = setTimeout(
+        () => {
+          setInactivityCountdown(60);
+          setShowInactivityModal(true);
+        },
+        14 * 60 * 1000,
+      ); // 14 minutes in milliseconds
     };
 
     const activityEvents = ["mousedown", "keydown", "scroll", "touchstart", "mousemove"];
-    
+
     // Initialize timer
     startInactivityTimer();
 
@@ -587,14 +602,14 @@ export function AdminDashboard() {
       primaria: "Primaria",
       secundaria: "Secundaria",
       preparatoria: "Preparatoria",
-      universidad: "Universidad y Posgrado"
+      universidad: "Universidad y Posgrado",
     };
     return m[l] || l;
   };
 
   const packageLabel = (kind: string, variant: string | null, level: string) => {
-    if (kind === 'A') {
-      if (level === 'universidad') return "Opción A — Impresión";
+    if (kind === "A") {
+      if (level === "universidad") return "Opción A — Impresión";
       return "Paquete A — Básico";
     }
     const labels: Record<string, string> = {
@@ -613,7 +628,10 @@ export function AdminDashboard() {
       uni_b: "Opción B — Bordado Sencillo",
       uni_c: "Opción C — Bordado Premium",
     };
-    return (variant && labels[variant]) || (kind === 'C' ? "Paquete C — Bordado" : "Paquete B — Personalizado");
+    return (
+      (variant && labels[variant]) ||
+      (kind === "C" ? "Paquete C — Bordado" : "Paquete B — Personalizado")
+    );
   };
 
   // Filtering & Sorting Logic
@@ -629,7 +647,7 @@ export function AdminDashboard() {
       const matchesLevel = levelFilter === "all" || q.school_level === levelFilter;
       const matchesService = serviceFilter === "all" || q.service_option === serviceFilter;
       const matchesCity = cityFilter === "all" || q.city === cityFilter;
-      
+
       const qStatus = q.status || "pending";
       const matchesStatus = statusFilter === "all" || qStatus === statusFilter;
 
@@ -639,7 +657,14 @@ export function AdminDashboard() {
         matchesMonth = quoteMonth === monthFilter;
       }
 
-      return matchesSearch && matchesLevel && matchesService && matchesCity && matchesStatus && matchesMonth;
+      return (
+        matchesSearch &&
+        matchesLevel &&
+        matchesService &&
+        matchesCity &&
+        matchesStatus &&
+        matchesMonth
+      );
     });
 
     // Apply sorting dynamically
@@ -653,9 +678,7 @@ export function AdminDashboard() {
 
       // Lowercase strings for case-insensitive sort
       if (typeof valA === "string" && typeof valB === "string") {
-        return sortAsc
-          ? valA.localeCompare(valB, "es")
-          : valB.localeCompare(valA, "es");
+        return sortAsc ? valA.localeCompare(valB, "es") : valB.localeCompare(valA, "es");
       }
 
       // Numeric or chronological sort
@@ -667,13 +690,13 @@ export function AdminDashboard() {
 
   // Paginated Quotes for active page view
   const paginatedQuotes = useMemo(() => {
-    if (rowsPerPage === 'all') return filteredQuotes;
+    if (rowsPerPage === "all") return filteredQuotes;
     const startIndex = (currentPage - 1) * rowsPerPage;
     return filteredQuotes.slice(startIndex, startIndex + rowsPerPage);
   }, [filteredQuotes, currentPage, rowsPerPage]);
 
   const totalPages = useMemo(() => {
-    if (rowsPerPage === 'all') return 1;
+    if (rowsPerPage === "all") return 1;
     return Math.ceil(filteredQuotes.length / rowsPerPage) || 1;
   }, [filteredQuotes, rowsPerPage]);
 
@@ -693,14 +716,16 @@ export function AdminDashboard() {
     const weightedRevenue = filteredQuotes.reduce((acc, q) => {
       const status = q.status || "pending";
       let rate = 0.15; // default pending
-      if (status === "contracted") rate = 1.00;
-      else if (status === "contacted") rate = 0.40;
-      else if (status === "archived") rate = 0.00;
-      return acc + (q.total_price * rate);
+      if (status === "contracted") rate = 1.0;
+      else if (status === "contacted") rate = 0.4;
+      else if (status === "archived") rate = 0.0;
+      return acc + q.total_price * rate;
     }, 0);
 
     // 2. Toga logistics metrics
-    const contractedStudents = filteredQuotes.filter(q => q.status === "contracted").reduce((acc, q) => acc + q.student_count, 0);
+    const contractedStudents = filteredQuotes
+      .filter((q) => q.status === "contracted")
+      .reduce((acc, q) => acc + q.student_count, 0);
     const totalPipelineStudents = totalStudents;
 
     return {
@@ -713,7 +738,7 @@ export function AdminDashboard() {
       conversionRate,
       weightedRevenue,
       contractedStudents,
-      totalPipelineStudents
+      totalPipelineStudents,
     };
   }, [filteredQuotes]);
 
@@ -732,22 +757,22 @@ export function AdminDashboard() {
     const saleCount = filteredQuotes.filter((q) => q.service_option === "venta").length;
     return [
       { name: "Renta", Cotizaciones: rentCount },
-      { name: "Venta", Cotizaciones: saleCount }
+      { name: "Venta", Cotizaciones: saleCount },
     ];
   }, [filteredQuotes]);
 
   // Event Demand Projection Timeline (Predictive Logistics Monthly)
   const eventTimelineData = useMemo(() => {
     const monthlyCounts: Record<string, { month: string; Togas: number; Ingreso: number }> = {};
-    
+
     filteredQuotes.forEach((q) => {
       if (!q.estimated_date) return;
       const date = new Date(q.estimated_date);
       if (isNaN(date.getTime())) return;
-      
+
       const monthName = date.toLocaleDateString("es-MX", { month: "long", year: "numeric" });
       const formattedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-      
+
       if (!monthlyCounts[formattedMonth]) {
         monthlyCounts[formattedMonth] = { month: formattedMonth, Togas: 0, Ingreso: 0 };
       }
@@ -759,8 +784,18 @@ export function AdminDashboard() {
       const parseDate = (str: string) => {
         const parts = str.split(" ");
         const months: Record<string, number> = {
-          Enero: 0, Febrero: 1, Marzo: 2, Abril: 3, Mayo: 4, Junio: 5,
-          Julio: 6, Agosto: 7, Septiembre: 8, Octubre: 9, Noviembre: 10, Diciembre: 11
+          Enero: 0,
+          Febrero: 1,
+          Marzo: 2,
+          Abril: 3,
+          Mayo: 4,
+          Junio: 5,
+          Julio: 6,
+          Agosto: 7,
+          Septiembre: 8,
+          Octubre: 9,
+          Noviembre: 10,
+          Diciembre: 11,
         };
         const month = months[parts[0]] || 0;
         const year = parseInt(parts[1]) || 2026;
@@ -792,7 +827,9 @@ export function AdminDashboard() {
           <DollarSign className="h-5 w-5" />
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Total Cotizado</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+            Total Cotizado
+          </p>
           <h3 className="text-xl font-bold text-navy font-display mt-0.5 tabular-nums">
             {formatMXN(stats.totalRevenue)}
           </h3>
@@ -806,11 +843,15 @@ export function AdminDashboard() {
           🔮
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-[#C5A85A] font-bold">Ingreso Ponderado</p>
+          <p className="text-[10px] uppercase tracking-wider text-[#C5A85A] font-bold">
+            Ingreso Ponderado
+          </p>
           <h3 className="text-xl font-bold text-navy font-display mt-0.5 tabular-nums">
             {formatMXN(stats.weightedRevenue)}
           </h3>
-          <p className="text-[9px] text-muted-foreground mt-0.5">Pronóstico real por probabilidad</p>
+          <p className="text-[9px] text-muted-foreground mt-0.5">
+            Pronóstico real por probabilidad
+          </p>
         </div>
       </div>
 
@@ -820,11 +861,15 @@ export function AdminDashboard() {
           🎯
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Conversión CRM</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+            Conversión CRM
+          </p>
           <h3 className="text-xl font-bold text-navy font-display mt-0.5 tabular-nums">
             {stats.conversionRate.toFixed(1)}%
           </h3>
-          <p className="text-[9px] text-muted-foreground mt-0.5">{stats.contractedCount} de {stats.totalQuotesCount} leads cerrados</p>
+          <p className="text-[9px] text-muted-foreground mt-0.5">
+            {stats.contractedCount} de {stats.totalQuotesCount} leads cerrados
+          </p>
         </div>
       </div>
 
@@ -834,9 +879,12 @@ export function AdminDashboard() {
           <span className="text-base">📦</span>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-emerald-800 font-bold">Togas Reservadas</p>
+          <p className="text-[10px] uppercase tracking-wider text-emerald-800 font-bold">
+            Togas Reservadas
+          </p>
           <h3 className="text-xl font-bold text-emerald-700 font-display mt-0.5 tabular-nums">
-            {stats.contractedStudents} <span className="text-xs font-semibold text-muted-foreground font-sans">unds</span>
+            {stats.contractedStudents}{" "}
+            <span className="text-xs font-semibold text-muted-foreground font-sans">unds</span>
           </h3>
           <p className="text-[9px] text-muted-foreground mt-0.5">Inventario comprometido</p>
         </div>
@@ -848,9 +896,12 @@ export function AdminDashboard() {
           <span className="text-base">📈</span>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-blue-800 font-bold">Togas en Pipeline</p>
+          <p className="text-[10px] uppercase tracking-wider text-blue-800 font-bold">
+            Togas en Pipeline
+          </p>
           <h3 className="text-xl font-bold text-navy font-display mt-0.5 tabular-nums">
-            {stats.totalPipelineStudents} <span className="text-xs font-semibold text-muted-foreground font-sans">unds</span>
+            {stats.totalPipelineStudents}{" "}
+            <span className="text-xs font-semibold text-muted-foreground font-sans">unds</span>
           </h3>
           <p className="text-[9px] text-muted-foreground mt-0.5">Demanda máxima potencial</p>
         </div>
@@ -867,7 +918,7 @@ export function AdminDashboard() {
     }
   };
 
-  const toggleRow = (id: number) => {
+  const toggleRow = (id: string) => {
     const newExpanded = new Set(expandedRows);
     if (newExpanded.has(id)) {
       newExpanded.delete(id);
@@ -899,7 +950,7 @@ export function AdminDashboard() {
       "Color Toga",
       "Color Estola",
       "Fecha Estimada",
-      "Estado"
+      "Estado",
     ];
 
     const rows = filteredQuotes.map((q) => [
@@ -922,12 +973,24 @@ export function AdminDashboard() {
       q.toga_color || "N/A",
       q.stola_color || "N/A",
       q.estimated_date || "Por definir",
-      q.status === "contracted" ? "Contratado" : q.status === "contacted" ? "Contactado" : q.status === "archived" ? "Archivado" : "Pendiente"
+      q.status === "contracted"
+        ? "Contratado"
+        : q.status === "contacted"
+          ? "Contactado"
+          : q.status === "archived"
+            ? "Archivado"
+            : "Pendiente",
     ]);
 
     // Add UTF-8 BOM so Excel opens it with correct encoding (accents, ñ, etc)
-    const csvContent = "\uFEFF" + headers.map(h => `"${h}"`).join(",") + "\n" + rows.map((e) => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const csvContent =
+      "\uFEFF" +
+      headers.map((h) => `"${h}"`).join(",") +
+      "\n" +
+      rows
+        .map((e) => e.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -941,7 +1004,10 @@ export function AdminDashboard() {
   // WhatsApp Follow Up Link
   const getWhatsAppLink = (q: QuoteRecord) => {
     const typeLabel = q.service_option === "renta" ? "renta" : "venta";
-    const cityText = q.service_option === "renta" ? ` en la ciudad de ${q.city === "tijuana" ? "Tijuana" : "Ensenada"}` : "";
+    const cityText =
+      q.service_option === "renta"
+        ? ` en la ciudad de ${q.city === "tijuana" ? "Tijuana" : "Ensenada"}`
+        : "";
     const text = `Hola ${q.contact_name}, te contacto de Kinder Togas respecto a tu cotización con folio *${q.quote_number}* para la escuela *${q.institution_name}* (${levelLabel(q.school_level)}). ¿En qué podemos ayudarte para agendar tu evento?`;
     return `https://wa.me/52${q.contact_phone.replace(/\D/g, "")}?text=${encodeURIComponent(text)}`;
   };
@@ -960,7 +1026,7 @@ export function AdminDashboard() {
           />
           {/* Navy Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#1E2346]/90 via-[#1E2346]/75 to-[#1E2346]/60" />
-          
+
           {/* Content over image */}
           <div className="relative z-10 flex flex-col justify-between p-12 w-full">
             {/* Spacer to align main messaging */}
@@ -972,7 +1038,8 @@ export function AdminDashboard() {
                 Tu graduación, a un <span className="text-[#C5A85A]">clic</span> de distancia
               </h1>
               <p className="text-white/60 text-base leading-relaxed">
-                Cotiza, personaliza y paga en línea de forma segura. Todo lo que necesitas para tu ceremonia de graduación en un solo lugar.
+                Cotiza, personaliza y paga en línea de forma segura. Todo lo que necesitas para tu
+                ceremonia de graduación en un solo lugar.
               </p>
 
               {/* Feature Pills */}
@@ -983,7 +1050,9 @@ export function AdminDashboard() {
                 </div>
                 <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
                   <FileText className="h-4 w-4 text-[#C5A85A]" />
-                  <span className="text-xs text-white/80 font-medium">Cotizaciones al instante</span>
+                  <span className="text-xs text-white/80 font-medium">
+                    Cotizaciones al instante
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
                   <GraduationCap className="h-4 w-4 text-[#C5A85A]" />
@@ -1000,12 +1069,16 @@ export function AdminDashboard() {
             <div className="flex items-center gap-8">
               <div>
                 <p className="text-2xl font-bold text-white font-display tabular-nums">5+</p>
-                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Niveles escolares</p>
+                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">
+                  Niveles escolares
+                </p>
               </div>
               <div className="h-10 w-px bg-white/10" />
               <div>
                 <p className="text-2xl font-bold text-white font-display tabular-nums">2</p>
-                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Sedes en BC</p>
+                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">
+                  Sedes en BC
+                </p>
               </div>
               <div className="h-10 w-px bg-white/10" />
               <div>
@@ -1013,7 +1086,9 @@ export function AdminDashboard() {
                   <ShieldCheck className="h-5 w-5 text-emerald-400" />
                   <p className="text-2xl font-bold text-white font-display">Seguro</p>
                 </div>
-                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">Pago protegido</p>
+                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mt-0.5">
+                  Pago protegido
+                </p>
               </div>
             </div>
           </div>
@@ -1023,11 +1098,7 @@ export function AdminDashboard() {
         <div className="w-full lg:w-[45%] bg-[#FAFBFC] flex flex-col relative h-full lg:overflow-y-auto">
           {/* Mobile-only background */}
           <div className="lg:hidden absolute inset-0">
-            <img
-              src={adminHeroImg}
-              alt="Graduación"
-              className="w-full h-full object-cover"
-            />
+            <img src={adminHeroImg} alt="Graduación" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-b from-[#1E2346]/80 via-[#1E2346]/60 to-[#0F1225]/95" />
           </div>
 
@@ -1037,39 +1108,54 @@ export function AdminDashboard() {
               <div className="flex flex-col items-center justify-center w-full">
                 <div className="flex items-center gap-3.5">
                   <div className="h-14 w-14 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-navy/10 border border-slate-100 lg:border-slate-200/60 p-1">
-                    <img src={logoImg} alt="Kinder Togas" className="h-full w-full object-contain" />
+                    <img
+                      src={logoImg}
+                      alt="Kinder Togas"
+                      className="h-full w-full object-contain"
+                    />
                   </div>
                   <div className="text-left">
-                    <h2 className="font-display text-xl lg:text-2xl font-bold text-white lg:text-[#1E2346] tracking-tight">Kinder Togas</h2>
-                    <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.25em] text-white/40 lg:text-[#94A3B8] font-bold">Graduaciones</p>
+                    <h2 className="font-display text-xl lg:text-2xl font-bold text-white lg:text-[#1E2346] tracking-tight">
+                      Kinder Togas
+                    </h2>
+                    <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.25em] text-white/40 lg:text-[#94A3B8] font-bold">
+                      Graduaciones
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Mode Toggle Tabs */}
-              {(authMode === 'login' || authMode === 'register') && (
+              {(authMode === "login" || authMode === "register") && (
                 <>
                   <div className="flex rounded-xl p-1 bg-white/8 lg:bg-[#F1F5F9] border border-white/10 lg:border-[#E2E8F0]">
                     <button
                       type="button"
-                      onClick={() => { setAuthMode('login'); setAuthError(''); setRegSuccess(false); }}
+                      onClick={() => {
+                        setAuthMode("login");
+                        setAuthError("");
+                        setRegSuccess(false);
+                      }}
                       className={cn(
                         "flex-1 py-2.5 rounded-lg text-sm font-semibold tracking-wide transition-all cursor-pointer",
-                        authMode === 'login'
+                        authMode === "login"
                           ? "bg-white/15 lg:bg-white text-white lg:text-[#1E2346] shadow-sm"
-                          : "text-white/40 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B]"
+                          : "text-white/40 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B]",
                       )}
                     >
                       Iniciar Sesión
                     </button>
                     <button
                       type="button"
-                      onClick={() => { setAuthMode('register'); setAuthError(''); }}
+                      onClick={() => {
+                        setAuthMode("register");
+                        setAuthError("");
+                      }}
                       className={cn(
                         "flex-1 py-2.5 rounded-lg text-sm font-semibold tracking-wide transition-all cursor-pointer",
-                        authMode === 'register'
+                        authMode === "register"
                           ? "bg-white/15 lg:bg-white text-white lg:text-[#1E2346] shadow-sm"
-                          : "text-white/40 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B]"
+                          : "text-white/40 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B]",
                       )}
                     >
                       Crear Cuenta
@@ -1078,20 +1164,23 @@ export function AdminDashboard() {
 
                   {/* Subtitle */}
                   <p className="text-sm text-white/50 lg:text-[#64748B] leading-relaxed text-center">
-                    {authMode === 'login'
-                      ? 'Accede a tu cuenta para gestionar tus cotizaciones, compras y realizar pagos en línea.'
-                      : 'Crea tu cuenta gratis para cotizar, comprar y personalizar tu graduación.'}
+                    {authMode === "login"
+                      ? "Accede a tu cuenta para gestionar tus cotizaciones, compras y realizar pagos en línea."
+                      : "Crea tu cuenta gratis para cotizar, comprar y personalizar tu graduación."}
                   </p>
                 </>
               )}
 
               {/* SLIDING FORM CONTAINER / PASSWORD RECOVERY LAYOUT */}
-              {authMode === 'forgot' ? (
+              {authMode === "forgot" ? (
                 <div className="w-full space-y-4">
                   <div className="space-y-1.5 text-center">
-                    <h3 className="font-display text-lg font-bold text-white lg:text-[#1E2346]">Recuperar Contraseña</h3>
+                    <h3 className="font-display text-lg font-bold text-white lg:text-[#1E2346]">
+                      Recuperar Contraseña
+                    </h3>
                     <p className="text-xs text-white/50 lg:text-[#64748B] leading-relaxed">
-                      Ingresa tu correo registrado y te enviaremos un enlace para restablecer tu contraseña de forma segura.
+                      Ingresa tu correo registrado y te enviaremos un enlace para restablecer tu
+                      contraseña de forma segura.
                     </p>
                   </div>
 
@@ -1101,14 +1190,22 @@ export function AdminDashboard() {
                         <Mail className="h-7 w-7 text-emerald-500 animate-bounce" />
                       </div>
                       <div className="space-y-1">
-                        <h4 className="font-display text-base font-bold text-white lg:text-[#1E2346]">¡Enlace Enviado!</h4>
+                        <h4 className="font-display text-base font-bold text-white lg:text-[#1E2346]">
+                          ¡Enlace Enviado!
+                        </h4>
                         <p className="text-xs text-white/60 lg:text-[#64748B] leading-relaxed px-4">
-                          Hemos enviado las instrucciones a <strong className="text-white lg:text-[#1E2346]">{loginEmail}</strong>. Por favor revisa tu bandeja de entrada y spam.
+                          Hemos enviado las instrucciones a{" "}
+                          <strong className="text-white lg:text-[#1E2346]">{loginEmail}</strong>.
+                          Por favor revisa tu bandeja de entrada y spam.
                         </p>
                       </div>
                       <button
                         type="button"
-                        onClick={() => { setAuthMode('login'); setForgotSuccess(false); setAuthError(''); }}
+                        onClick={() => {
+                          setAuthMode("login");
+                          setForgotSuccess(false);
+                          setAuthError("");
+                        }}
                         className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-3 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
                       >
                         <ArrowLeft className="h-4 w-4 animate-pulse" />
@@ -1147,7 +1244,10 @@ export function AdminDashboard() {
                       <div className="flex gap-3">
                         <button
                           type="button"
-                          onClick={() => { setAuthMode('login'); setAuthError(''); }}
+                          onClick={() => {
+                            setAuthMode("login");
+                            setAuthError("");
+                          }}
                           className="flex-1 border border-white/10 lg:border-[#E2E8F0] text-white/70 lg:text-[#64748B] hover:bg-white/5 lg:hover:bg-slate-50 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all cursor-pointer flex items-center justify-center gap-2"
                         >
                           Cancelar
@@ -1163,12 +1263,15 @@ export function AdminDashboard() {
                     </form>
                   )}
                 </div>
-              ) : authMode === 'reset' ? (
+              ) : authMode === "reset" ? (
                 <div className="w-full space-y-4">
                   <div className="space-y-1.5 text-center">
-                    <h3 className="font-display text-lg font-bold text-white lg:text-[#1E2346]">Restablecer Contraseña</h3>
+                    <h3 className="font-display text-lg font-bold text-white lg:text-[#1E2346]">
+                      Restablecer Contraseña
+                    </h3>
                     <p className="text-xs text-white/50 lg:text-[#64748B] leading-relaxed">
-                      Escribe tu nueva contraseña de acceso. Asegúrate de guardarla en un lugar seguro.
+                      Escribe tu nueva contraseña de acceso. Asegúrate de guardarla en un lugar
+                      seguro.
                     </p>
                   </div>
 
@@ -1178,9 +1281,12 @@ export function AdminDashboard() {
                         <ShieldCheck className="h-7 w-7 text-emerald-500 animate-pulse" />
                       </div>
                       <div className="space-y-1">
-                        <h4 className="font-display text-base font-bold text-white lg:text-[#1E2346]">¡Contraseña Actualizada!</h4>
+                        <h4 className="font-display text-base font-bold text-white lg:text-[#1E2346]">
+                          ¡Contraseña Actualizada!
+                        </h4>
                         <p className="text-xs text-white/60 lg:text-[#64748B] leading-relaxed">
-                          Tu contraseña ha sido restablecida con éxito. Serás redirigido al inicio de sesión en unos momentos.
+                          Tu contraseña ha sido restablecida con éxito. Serás redirigido al inicio
+                          de sesión en unos momentos.
                         </p>
                       </div>
                     </div>
@@ -1246,12 +1352,17 @@ export function AdminDashboard() {
                 </div>
               ) : (
                 <div className="w-full overflow-hidden relative px-1 py-1">
-                  <div 
+                  <div
                     className="flex w-[200%] transition-transform duration-500 ease-in-out"
-                    style={{ transform: authMode === 'login' ? 'translateX(0%)' : 'translateX(-50%)' }}
+                    style={{
+                      transform: authMode === "login" ? "translateX(0%)" : "translateX(-50%)",
+                    }}
                   >
                     {/* PANEL 1: LOGIN FORM */}
-                    <div className="w-1/2 shrink-0 px-2 transition-opacity duration-300" style={{ opacity: authMode === 'login' ? 1 : 0 }}>
+                    <div
+                      className="w-1/2 shrink-0 px-2 transition-opacity duration-300"
+                      style={{ opacity: authMode === "login" ? 1 : 0 }}
+                    >
                       <form onSubmit={handleLogin} className="space-y-4">
                         {/* Email */}
                         <div className="space-y-1.5">
@@ -1282,7 +1393,11 @@ export function AdminDashboard() {
                             </label>
                             <button
                               type="button"
-                              onClick={() => { setAuthMode('forgot'); setAuthError(''); setForgotSuccess(false); }}
+                              onClick={() => {
+                                setAuthMode("forgot");
+                                setAuthError("");
+                                setForgotSuccess(false);
+                              }}
                               className="text-xs font-semibold text-white/50 lg:text-[#C5A85A] hover:text-white/80 lg:hover:text-[#B5984A] transition-colors cursor-pointer animate-pulse"
                             >
                               ¿Olvidaste tu contraseña?
@@ -1306,7 +1421,11 @@ export function AdminDashboard() {
                               onClick={() => setShowPassword(!showPassword)}
                               className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B] transition-colors cursor-pointer"
                             >
-                              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
                             </button>
                           </div>
                         </div>
@@ -1320,15 +1439,25 @@ export function AdminDashboard() {
                               onChange={(e) => setRememberMe(e.target.checked)}
                               className="sr-only"
                             />
-                            <div className={cn(
-                              "h-5 w-5 rounded-lg border flex items-center justify-center transition-all duration-200",
-                              rememberMe 
-                                ? "bg-[#1E2346] border-transparent lg:bg-[#C5A85A] text-white" 
-                                : "border-white/20 lg:border-[#E2E8F0] bg-transparent group-hover:border-white/40 lg:group-hover:border-[#C5A85A]/50"
-                            )}>
+                            <div
+                              className={cn(
+                                "h-5 w-5 rounded-lg border flex items-center justify-center transition-all duration-200",
+                                rememberMe
+                                  ? "bg-[#1E2346] border-transparent lg:bg-[#C5A85A] text-white"
+                                  : "border-white/20 lg:border-[#E2E8F0] bg-transparent group-hover:border-white/40 lg:group-hover:border-[#C5A85A]/50",
+                              )}
+                            >
                               {rememberMe && (
-                                <svg className="h-3.5 w-3.5 stroke-current stroke-[3] text-white" fill="none" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                <svg
+                                  className="h-3.5 w-3.5 stroke-current stroke-[3] text-white"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M5 13l4 4L19 7"
+                                  />
                                 </svg>
                               )}
                             </div>
@@ -1338,7 +1467,7 @@ export function AdminDashboard() {
                           </label>
                         </div>
 
-                        {authError && authMode === 'login' && (
+                        {authError && authMode === "login" && (
                           <div className="flex items-center gap-2 text-xs bg-red-500/10 lg:bg-red-50 text-red-300 lg:text-red-600 py-3 px-4 rounded-xl border border-red-500/20 lg:border-red-200 font-medium">
                             <div className="h-1.5 w-1.5 bg-red-400 rounded-full shrink-0" />
                             {authError}
@@ -1356,32 +1485,43 @@ export function AdminDashboard() {
                     </div>
 
                     {/* PANEL 2: REGISTER FORM */}
-                    <div className="w-1/2 shrink-0 px-2 transition-opacity duration-300" style={{ opacity: authMode === 'register' ? 1 : 0 }}>
+                    <div
+                      className="w-1/2 shrink-0 px-2 transition-opacity duration-300"
+                      style={{ opacity: authMode === "register" ? 1 : 0 }}
+                    >
                       <form
                         onSubmit={async (e) => {
                           e.preventDefault();
-                          if (!regName.trim() || !regEmail.trim() || !regPhone.trim() || !regPassword.trim() || !regConfirmPassword.trim()) {
-                            setAuthError('Por favor completa todos los campos.');
+                          if (
+                            !regName.trim() ||
+                            !regEmail.trim() ||
+                            !regPhone.trim() ||
+                            !regPassword.trim() ||
+                            !regConfirmPassword.trim()
+                          ) {
+                            setAuthError("Por favor completa todos los campos.");
                             return;
                           }
                           if (regName.trim().length < 3) {
-                            setAuthError('El nombre completo debe tener al menos 3 caracteres.');
+                            setAuthError("El nombre completo debe tener al menos 3 caracteres.");
                             return;
                           }
                           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                           if (!emailRegex.test(regEmail.trim())) {
-                            setAuthError('Por favor ingresa un correo electrónico válido.');
+                            setAuthError("Por favor ingresa un correo electrónico válido.");
                             return;
                           }
-                          if (regPhone.replace(/\D/g, '').length !== 10) {
-                            setAuthError('El teléfono de contacto debe tener exactamente 10 dígitos.');
+                          if (regPhone.replace(/\D/g, "").length !== 10) {
+                            setAuthError(
+                              "El teléfono de contacto debe tener exactamente 10 dígitos.",
+                            );
                             return;
                           }
                           if (regPassword !== regConfirmPassword) {
-                            setAuthError('Las contraseñas no coinciden.');
+                            setAuthError("Las contraseñas no coinciden.");
                             return;
                           }
-                          setAuthError('');
+                          setAuthError("");
                           try {
                             const { error: signUpErr } = await supabase.auth.signUp({
                               email: regEmail.trim(),
@@ -1389,9 +1529,9 @@ export function AdminDashboard() {
                               options: {
                                 data: {
                                   full_name: regName.trim(),
-                                  phone: regPhone.trim()
-                                }
-                              }
+                                  phone: regPhone.trim(),
+                                },
+                              },
                             });
 
                             if (signUpErr) throw signUpErr;
@@ -1409,14 +1549,20 @@ export function AdminDashboard() {
                               <ShieldCheck className="h-7 w-7 text-emerald-500" />
                             </div>
                             <div className="space-y-1">
-                              <h3 className="font-display text-lg font-bold text-white lg:text-[#1E2346]">¡Registro exitoso!</h3>
+                              <h3 className="font-display text-lg font-bold text-white lg:text-[#1E2346]">
+                                ¡Registro exitoso!
+                              </h3>
                               <p className="text-xs text-white/50 lg:text-[#64748B] leading-relaxed">
-                                Tu cuenta ha sido creada. Pronto recibirás un correo de confirmación. Ya puedes iniciar sesión.
+                                Tu cuenta ha sido creada. Pronto recibirás un correo de
+                                confirmación. Ya puedes iniciar sesión.
                               </p>
                             </div>
                             <button
                               type="button"
-                              onClick={() => { setAuthMode('login'); setRegSuccess(false); }}
+                              onClick={() => {
+                                setAuthMode("login");
+                                setRegSuccess(false);
+                              }}
                               className="w-full bg-[#1E2346] hover:bg-[#2a305c] text-white py-3.5 rounded-xl text-sm font-semibold tracking-wide transition-all shadow-lg shadow-navy/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
                             >
                               Ir a Iniciar Sesión
@@ -1464,7 +1610,7 @@ export function AdminDashboard() {
                                 type="tel"
                                 value={regPhone}
                                 onChange={(e) => {
-                                  const digits = e.target.value.replace(/\D/g, '').substring(0, 10);
+                                  const digits = e.target.value.replace(/\D/g, "").substring(0, 10);
                                   let formatted = "";
                                   if (digits.length > 0) {
                                     if (digits.length <= 3) {
@@ -1505,7 +1651,11 @@ export function AdminDashboard() {
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 lg:text-[#94A3B8] hover:text-white/60 lg:hover:text-[#64748B] transition-colors cursor-pointer"
                               >
-                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                {showPassword ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
                               </button>
                             </div>
 
@@ -1525,7 +1675,7 @@ export function AdminDashboard() {
                               />
                             </div>
 
-                            {authError && authMode === 'register' && (
+                            {authError && authMode === "register" && (
                               <div className="flex items-center gap-2 text-xs bg-red-500/10 lg:bg-red-50 text-red-300 lg:text-red-600 py-3 px-4 rounded-xl border border-red-500/20 lg:border-red-200 font-medium">
                                 <div className="h-1.5 w-1.5 bg-red-400 rounded-full shrink-0" />
                                 {authError}
@@ -1550,7 +1700,9 @@ export function AdminDashboard() {
               {/* Divider */}
               <div className="flex items-center gap-4">
                 <div className="flex-1 h-px bg-white/10 lg:bg-[#E2E8F0]" />
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-white/25 lg:text-[#CBD5E1]">o bien</span>
+                <span className="text-[10px] uppercase tracking-wider font-semibold text-white/25 lg:text-[#CBD5E1]">
+                  o bien
+                </span>
                 <div className="flex-1 h-px bg-white/10 lg:bg-[#E2E8F0]" />
               </div>
 
@@ -1583,7 +1735,7 @@ export function AdminDashboard() {
 
               {/* Back to Quoter */}
               <button
-                onClick={() => window.location.href = "/"}
+                onClick={() => (window.location.href = "/")}
                 className="w-full py-3 rounded-xl text-sm font-medium tracking-wide transition-all cursor-pointer flex items-center justify-center gap-2
                   text-white/40 hover:text-white/60 lg:text-[#94A3B8] lg:hover:text-[#64748B]
                   border border-white/8 lg:border-[#E2E8F0] hover:border-white/15 lg:hover:border-[#CBD5E1]
@@ -1617,10 +1769,12 @@ export function AdminDashboard() {
             </div>
             <div>
               <h1 className="font-display text-xl font-bold tracking-tight">Kinder Togas</h1>
-              <p className="text-[9px] uppercase tracking-[0.22em] text-white/50 font-bold">Admin Dashboard</p>
+              <p className="text-[9px] uppercase tracking-[0.22em] text-white/50 font-bold">
+                Admin Dashboard
+              </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <button
               onClick={() => fetchQuotes(true)}
@@ -1643,1685 +1797,2662 @@ export function AdminDashboard() {
 
       {/* Main Container */}
       <main className="flex-1 w-full max-w-full px-4 sm:px-8 mx-auto py-4 sm:py-8 space-y-8">
-        
         {/* Navigation Tabs */}
         <div className="flex border-b border-hairline/80 gap-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
           <button
-            onClick={() => setActiveTab('crm')}
+            onClick={() => setActiveTab("crm")}
             className={cn(
               "pb-4 text-sm font-bold tracking-wide transition-all border-b-2 cursor-pointer flex items-center gap-2",
-              activeTab === 'crm'
+              activeTab === "crm"
                 ? "border-navy text-navy font-extrabold"
-                : "border-transparent text-muted-foreground hover:text-navy/70"
+                : "border-transparent text-muted-foreground hover:text-navy/70",
             )}
           >
             <span>📋</span> Lista de Cotizaciones
           </button>
           <button
-            onClick={() => setActiveTab('stats')}
+            onClick={() => setActiveTab("stats")}
             className={cn(
               "pb-4 text-sm font-bold tracking-wide transition-all border-b-2 cursor-pointer flex items-center gap-2",
-              activeTab === 'stats'
+              activeTab === "stats"
                 ? "border-navy text-navy font-extrabold"
-                : "border-transparent text-muted-foreground hover:text-navy/70"
+                : "border-transparent text-muted-foreground hover:text-navy/70",
             )}
           >
             <span>📈</span> Métricas y Gráficos
           </button>
           <button
-            onClick={() => setActiveTab('pricing')}
+            onClick={() => setActiveTab("pricing")}
             className={cn(
               "pb-4 text-sm font-bold tracking-wide transition-all border-b-2 cursor-pointer flex items-center gap-2",
-              activeTab === 'pricing'
+              activeTab === "pricing"
                 ? "border-navy text-navy font-extrabold"
-                : "border-transparent text-muted-foreground hover:text-navy/70"
+                : "border-transparent text-muted-foreground hover:text-navy/70",
             )}
           >
             <span>🏷️</span> Tarifas & Descuentos
           </button>
           <button
-            onClick={() => setActiveTab('calendar')}
+            onClick={() => setActiveTab("calendar")}
             className={cn(
               "pb-4 text-sm font-bold tracking-wide transition-all border-b-2 cursor-pointer flex items-center gap-2",
-              activeTab === 'calendar'
+              activeTab === "calendar"
                 ? "border-navy text-navy font-extrabold"
-                : "border-transparent text-muted-foreground hover:text-navy/70"
+                : "border-transparent text-muted-foreground hover:text-navy/70",
             )}
           >
             <span>📅</span> Agenda de Eventos
           </button>
         </div>
 
-        {activeTab === 'crm' && (
+        {activeTab === "crm" && (
           <div className="space-y-8 animate-fadeIn">
             {/* Metric Cards Row */}
             {renderMetricCards()}
 
-        {/* Filter and Table Section */}
-        <section className="bg-white border border-hairline rounded-2xl shadow-sm overflow-hidden">
-          {/* Table Header and Filters */}
-          <div className="p-6 border-b border-hairline bg-cream/20 space-y-4">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h3 className="font-display text-lg text-navy font-bold">Listado de Cotizaciones</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Visualiza, busca y filtra las cotizaciones del cotizador interactivo.
-                </p>
-              </div>
-              
-              <button
-                onClick={handleExportCSV}
-                disabled={filteredQuotes.length === 0}
-                className="flex items-center gap-2 self-start md:self-auto bg-navy hover:bg-navy/90 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
-              >
-                <Download className="h-4 w-4" />
-                Exportar a Excel (CSV)
-              </button>
-            </div>
+            {/* Filter and Table Section */}
+            <section className="bg-white border border-hairline rounded-2xl shadow-sm overflow-hidden">
+              {/* Table Header and Filters */}
+              <div className="p-6 border-b border-hairline bg-cream/20 space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="font-display text-lg text-navy font-bold">
+                      Listado de Cotizaciones
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Visualiza, busca y filtra las cotizaciones del cotizador interactivo.
+                    </p>
+                  </div>
 
-            {/* Inputs Panel */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 pt-2">
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar escuela, cliente, folio..."
-                  className="w-full bg-white border border-hairline rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy focus:border-transparent"
-                />
-              </div>
+                  <button
+                    onClick={handleExportCSV}
+                    disabled={filteredQuotes.length === 0}
+                    className="flex items-center gap-2 self-start md:self-auto bg-navy hover:bg-navy/90 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
+                  >
+                    <Download className="h-4 w-4" />
+                    Exportar a Excel (CSV)
+                  </button>
+                </div>
 
-              {/* Level Selector */}
-              <div className="relative">
-                <Filter className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
-                <select
-                  value={levelFilter}
-                  onChange={(e) => setLevelFilter(e.target.value)}
-                  className="w-full bg-white border border-hairline rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer appearance-none"
-                >
-                  <option value="all">Todos los Niveles</option>
-                  <option value="preescolar">Preescolar</option>
-                  <option value="primaria">Primaria</option>
-                  <option value="secundaria">Secundaria</option>
-                  <option value="preparatoria">Preparatoria</option>
-                  <option value="universidad">Universidad y Posgrado</option>
-                </select>
-              </div>
+                {/* Inputs Panel */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 pt-2">
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
+                    <input
+                      type="text"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Buscar escuela, cliente, folio..."
+                      className="w-full bg-white border border-hairline rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy focus:border-transparent"
+                    />
+                  </div>
 
-              {/* Service Selector */}
-              <div className="relative">
-                <select
-                  value={serviceFilter}
-                  onChange={(e) => setServiceFilter(e.target.value)}
-                  className="w-full bg-white border border-hairline rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer appearance-none"
-                >
-                  <option value="all">Cualquier Modalidad</option>
-                  <option value="renta">Renta</option>
-                  <option value="venta">Venta</option>
-                </select>
-              </div>
-
-              {/* Sede Selector */}
-              <div className="relative">
-                <select
-                  value={cityFilter}
-                  onChange={(e) => setCityFilter(e.target.value)}
-                  className="w-full bg-white border border-hairline rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer appearance-none"
-                >
-                  <option value="all">Todas las Sedes</option>
-                  <option value="tijuana">Tijuana</option>
-                  <option value="ensenada">Ensenada</option>
-                </select>
-              </div>
-
-              {/* Month Selector */}
-              <div className="relative">
-                <select
-                  value={monthFilter}
-                  onChange={(e) => setMonthFilter(e.target.value)}
-                  className="w-full bg-white border border-hairline rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer appearance-none"
-                >
-                  <option value="all">Todos los Meses</option>
-                  <option value="0">Enero</option>
-                  <option value="1">Febrero</option>
-                  <option value="2">Marzo</option>
-                  <option value="3">Abril</option>
-                  <option value="4">Mayo</option>
-                  <option value="5">Junio</option>
-                  <option value="6">Julio</option>
-                  <option value="7">Agosto</option>
-                  <option value="8">Septiembre</option>
-                  <option value="9">Octubre</option>
-                  <option value="10">Noviembre</option>
-                  <option value="11">Diciembre</option>
-                </select>
-              </div>
-
-              {/* Status Selector (CRM) */}
-              <div className="relative">
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full bg-white border border-hairline rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer appearance-none font-medium"
-                >
-                  <option value="all">Todos los Estados</option>
-                  <option value="pending">Pendientes 🟡</option>
-                  <option value="contacted">Contactados 🔵</option>
-                  <option value="contracted">Contratados 🟢</option>
-                  <option value="archived">Archivados ⚫</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Table Container */}
-          {loading ? (
-            <div className="p-12 text-center text-muted-foreground space-y-3">
-              <RefreshCw className="h-8 w-8 animate-spin mx-auto text-navy" />
-              <p className="text-sm font-medium">Cargando base de datos...</p>
-            </div>
-          ) : error ? (
-            <div className="p-12 text-center text-destructive space-y-2">
-              <p className="text-sm font-bold">{error}</p>
-              <button 
-                onClick={() => fetchQuotes()} 
-                className="text-xs text-navy underline hover:opacity-85 cursor-pointer font-medium"
-              >
-                Reintentar
-              </button>
-            </div>
-          ) : filteredQuotes.length === 0 ? (
-            <div className="p-16 text-center text-muted-foreground">
-              <p className="text-sm">No se encontraron cotizaciones con los filtros actuales.</p>
-            </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto bg-white border border-hairline rounded-2xl shadow-sm">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="bg-cream/10 border-b border-hairline text-muted-foreground uppercase text-[10px] tracking-wider font-bold select-none">
-                    <th 
-                      className="py-4 px-6 cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
-                      onClick={() => handleSort("created_at")}
-                      title="Ordenar por Fecha de Creación"
+                  {/* Level Selector */}
+                  <div className="relative">
+                    <Filter className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
+                    <select
+                      value={levelFilter}
+                      onChange={(e) => setLevelFilter(e.target.value)}
+                      className="w-full bg-white border border-hairline rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer appearance-none"
                     >
-                      <div className="flex items-center gap-1">
-                        <span>Folio / Fecha</span>
-                        <span className="text-[8px] text-navy/60">{sortField === "created_at" ? (sortAsc ? "▲" : "▼") : ""}</span>
-                      </div>
-                    </th>
-                    <th 
-                      className="py-4 px-6 cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
-                      onClick={() => handleSort("institution_name")}
-                      title="Ordenar por Escuela / Institución"
-                    >
-                      <div className="flex items-center gap-1">
-                        <span>Escuela / Solicitante</span>
-                        <span className="text-[8px] text-navy/60">{sortField === "institution_name" ? (sortAsc ? "▲" : "▼") : ""}</span>
-                      </div>
-                    </th>
-                    <th 
-                      className="py-4 px-6 cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
-                      onClick={() => handleSort("school_level")}
-                      title="Ordenar por Nivel Escolar"
-                    >
-                      <div className="flex items-center gap-1">
-                        <span>Modalidad / Nivel</span>
-                        <span className="text-[8px] text-navy/60">{sortField === "school_level" ? (sortAsc ? "▲" : "▼") : ""}</span>
-                      </div>
-                    </th>
-                    <th 
-                      className="py-4 px-6 text-center cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
-                      onClick={() => handleSort("student_count")}
-                      title="Ordenar por Cantidad de Alumnos"
-                    >
-                      <div className="flex items-center justify-center gap-1">
-                        <span>Alumnos</span>
-                        <span className="text-[8px] text-navy/60">{sortField === "student_count" ? (sortAsc ? "▲" : "▼") : ""}</span>
-                      </div>
-                    </th>
-                    <th 
-                      className="py-4 px-6 text-right cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
-                      onClick={() => handleSort("total_price")}
-                      title="Ordenar por Total"
-                    >
-                      <div className="flex items-center justify-end gap-1">
-                        <span>Total</span>
-                        <span className="text-[8px] text-navy/60">{sortField === "total_price" ? (sortAsc ? "▲" : "▼") : ""}</span>
-                      </div>
-                    </th>
-                    <th 
-                      className="py-4 px-6 text-center cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
-                      onClick={() => handleSort("status")}
-                      title="Ordenar por Estado (CRM)"
-                    >
-                      <div className="flex items-center justify-center gap-1">
-                        <span>Estado</span>
-                        <span className="text-[8px] text-navy/60">{sortField === "status" ? (sortAsc ? "▲" : "▼") : ""}</span>
-                      </div>
-                    </th>
-                    <th className="py-4 px-6 text-center text-muted-foreground cursor-default">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-hairline">
-                  {paginatedQuotes.map((q) => {
-                    const isExpanded = expandedRows.has(q.id);
-                    return (
-                      <>
-                        <tr 
-                          key={q.id}
-                          className={cn(
-                            "hover:bg-cream/10 transition-colors text-sm group cursor-pointer",
-                            isExpanded && "bg-cream/20"
-                          )}
-                          onClick={() => toggleRow(q.id)}
-                        >
-                          {/* Folio / Fecha */}
-                          <td className="py-4.5 px-6">
-                            <div className="font-semibold text-navy tracking-tight">{q.quote_number}</div>
-                            <div className="text-xs text-muted-foreground mt-0.5" title="Fecha de Creación">
-                              {new Date(q.created_at).toLocaleDateString("es-MX", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit"
-                              })}
-                            </div>
-                            {q.estimated_date && (
-                              <div className="text-[10px] font-bold text-slate-500 bg-slate-100 rounded px-1.5 py-0.5 mt-1 inline-block" title="Fecha Tentativa del Evento">
-                                📅 {new Date(q.estimated_date).toLocaleDateString("es-MX", { day: "numeric", month: "short" })}
-                              </div>
-                            )}
-                          </td>
+                      <option value="all">Todos los Niveles</option>
+                      <option value="preescolar">Preescolar</option>
+                      <option value="primaria">Primaria</option>
+                      <option value="secundaria">Secundaria</option>
+                      <option value="preparatoria">Preparatoria</option>
+                      <option value="universidad">Universidad y Posgrado</option>
+                    </select>
+                  </div>
 
-                          {/* Escuela / Solicitante */}
-                          <td className="py-4.5 px-6">
-                            <div className="font-semibold text-foreground truncate max-w-[220px]">{q.institution_name}</div>
-                            {q.institution_address && (
-                              <div className="text-[10px] text-muted-foreground truncate max-w-[220px] mb-1">
-                                📍 {q.institution_address}
-                              </div>
-                            )}
-                            <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-[220px] font-medium">
-                              👤 {q.contact_name}
-                            </div>
-                            <div className="text-[11px] text-[#C5A85A] font-bold mt-1.5 truncate max-w-[220px]">
-                              📦 {packageLabel(q.package_kind, q.package_variant, q.school_level)}
-                            </div>
-                          </td>
+                  {/* Service Selector */}
+                  <div className="relative">
+                    <select
+                      value={serviceFilter}
+                      onChange={(e) => setServiceFilter(e.target.value)}
+                      className="w-full bg-white border border-hairline rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer appearance-none"
+                    >
+                      <option value="all">Cualquier Modalidad</option>
+                      <option value="renta">Renta</option>
+                      <option value="venta">Venta</option>
+                    </select>
+                  </div>
 
-                          {/* Modalidad / Sede */}
-                          <td className="py-4.5 px-6">
-                            <div className="flex items-center gap-1.5">
-                              <span className={cn(
-                                "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
-                                q.service_option === "renta" 
-                                  ? "bg-blue-100 text-blue-800" 
-                                  : "bg-amber-100 text-amber-800"
-                              )}>
-                                {q.service_option === "renta" ? "Renta" : "Venta"}
+                  {/* Sede Selector */}
+                  <div className="relative">
+                    <select
+                      value={cityFilter}
+                      onChange={(e) => setCityFilter(e.target.value)}
+                      className="w-full bg-white border border-hairline rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer appearance-none"
+                    >
+                      <option value="all">Todas las Sedes</option>
+                      <option value="tijuana">Tijuana</option>
+                      <option value="ensenada">Ensenada</option>
+                    </select>
+                  </div>
+
+                  {/* Month Selector */}
+                  <div className="relative">
+                    <select
+                      value={monthFilter}
+                      onChange={(e) => setMonthFilter(e.target.value)}
+                      className="w-full bg-white border border-hairline rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer appearance-none"
+                    >
+                      <option value="all">Todos los Meses</option>
+                      <option value="0">Enero</option>
+                      <option value="1">Febrero</option>
+                      <option value="2">Marzo</option>
+                      <option value="3">Abril</option>
+                      <option value="4">Mayo</option>
+                      <option value="5">Junio</option>
+                      <option value="6">Julio</option>
+                      <option value="7">Agosto</option>
+                      <option value="8">Septiembre</option>
+                      <option value="9">Octubre</option>
+                      <option value="10">Noviembre</option>
+                      <option value="11">Diciembre</option>
+                    </select>
+                  </div>
+
+                  {/* Status Selector (CRM) */}
+                  <div className="relative">
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="w-full bg-white border border-hairline rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer appearance-none font-medium"
+                    >
+                      <option value="all">Todos los Estados</option>
+                      <option value="pending">Pendientes 🟡</option>
+                      <option value="contacted">Contactados 🔵</option>
+                      <option value="contracted">Contratados 🟢</option>
+                      <option value="archived">Archivados ⚫</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Table Container */}
+              {loading ? (
+                <div className="p-12 text-center text-muted-foreground space-y-3">
+                  <RefreshCw className="h-8 w-8 animate-spin mx-auto text-navy" />
+                  <p className="text-sm font-medium">Cargando base de datos...</p>
+                </div>
+              ) : error ? (
+                <div className="p-12 text-center text-destructive space-y-2">
+                  <p className="text-sm font-bold">{error}</p>
+                  <button
+                    onClick={() => fetchQuotes()}
+                    className="text-xs text-navy underline hover:opacity-85 cursor-pointer font-medium"
+                  >
+                    Reintentar
+                  </button>
+                </div>
+              ) : filteredQuotes.length === 0 ? (
+                <div className="p-16 text-center text-muted-foreground">
+                  <p className="text-sm">
+                    No se encontraron cotizaciones con los filtros actuales.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="overflow-x-auto bg-white border border-hairline rounded-2xl shadow-sm">
+                    <table className="w-full border-collapse text-left">
+                      <thead>
+                        <tr className="bg-cream/10 border-b border-hairline text-muted-foreground uppercase text-[10px] tracking-wider font-bold select-none">
+                          <th
+                            className="py-4 px-6 cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
+                            onClick={() => handleSort("created_at")}
+                            title="Ordenar por Fecha de Creación"
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>Folio / Fecha</span>
+                              <span className="text-[8px] text-navy/60">
+                                {sortField === "created_at" ? (sortAsc ? "▲" : "▼") : ""}
                               </span>
-                              {q.service_option === "renta" && q.city && (
-                                <span className="text-xs text-muted-foreground font-medium">
-                                  {q.city === "tijuana" ? "Tijuana" : "Ensenada"}
-                                </span>
-                              )}
                             </div>
-                            <div className="text-xs text-muted-foreground mt-1 font-medium">
-                              {levelLabel(q.school_level)}
-                            </div>
-                          </td>
-
-                          {/* Alumnos */}
-                          <td className="py-4.5 px-6 text-center font-semibold tabular-nums text-foreground">
-                            {q.student_count}
-                          </td>
-
-                          {/* Total */}
-                          <td className="py-4.5 px-6 text-right font-bold text-navy tabular-nums">
-                            <div>{formatMXN(q.total_price)}</div>
-                            {q.discount_percent !== undefined && q.discount_percent > 0 && (
-                              <span className="inline-block text-[9px] font-bold text-[#C5A85A] bg-[#C5A85A]/10 px-1.5 py-0.5 rounded-md mt-0.5 tracking-wider select-none">
-                                -{q.discount_percent}% DTO
+                          </th>
+                          <th
+                            className="py-4 px-6 cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
+                            onClick={() => handleSort("institution_name")}
+                            title="Ordenar por Escuela / Institución"
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>Escuela / Solicitante</span>
+                              <span className="text-[8px] text-navy/60">
+                                {sortField === "institution_name" ? (sortAsc ? "▲" : "▼") : ""}
                               </span>
-                            )}
-                          </td>
-
-                          {/* Estado (CRM) */}
-                          <td className="py-4.5 px-6 text-center select-none" onClick={(e) => e.stopPropagation()}>
-                            {(() => {
-                              const curStatus = q.status || "pending";
-                              const configs: Record<string, { label: string; cls: string }> = {
-                                pending: { label: "Pendiente 🟡", cls: "bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-100/70" },
-                                contacted: { label: "Contactado 🔵", cls: "bg-blue-50 text-blue-700 border-blue-200/50 hover:bg-blue-100/70" },
-                                contracted: { label: "Contratado 🟢", cls: "bg-emerald-50 text-emerald-700 border-emerald-200/50 hover:bg-emerald-100/70" },
-                                archived: { label: "Archivado ⚫", cls: "bg-slate-50 text-slate-600 border-slate-200/50 hover:bg-slate-100/70" }
-                              };
-                              const cfg = configs[curStatus] || configs.pending;
-                              return (
-                                <div className="relative inline-flex items-center justify-center">
-                                  <select
-                                    value={curStatus}
-                                    disabled={updatingStatusId === q.id}
-                                    onChange={(e) => handleUpdateStatus(q.id, e.target.value)}
-                                    className={cn(
-                                      "appearance-none inline-flex items-center justify-center rounded-full pl-3.5 pr-7.5 py-1.5 text-xs font-bold border leading-none tracking-wide transition-all shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-navy/20",
-                                      cfg.cls
-                                    )}
-                                  >
-                                    <option value="pending" className="bg-white text-amber-700 font-bold">Pendiente 🟡</option>
-                                    <option value="contacted" className="bg-white text-blue-700 font-bold">Contactado 🔵</option>
-                                    <option value="contracted" className="bg-white text-emerald-700 font-bold">Contratado 🟢</option>
-                                    <option value="archived" className="bg-white text-slate-600 font-bold">Archivado ⚫</option>
-                                  </select>
-                                  {updatingStatusId === q.id ? (
-                                    <RefreshCw className="absolute right-2.5 h-3 w-3 animate-spin text-navy" />
-                                  ) : (
-                                    <span className="absolute right-2.5 pointer-events-none text-[8px] font-extrabold opacity-70">▼</span>
-                                  )}
-                                </div>
-                              );
-                            })()}
-                          </td>
-
-                          {/* Acciones */}
-                          <td className="py-4.5 px-6 text-center" onClick={(e) => e.stopPropagation()}>
-                            <div className="flex items-center justify-center gap-2">
-                              <button
-                                onClick={() => generateQuotePDF({
-                                  level: q.school_level as any,
-                                  city: q.city as any,
-                                  pkg: { kind: q.package_kind as any, variant: q.package_variant as any },
-                                  quantity: q.student_count,
-                                  school: q.institution_name,
-                                  contact: q.contact_name,
-                                  phone: q.contact_phone,
-                                  date: q.estimated_date || "",
-                                  email: q.contact_email || "",
-                                  quoteNumber: q.quote_number,
-                                  togaColor: q.toga_color || undefined,
-                                  stolaColor: q.stola_color || undefined
-                                })}
-                                className="p-2 bg-navy/5 text-navy hover:bg-navy/15 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
-                                title="Descargar PDF de la Cotización"
-                              >
-                                <Download className="h-4 w-4" />
-                              </button>
-
-                              <a
-                                href={getWhatsAppLink(q)}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="p-2 bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
-                                title="Hacer seguimiento por WhatsApp"
-                              >
-                                <MessageSquare className="h-4 w-4" />
-                              </a>
                             </div>
-                          </td>
+                          </th>
+                          <th
+                            className="py-4 px-6 cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
+                            onClick={() => handleSort("school_level")}
+                            title="Ordenar por Nivel Escolar"
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>Modalidad / Nivel</span>
+                              <span className="text-[8px] text-navy/60">
+                                {sortField === "school_level" ? (sortAsc ? "▲" : "▼") : ""}
+                              </span>
+                            </div>
+                          </th>
+                          <th
+                            className="py-4 px-6 text-center cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
+                            onClick={() => handleSort("student_count")}
+                            title="Ordenar por Cantidad de Alumnos"
+                          >
+                            <div className="flex items-center justify-center gap-1">
+                              <span>Alumnos</span>
+                              <span className="text-[8px] text-navy/60">
+                                {sortField === "student_count" ? (sortAsc ? "▲" : "▼") : ""}
+                              </span>
+                            </div>
+                          </th>
+                          <th
+                            className="py-4 px-6 text-right cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
+                            onClick={() => handleSort("total_price")}
+                            title="Ordenar por Total"
+                          >
+                            <div className="flex items-center justify-end gap-1">
+                              <span>Total</span>
+                              <span className="text-[8px] text-navy/60">
+                                {sortField === "total_price" ? (sortAsc ? "▲" : "▼") : ""}
+                              </span>
+                            </div>
+                          </th>
+                          <th
+                            className="py-4 px-6 text-center cursor-pointer hover:text-navy hover:bg-cream/20 transition-colors"
+                            onClick={() => handleSort("status")}
+                            title="Ordenar por Estado (CRM)"
+                          >
+                            <div className="flex items-center justify-center gap-1">
+                              <span>Estado</span>
+                              <span className="text-[8px] text-navy/60">
+                                {sortField === "status" ? (sortAsc ? "▲" : "▼") : ""}
+                              </span>
+                            </div>
+                          </th>
+                          <th className="py-4 px-6 text-center text-muted-foreground cursor-default">
+                            Acciones
+                          </th>
                         </tr>
-
-                        {/* Expanded Details Row */}
-                        {isExpanded && (
-                          <tr className="bg-cream/15">
-                            <td colSpan={7} className="py-6 px-8 border-t border-b border-hairline/80">
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                                {/* Datos de Contacto */}
-                                <div className="space-y-2">
-                                  <h4 className="font-bold text-navy text-xs uppercase tracking-wider">Contacto Completo</h4>
-                                  <div className="space-y-1 text-xs">
-                                    <p><span className="text-muted-foreground">Teléfono:</span> <span className="font-semibold text-foreground">{q.contact_phone}</span></p>
-                                    <p><span className="text-muted-foreground">Email:</span> <span className="font-semibold text-foreground">{q.contact_email || "No provisto"}</span></p>
-                                    <p><span className="text-muted-foreground">Fecha Estimada:</span> <span className="font-semibold text-foreground">{q.estimated_date ? new Date(q.estimated_date).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" }) : "Por definir"}</span></p>
+                      </thead>
+                      <tbody className="divide-y divide-hairline">
+                        {paginatedQuotes.map((q) => {
+                          const isExpanded = expandedRows.has(q.id);
+                          return (
+                            <>
+                              <tr
+                                key={q.id}
+                                className={cn(
+                                  "hover:bg-cream/10 transition-colors text-sm group cursor-pointer",
+                                  isExpanded && "bg-cream/20",
+                                )}
+                                onClick={() => toggleRow(q.id)}
+                              >
+                                {/* Folio / Fecha */}
+                                <td className="py-4.5 px-6">
+                                  <div className="font-semibold text-navy tracking-tight">
+                                    {q.quote_number}
                                   </div>
-                                </div>
+                                  <div
+                                    className="text-xs text-muted-foreground mt-0.5"
+                                    title="Fecha de Creación"
+                                  >
+                                    {new Date(q.created_at).toLocaleDateString("es-MX", {
+                                      day: "numeric",
+                                      month: "short",
+                                      year: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </div>
+                                  {q.estimated_date && (
+                                    <div
+                                      className="text-[10px] font-bold text-slate-500 bg-slate-100 rounded px-1.5 py-0.5 mt-1 inline-block"
+                                      title="Fecha Tentativa del Evento"
+                                    >
+                                      📅{" "}
+                                      {new Date(q.estimated_date).toLocaleDateString("es-MX", {
+                                        day: "numeric",
+                                        month: "short",
+                                      })}
+                                    </div>
+                                  )}
+                                </td>
 
-                                {/* Especificaciones del Pedido */}
-                                <div className="space-y-2">
-                                  <h4 className="font-bold text-navy text-xs uppercase tracking-wider">Detalles del Paquete</h4>
-                                  <div className="space-y-1 text-xs">
-                                    <p><span className="text-muted-foreground">Paquete:</span> <span className="font-semibold text-foreground">{packageLabel(q.package_kind, q.package_variant, q.school_level)}</span></p>
-                                    {q.discount_percent !== undefined && q.discount_percent > 0 ? (
-                                      <>
-                                        <p><span className="text-muted-foreground">Precio Lista:</span> <span className="font-semibold text-muted-foreground line-through">{formatMXN(q.original_unit_price || q.unit_price)}</span></p>
-                                        <p><span className="text-muted-foreground">Descuento:</span> <span className="font-bold text-[#C5A85A]">-{q.discount_percent}%</span></p>
-                                        <p><span className="text-muted-foreground">Precio Neto:</span> <span className="font-bold text-navy">{formatMXN(q.unit_price)}</span></p>
-                                      </>
-                                    ) : (
-                                      <p><span className="text-muted-foreground">Precio Unitario:</span> <span className="font-semibold text-foreground">{formatMXN(q.unit_price)}</span></p>
+                                {/* Escuela / Solicitante */}
+                                <td className="py-4.5 px-6">
+                                  <div className="font-semibold text-foreground truncate max-w-[220px]">
+                                    {q.institution_name}
+                                  </div>
+                                  {q.institution_address && (
+                                    <div className="text-[10px] text-muted-foreground truncate max-w-[220px] mb-1">
+                                      📍 {q.institution_address}
+                                    </div>
+                                  )}
+                                  <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-[220px] font-medium">
+                                    👤 {q.contact_name}
+                                  </div>
+                                  <div className="text-[11px] text-[#C5A85A] font-bold mt-1.5 truncate max-w-[220px]">
+                                    📦{" "}
+                                    {packageLabel(
+                                      q.package_kind,
+                                      q.package_variant,
+                                      q.school_level,
                                     )}
-                                    <p><span className="text-muted-foreground">Cantidad:</span> <span className="font-semibold text-foreground">{q.student_count} togas/birretes</span></p>
                                   </div>
-                                </div>
+                                </td>
 
-                                {/* Colores de Graduación */}
-                                <div className="space-y-2">
-                                  <h4 className="font-bold text-navy text-xs uppercase tracking-wider">Colores Seleccionados</h4>
-                                  <div className="space-y-1 text-xs">
-                                    <p><span className="text-muted-foreground">Color Toga:</span> <span className="font-semibold text-foreground uppercase tracking-wide">{q.toga_color || "Predeterminado"}</span></p>
-                                    <p><span className="text-muted-foreground">Color Estola:</span> <span className="font-semibold text-foreground uppercase tracking-wide">{q.stola_color || "Predeterminado"}</span></p>
-                                    {q.package_kind === "A" && <p className="text-muted-foreground/60 italic text-[11px]">* Paquete A incluye Toga y Estola Lisa por defecto.</p>}
+                                {/* Modalidad / Sede */}
+                                <td className="py-4.5 px-6">
+                                  <div className="flex items-center gap-1.5">
+                                    <span
+                                      className={cn(
+                                        "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                                        q.service_option === "renta"
+                                          ? "bg-blue-100 text-blue-800"
+                                          : "bg-amber-100 text-amber-800",
+                                      )}
+                                    >
+                                      {q.service_option === "renta" ? "Renta" : "Venta"}
+                                    </span>
+                                    {q.service_option === "renta" && q.city && (
+                                      <span className="text-xs text-muted-foreground font-medium">
+                                        {q.city === "tijuana" ? "Tijuana" : "Ensenada"}
+                                      </span>
+                                    )}
                                   </div>
-                                </div>
-                              </div>
+                                  <div className="text-xs text-muted-foreground mt-1 font-medium">
+                                    {levelLabel(q.school_level)}
+                                  </div>
+                                </td>
 
-                              {/* 📅 Event Countdown and Logistics Timeline */}
-                              {(() => {
-                                const createdDate = new Date(q.created_at);
-                                createdDate.setHours(0,0,0,0);
-                                
-                                const today = new Date();
-                                today.setHours(0,0,0,0);
-                                
-                                if (!q.estimated_date) {
-                                  return (
-                                    <>
-                                      <div className="border-t border-hairline my-5" />
-                                      <div className="flex items-center gap-3 bg-slate-50 border border-slate-200/60 p-4.5 rounded-xl">
-                                        <AlertTriangle className="h-5 w-5 text-slate-400 shrink-0" />
-                                        <div>
-                                          <h5 className="font-bold text-navy text-xs uppercase tracking-wider">Seguimiento de Logística</h5>
-                                          <p className="text-xs text-muted-foreground mt-0.5">
-                                            Sin fecha estimada de evento definida. Por favor contacte al cliente para establecer la fecha de graduación y coordinar la entrega.
+                                {/* Alumnos */}
+                                <td className="py-4.5 px-6 text-center font-semibold tabular-nums text-foreground">
+                                  {q.student_count}
+                                </td>
+
+                                {/* Total */}
+                                <td className="py-4.5 px-6 text-right font-bold text-navy tabular-nums">
+                                  <div>{formatMXN(q.total_price)}</div>
+                                  {q.discount_percent !== undefined && q.discount_percent > 0 && (
+                                    <span className="inline-block text-[9px] font-bold text-[#C5A85A] bg-[#C5A85A]/10 px-1.5 py-0.5 rounded-md mt-0.5 tracking-wider select-none">
+                                      -{q.discount_percent}% DTO
+                                    </span>
+                                  )}
+                                </td>
+
+                                {/* Estado (CRM) */}
+                                <td
+                                  className="py-4.5 px-6 text-center select-none"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {(() => {
+                                    const curStatus = q.status || "pending";
+                                    const configs: Record<string, { label: string; cls: string }> =
+                                      {
+                                        pending: {
+                                          label: "Pendiente 🟡",
+                                          cls: "bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-100/70",
+                                        },
+                                        contacted: {
+                                          label: "Contactado 🔵",
+                                          cls: "bg-blue-50 text-blue-700 border-blue-200/50 hover:bg-blue-100/70",
+                                        },
+                                        contracted: {
+                                          label: "Contratado 🟢",
+                                          cls: "bg-emerald-50 text-emerald-700 border-emerald-200/50 hover:bg-emerald-100/70",
+                                        },
+                                        archived: {
+                                          label: "Archivado ⚫",
+                                          cls: "bg-slate-50 text-slate-600 border-slate-200/50 hover:bg-slate-100/70",
+                                        },
+                                      };
+                                    const cfg = configs[curStatus] || configs.pending;
+                                    return (
+                                      <div className="relative inline-flex items-center justify-center">
+                                        <select
+                                          value={curStatus}
+                                          disabled={updatingStatusId === q.id}
+                                          onChange={(e) => handleUpdateStatus(q.id, e.target.value)}
+                                          className={cn(
+                                            "appearance-none inline-flex items-center justify-center rounded-full pl-3.5 pr-7.5 py-1.5 text-xs font-bold border leading-none tracking-wide transition-all shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-navy/20",
+                                            cfg.cls,
+                                          )}
+                                        >
+                                          <option
+                                            value="pending"
+                                            className="bg-white text-amber-700 font-bold"
+                                          >
+                                            Pendiente 🟡
+                                          </option>
+                                          <option
+                                            value="contacted"
+                                            className="bg-white text-blue-700 font-bold"
+                                          >
+                                            Contactado 🔵
+                                          </option>
+                                          <option
+                                            value="contracted"
+                                            className="bg-white text-emerald-700 font-bold"
+                                          >
+                                            Contratado 🟢
+                                          </option>
+                                          <option
+                                            value="archived"
+                                            className="bg-white text-slate-600 font-bold"
+                                          >
+                                            Archivado ⚫
+                                          </option>
+                                        </select>
+                                        {updatingStatusId === q.id ? (
+                                          <RefreshCw className="absolute right-2.5 h-3 w-3 animate-spin text-navy" />
+                                        ) : (
+                                          <span className="absolute right-2.5 pointer-events-none text-[8px] font-extrabold opacity-70">
+                                            ▼
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
+                                </td>
+
+                                {/* Acciones */}
+                                <td
+                                  className="py-4.5 px-6 text-center"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <div className="flex items-center justify-center gap-2">
+                                    <button
+                                      onClick={() =>
+                                        generateQuotePDF({
+                                          level: q.school_level as any,
+                                          city: q.city as any,
+                                          pkg: {
+                                            kind: q.package_kind as any,
+                                            variant: q.package_variant as any,
+                                          },
+                                          quantity: q.student_count,
+                                          school: q.institution_name,
+                                          contact: q.contact_name,
+                                          phone: q.contact_phone,
+                                          date: q.estimated_date || "",
+                                          email: q.contact_email || "",
+                                          quoteNumber: q.quote_number,
+                                          togaColor: q.toga_color || undefined,
+                                          stolaColor: q.stola_color || undefined,
+                                        })
+                                      }
+                                      className="p-2 bg-navy/5 text-navy hover:bg-navy/15 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
+                                      title="Descargar PDF de la Cotización"
+                                    >
+                                      <Download className="h-4 w-4" />
+                                    </button>
+
+                                    <a
+                                      href={getWhatsAppLink(q)}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="p-2 bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
+                                      title="Hacer seguimiento por WhatsApp"
+                                    >
+                                      <MessageSquare className="h-4 w-4" />
+                                    </a>
+                                  </div>
+                                </td>
+                              </tr>
+
+                              {/* Expanded Details Row */}
+                              {isExpanded && (
+                                <tr className="bg-cream/15">
+                                  <td
+                                    colSpan={7}
+                                    className="py-6 px-8 border-t border-b border-hairline/80"
+                                  >
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                                      {/* Datos de Contacto */}
+                                      <div className="space-y-2">
+                                        <h4 className="font-bold text-navy text-xs uppercase tracking-wider">
+                                          Contacto Completo
+                                        </h4>
+                                        <div className="space-y-1 text-xs">
+                                          <p>
+                                            <span className="text-muted-foreground">Teléfono:</span>{" "}
+                                            <span className="font-semibold text-foreground">
+                                              {q.contact_phone}
+                                            </span>
+                                          </p>
+                                          <p>
+                                            <span className="text-muted-foreground">Email:</span>{" "}
+                                            <span className="font-semibold text-foreground">
+                                              {q.contact_email || "No provisto"}
+                                            </span>
+                                          </p>
+                                          <p>
+                                            <span className="text-muted-foreground">
+                                              Fecha Estimada:
+                                            </span>{" "}
+                                            <span className="font-semibold text-foreground">
+                                              {q.estimated_date
+                                                ? new Date(q.estimated_date).toLocaleDateString(
+                                                    "es-MX",
+                                                    {
+                                                      day: "numeric",
+                                                      month: "long",
+                                                      year: "numeric",
+                                                    },
+                                                  )
+                                                : "Por definir"}
+                                            </span>
                                           </p>
                                         </div>
                                       </div>
-                                    </>
-                                  );
-                                }
-                                
-                                const estDate = new Date(q.estimated_date);
-                                estDate.setHours(0,0,0,0);
-                                
-                                const totalDays = Math.max(1, Math.ceil((estDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24)));
-                                const daysElapsed = Math.max(0, Math.ceil((today.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24)));
-                                const daysRemaining = Math.ceil((estDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                                const progressPercent = Math.min(100, Math.max(0, (daysElapsed / totalDays) * 100));
-                                
-                                // Determine styling based on remaining time
-                                let statusColor = "bg-navy text-navy";
-                                let bgAlert = "bg-[#1E2346]/5 border-[#1E2346]/15";
-                                let badgeText = "";
-                                let badgeCls = "";
-                                let iconElement = <Clock className="h-5 w-5 text-[#1E2346]" />;
-                                
-                                if (daysRemaining < 0) {
-                                  statusColor = "bg-slate-400";
-                                  bgAlert = "bg-slate-50 border-slate-200";
-                                  badgeText = `🎉 Evento Concluido (hace ${Math.abs(daysRemaining)} días)`;
-                                  badgeCls = "bg-slate-100 text-slate-700 border-slate-300";
-                                  iconElement = <span className="text-xl">🎉</span>;
-                                } else if (daysRemaining === 0) {
-                                  statusColor = "bg-red-500 animate-pulse";
-                                  bgAlert = "bg-red-50 border-red-200 animate-pulse-slow";
-                                  badgeText = "🚨 ¡EL EVENTO ES HOY!";
-                                  badgeCls = "bg-red-100 text-red-700 border-red-300 font-extrabold animate-pulse";
-                                  iconElement = <AlertTriangle className="h-5 w-5 text-red-600 shrink-0" />;
-                                } else if (daysRemaining <= 30) {
-                                  statusColor = "bg-amber-500";
-                                  bgAlert = "bg-amber-50/50 border-amber-200";
-                                  badgeText = `⚠️ Evento Próximo (Faltan ${daysRemaining} días)`;
-                                  badgeCls = "bg-amber-100 text-amber-800 border-amber-300 font-bold";
-                                  iconElement = <Truck className="h-5 w-5 text-amber-600 shrink-0" />;
-                                } else {
-                                  statusColor = "bg-[#C5A85A]";
-                                  bgAlert = "bg-[#C5A85A]/5 border-[#C5A85A]/15";
-                                  badgeText = `📅 En Agenda (Faltan ${daysRemaining} días)`;
-                                  badgeCls = "bg-[#C5A85A]/15 text-[#8c712b] border-[#C5A85A]/30 font-semibold";
-                                  iconElement = <Calendar className="h-5 w-5 text-[#C5A85A] shrink-0" />;
-                                }
-                                
-                                return (
-                                  <>
-                                    <div className="border-t border-hairline my-5" />
-                                    <div className={cn("border p-5 rounded-2xl flex flex-col md:flex-row gap-5 items-start md:items-center shadow-sm", bgAlert)}>
-                                      {/* Icon Badge */}
-                                      <div className="flex-shrink-0 flex items-center justify-center h-11 w-11 rounded-2xl bg-white border border-hairline shadow-sm">
-                                        {iconElement}
-                                      </div>
-                                      
-                                      {/* Timeline Progression */}
-                                      <div className="flex-1 w-full space-y-2.5">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-                                          <h5 className="font-bold text-navy text-xs uppercase tracking-wider">
-                                            Seguimiento y Línea de Tiempo del Evento
-                                          </h5>
-                                          <span className={cn("text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full border", badgeCls)}>
-                                            {badgeText}
-                                          </span>
-                                        </div>
-                                        
-                                        {/* Gown & Delivery details text */}
-                                        <p className="text-xs text-muted-foreground leading-relaxed">
-                                          {daysRemaining >= 0 ? (
-                                            <>
-                                              Esta cotización para <span className="font-semibold text-foreground">{q.student_count} alumnos</span> tiene programada su ceremonia el día <span className="font-bold text-navy">{new Date(q.estimated_date).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</span>. 
-                                              {daysRemaining <= 30 && q.status !== "contracted" && (
-                                                <span className="font-bold text-amber-700"> ¡Recomendamos agilizar el contacto para asegurar stock disponible!</span>
+
+                                      {/* Especificaciones del Pedido */}
+                                      <div className="space-y-2">
+                                        <h4 className="font-bold text-navy text-xs uppercase tracking-wider">
+                                          Detalles del Paquete
+                                        </h4>
+                                        <div className="space-y-1 text-xs">
+                                          <p>
+                                            <span className="text-muted-foreground">Paquete:</span>{" "}
+                                            <span className="font-semibold text-foreground">
+                                              {packageLabel(
+                                                q.package_kind,
+                                                q.package_variant,
+                                                q.school_level,
                                               )}
+                                            </span>
+                                          </p>
+                                          {q.discount_percent !== undefined &&
+                                          q.discount_percent > 0 ? (
+                                            <>
+                                              <p>
+                                                <span className="text-muted-foreground">
+                                                  Precio Lista:
+                                                </span>{" "}
+                                                <span className="font-semibold text-muted-foreground line-through">
+                                                  {formatMXN(q.original_unit_price || q.unit_price)}
+                                                </span>
+                                              </p>
+                                              <p>
+                                                <span className="text-muted-foreground">
+                                                  Descuento:
+                                                </span>{" "}
+                                                <span className="font-bold text-[#C5A85A]">
+                                                  -{q.discount_percent}%
+                                                </span>
+                                              </p>
+                                              <p>
+                                                <span className="text-muted-foreground">
+                                                  Precio Neto:
+                                                </span>{" "}
+                                                <span className="font-bold text-navy">
+                                                  {formatMXN(q.unit_price)}
+                                                </span>
+                                              </p>
                                             </>
                                           ) : (
-                                            <>
-                                              La ceremonia de graduación de esta escuela se llevó a cabo el día <span className="font-semibold text-foreground">{new Date(q.estimated_date).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</span>.
-                                            </>
+                                            <p>
+                                              <span className="text-muted-foreground">
+                                                Precio Unitario:
+                                              </span>{" "}
+                                              <span className="font-semibold text-foreground">
+                                                {formatMXN(q.unit_price)}
+                                              </span>
+                                            </p>
                                           )}
-                                        </p>
-                                        
-                                        {/* Progress Bar Element */}
-                                        <div className="space-y-1">
-                                          <div className="relative h-2 w-full bg-white border border-hairline rounded-full overflow-hidden shadow-inner">
-                                            <div 
-                                              className={cn("absolute top-0 left-0 h-full rounded-full transition-all duration-500", statusColor)}
-                                              style={{ width: `${progressPercent}%` }}
-                                            />
-                                          </div>
-                                          <div className="flex justify-between text-[9px] text-muted-foreground font-semibold uppercase tracking-wider select-none">
-                                            <span>Creado ({createdDate.toLocaleDateString("es-MX", { day: "numeric", month: "short" })})</span>
-                                            {daysRemaining >= 0 && daysRemaining < totalDays && (
-                                              <span className="text-navy font-bold">Hoy</span>
-                                            )}
-                                            <span>Graduación ({estDate.toLocaleDateString("es-MX", { day: "numeric", month: "short" })})</span>
-                                          </div>
+                                          <p>
+                                            <span className="text-muted-foreground">Cantidad:</span>{" "}
+                                            <span className="font-semibold text-foreground">
+                                              {q.student_count} togas/birretes
+                                            </span>
+                                          </p>
+                                        </div>
+                                      </div>
+
+                                      {/* Colores de Graduación */}
+                                      <div className="space-y-2">
+                                        <h4 className="font-bold text-navy text-xs uppercase tracking-wider">
+                                          Colores Seleccionados
+                                        </h4>
+                                        <div className="space-y-1 text-xs">
+                                          <p>
+                                            <span className="text-muted-foreground">
+                                              Color Toga:
+                                            </span>{" "}
+                                            <span className="font-semibold text-foreground uppercase tracking-wide">
+                                              {q.toga_color || "Predeterminado"}
+                                            </span>
+                                          </p>
+                                          <p>
+                                            <span className="text-muted-foreground">
+                                              Color Estola:
+                                            </span>{" "}
+                                            <span className="font-semibold text-foreground uppercase tracking-wide">
+                                              {q.stola_color || "Predeterminado"}
+                                            </span>
+                                          </p>
+                                          {q.package_kind === "A" && (
+                                            <p className="text-muted-foreground/60 italic text-[11px]">
+                                              * Paquete A incluye Toga y Estola Lisa por defecto.
+                                            </p>
+                                          )}
                                         </div>
                                       </div>
                                     </div>
-                                  </>
-                                );
-                              })()}
-                            </td>
-                          </tr>
-                        )}
-                      </>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
 
-            {/* Premium Pagination Control Footer */}
-            {filteredQuotes.length > 0 && (
-              <div className="bg-white border-x border-b border-hairline/80 px-6 py-4.5 rounded-b-2xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 -mt-6 z-10 relative">
-                {/* Rows per page selector */}
-                <div className="flex items-center gap-2.5 text-xs text-[#1E2346] font-medium order-2 sm:order-1">
-                  <span className="text-muted-foreground">Filas por página:</span>
-                  <div className="relative">
-                    <select
-                      value={rowsPerPage}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setRowsPerPage(val === 'all' ? 'all' : parseInt(val));
-                        setCurrentPage(1);
-                      }}
-                      className="bg-cream/10 hover:bg-cream/20 border border-hairline rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-navy font-bold text-navy cursor-pointer appearance-none pr-8"
-                    >
-                      <option value={10}>10 por página</option>
-                      <option value={25}>25 por página</option>
-                      <option value={50}>50 por página</option>
-                      <option value="all">Ver Todas</option>
-                    </select>
-                    <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-navy text-[8px] font-bold">▼</span>
-                  </div>
-                </div>
+                                    {/* 📅 Event Countdown and Logistics Timeline */}
+                                    {(() => {
+                                      const createdDate = new Date(q.created_at);
+                                      createdDate.setHours(0, 0, 0, 0);
 
-                {/* Showing Range status */}
-                <div className="text-xs text-muted-foreground font-medium order-1 sm:order-2">
-                  Mostrando <span className="font-bold text-navy">{Math.min((currentPage - 1) * (rowsPerPage === 'all' ? filteredQuotes.length : rowsPerPage) + 1, filteredQuotes.length)}</span> – <span className="font-bold text-navy">{Math.min(currentPage * (rowsPerPage === 'all' ? filteredQuotes.length : rowsPerPage), filteredQuotes.length)}</span> de <span className="font-bold text-navy">{filteredQuotes.length}</span> cotizaciones
-                </div>
+                                      const today = new Date();
+                                      today.setHours(0, 0, 0, 0);
 
-                {/* Navigation controls */}
-                <div className="flex items-center gap-1.5 order-3">
-                  <button
-                    type="button"
-                    disabled={currentPage === 1 || rowsPerPage === 'all'}
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    className="px-3 py-1.5 rounded-lg border border-hairline hover:bg-cream/10 active:scale-[0.96] disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100 transition-all text-xs font-bold text-navy cursor-pointer"
-                  >
-                    Anterior
-                  </button>
+                                      if (!q.estimated_date) {
+                                        return (
+                                          <>
+                                            <div className="border-t border-hairline my-5" />
+                                            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200/60 p-4.5 rounded-xl">
+                                              <AlertTriangle className="h-5 w-5 text-slate-400 shrink-0" />
+                                              <div>
+                                                <h5 className="font-bold text-navy text-xs uppercase tracking-wider">
+                                                  Seguimiento de Logística
+                                                </h5>
+                                                <p className="text-xs text-muted-foreground mt-0.5">
+                                                  Sin fecha estimada de evento definida. Por favor
+                                                  contacte al cliente para establecer la fecha de
+                                                  graduación y coordinar la entrega.
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </>
+                                        );
+                                      }
 
-                  {rowsPerPage !== 'all' && Array.from({ length: totalPages }).map((_, i) => {
-                    const pageNum = i + 1;
-                    // Render page numbers or ellipses
-                    if (totalPages > 6 && Math.abs(currentPage - pageNum) > 1 && pageNum !== 1 && pageNum !== totalPages) {
-                      if (pageNum === 2 || pageNum === totalPages - 1) {
-                        return <span key={pageNum} className="px-1 text-muted-foreground text-xs font-semibold">...</span>;
-                      }
-                      return null;
-                    }
-                    return (
-                      <button
-                        type="button"
-                        key={pageNum}
-                        onClick={() => setCurrentPage(pageNum)}
-                        className={cn(
-                          "h-8 w-8 rounded-lg text-xs font-extrabold transition-all cursor-pointer",
-                          currentPage === pageNum
-                            ? "bg-[#1E2346] text-white shadow-md shadow-navy/10"
-                            : "border border-hairline hover:bg-cream/10 text-navy"
-                        )}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
+                                      const estDate = new Date(q.estimated_date);
+                                      estDate.setHours(0, 0, 0, 0);
 
-                  <button
-                    type="button"
-                    disabled={currentPage === totalPages || rowsPerPage === 'all'}
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    className="px-3 py-1.5 rounded-lg border border-hairline hover:bg-cream/10 active:scale-[0.96] disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100 transition-all text-xs font-bold text-navy cursor-pointer"
-                  >
-                    Siguiente
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </section>
-    </div>
-  )}
+                                      const totalDays = Math.max(
+                                        1,
+                                        Math.ceil(
+                                          (estDate.getTime() - createdDate.getTime()) /
+                                            (1000 * 60 * 60 * 24),
+                                        ),
+                                      );
+                                      const daysElapsed = Math.max(
+                                        0,
+                                        Math.ceil(
+                                          (today.getTime() - createdDate.getTime()) /
+                                            (1000 * 60 * 60 * 24),
+                                        ),
+                                      );
+                                      const daysRemaining = Math.ceil(
+                                        (estDate.getTime() - today.getTime()) /
+                                          (1000 * 60 * 60 * 24),
+                                      );
+                                      const progressPercent = Math.min(
+                                        100,
+                                        Math.max(0, (daysElapsed / totalDays) * 100),
+                                      );
 
-    {activeTab === 'stats' && (
-      <div className="space-y-8 animate-fadeIn">
-        {/* Metric Cards Row */}
-        {renderMetricCards()}
+                                      // Determine styling based on remaining time
+                                      let statusColor = "bg-navy text-navy";
+                                      let bgAlert = "bg-[#1E2346]/5 border-[#1E2346]/15";
+                                      let badgeText = "";
+                                      let badgeCls = "";
+                                      let iconElement = (
+                                        <Clock className="h-5 w-5 text-[#1E2346]" />
+                                      );
 
-        {/* Charts Row */}
-        {filteredQuotes.length > 0 ? (
-          <div className="space-y-6">
-            {/* Row 1: Core Distribution */}
-            <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Levels Distribution Chart */}
-              <div className="bg-white border border-hairline rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                <div>
-                  <h3 className="font-display text-base text-navy font-bold flex items-center gap-2">
-                    <span>🏫</span> Demanda por Nivel Escolar
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5 mb-6">Participación de mercado por niveles educativos cotizados.</p>
-                </div>
-                <div className="h-[280px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={levelChartData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={90}
-                        paddingAngle={3}
-                        dataKey="value"
-                      >
-                        {levelChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={CHART_PIE_COLORS[index % CHART_PIE_COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{ background: "#1E2346", borderRadius: "8px", color: "#FFFFFF", border: "none" }} 
-                        itemStyle={{ color: "#FFFFFF" }}
-                      />
-                      <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
+                                      if (daysRemaining < 0) {
+                                        statusColor = "bg-slate-400";
+                                        bgAlert = "bg-slate-50 border-slate-200";
+                                        badgeText = `🎉 Evento Concluido (hace ${Math.abs(daysRemaining)} días)`;
+                                        badgeCls = "bg-slate-100 text-slate-700 border-slate-300";
+                                        iconElement = <span className="text-xl">🎉</span>;
+                                      } else if (daysRemaining === 0) {
+                                        statusColor = "bg-red-500 animate-pulse";
+                                        bgAlert = "bg-red-50 border-red-200 animate-pulse-slow";
+                                        badgeText = "🚨 ¡EL EVENTO ES HOY!";
+                                        badgeCls =
+                                          "bg-red-100 text-red-700 border-red-300 font-extrabold animate-pulse";
+                                        iconElement = (
+                                          <AlertTriangle className="h-5 w-5 text-red-600 shrink-0" />
+                                        );
+                                      } else if (daysRemaining <= 30) {
+                                        statusColor = "bg-amber-500";
+                                        bgAlert = "bg-amber-50/50 border-amber-200";
+                                        badgeText = `⚠️ Evento Próximo (Faltan ${daysRemaining} días)`;
+                                        badgeCls =
+                                          "bg-amber-100 text-amber-800 border-amber-300 font-bold";
+                                        iconElement = (
+                                          <Truck className="h-5 w-5 text-amber-600 shrink-0" />
+                                        );
+                                      } else {
+                                        statusColor = "bg-[#C5A85A]";
+                                        bgAlert = "bg-[#C5A85A]/5 border-[#C5A85A]/15";
+                                        badgeText = `📅 En Agenda (Faltan ${daysRemaining} días)`;
+                                        badgeCls =
+                                          "bg-[#C5A85A]/15 text-[#8c712b] border-[#C5A85A]/30 font-semibold";
+                                        iconElement = (
+                                          <Calendar className="h-5 w-5 text-[#C5A85A] shrink-0" />
+                                        );
+                                      }
 
-              {/* Service Distribution Chart */}
-              <div className="bg-white border border-hairline rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                <div>
-                  <h3 className="font-display text-base text-navy font-bold flex items-center gap-2">
-                    <span>🔄</span> Distribución Renta vs Venta
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5 mb-6">Comparativa de cotizaciones según modalidad comercial elegida.</p>
-                </div>
-                <div className="h-[280px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={serviceChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <XAxis dataKey="name" stroke="#64748B" strokeWidth={0.5} style={{ fontSize: "11px" }} />
-                      <YAxis stroke="#64748B" strokeWidth={0.5} style={{ fontSize: "11px" }} />
-                      <Tooltip 
-                        cursor={{ fill: "rgba(30, 35, 70, 0.02)" }}
-                        contentStyle={{ background: "#1E2346", borderRadius: "8px", color: "#FFFFFF", border: "none" }} 
-                        itemStyle={{ color: "#FFFFFF" }}
-                      />
-                      <Bar dataKey="Cotizaciones" fill="#1E2346" radius={[8, 8, 0, 0]}>
-                        <Cell fill="#1E2346" />
-                        <Cell fill="#C5A85A" />
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </section>
+                                      return (
+                                        <>
+                                          <div className="border-t border-hairline my-5" />
+                                          <div
+                                            className={cn(
+                                              "border p-5 rounded-2xl flex flex-col md:flex-row gap-5 items-start md:items-center shadow-sm",
+                                              bgAlert,
+                                            )}
+                                          >
+                                            {/* Icon Badge */}
+                                            <div className="flex-shrink-0 flex items-center justify-center h-11 w-11 rounded-2xl bg-white border border-hairline shadow-sm">
+                                              {iconElement}
+                                            </div>
 
-            {/* Row 2: Predictive & Logistics Insights */}
-            <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Event demand logistics timeline */}
-              <div className="bg-white border border-hairline rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                <div>
-                  <h3 className="font-display text-base text-navy font-bold flex items-center gap-2">
-                    <span>📅</span> Proyección de Demanda Logística Mensual (Picos)
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5 mb-6">Togas totales requeridas en el calendario según la fecha de graduación de los eventos cotizados.</p>
-                </div>
-                <div className="h-[280px]">
-                  {eventTimelineData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={eventTimelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <XAxis dataKey="month" stroke="#64748B" strokeWidth={0.5} style={{ fontSize: "10px" }} />
-                        <YAxis stroke="#64748B" strokeWidth={0.5} style={{ fontSize: "11px" }} />
-                        <Tooltip 
-                          cursor={{ fill: "rgba(30, 35, 70, 0.02)" }}
-                          contentStyle={{ background: "#1E2346", borderRadius: "8px", color: "#FFFFFF", border: "none" }} 
-                          itemStyle={{ color: "#FFFFFF" }}
-                        />
-                        <Bar dataKey="Togas" fill="#C5A85A" name="Togas Requeridas" radius={[8, 8, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-xs text-muted-foreground italic">
-                      Ingresa fechas de eventos en tus cotizaciones para visualizar esta proyección.
-                    </div>
-                  )}
-                </div>
-              </div>
+                                            {/* Timeline Progression */}
+                                            <div className="flex-1 w-full space-y-2.5">
+                                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                                                <h5 className="font-bold text-navy text-xs uppercase tracking-wider">
+                                                  Seguimiento y Línea de Tiempo del Evento
+                                                </h5>
+                                                <span
+                                                  className={cn(
+                                                    "text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full border",
+                                                    badgeCls,
+                                                  )}
+                                                >
+                                                  {badgeText}
+                                                </span>
+                                              </div>
 
-              {/* Manufacturing Color popularity trend */}
-              <div className="bg-white border border-hairline rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                <div>
-                  <h3 className="font-display text-base text-navy font-bold flex items-center gap-2">
-                    <span>🎨</span> Tendencia de Colores Solicitados (Textil & Stock)
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5 mb-6">Ranking del volumen de togas requeridas por color para planificar compras de telas e insumos.</p>
-                </div>
-                <div className="h-[280px]">
-                  {colorChartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart 
-                        data={colorChartData} 
-                        layout="vertical"
-                        margin={{ top: 10, right: 20, left: 10, bottom: 5 }}
-                      >
-                        <XAxis type="number" stroke="#64748B" strokeWidth={0.5} style={{ fontSize: "10px" }} />
-                        <YAxis 
-                          type="category" 
-                          dataKey="name" 
-                          stroke="#64748B" 
-                          strokeWidth={0.5} 
-                          style={{ fontSize: "10px" }}
-                          width={95}
-                        />
-                        <Tooltip 
-                          contentStyle={{ background: "#1E2346", borderRadius: "8px", color: "#FFFFFF", border: "none" }} 
-                          itemStyle={{ color: "#FFFFFF" }}
-                        />
-                        <Bar dataKey="Togas" fill="#1E2346" name="Togas" radius={[0, 6, 6, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-xs text-muted-foreground italic">
-                      No hay información de colores disponible.
-                    </div>
-                  )}
-                </div>
-              </div>
-            </section>
-          </div>
-        ) : (
-          <div className="bg-white border border-hairline rounded-2xl p-12 text-center text-muted-foreground shadow-sm">
-            <p className="text-sm">No hay suficientes cotizaciones con los filtros seleccionados para generar análisis estadístico.</p>
-          </div>
-        )}
-      </div>
-    )}
+                                              {/* Gown & Delivery details text */}
+                                              <p className="text-xs text-muted-foreground leading-relaxed">
+                                                {daysRemaining >= 0 ? (
+                                                  <>
+                                                    Esta cotización para{" "}
+                                                    <span className="font-semibold text-foreground">
+                                                      {q.student_count} alumnos
+                                                    </span>{" "}
+                                                    tiene programada su ceremonia el día{" "}
+                                                    <span className="font-bold text-navy">
+                                                      {new Date(
+                                                        q.estimated_date,
+                                                      ).toLocaleDateString("es-MX", {
+                                                        day: "numeric",
+                                                        month: "long",
+                                                        year: "numeric",
+                                                      })}
+                                                    </span>
+                                                    .
+                                                    {daysRemaining <= 30 &&
+                                                      q.status !== "contracted" && (
+                                                        <span className="font-bold text-amber-700">
+                                                          {" "}
+                                                          ¡Recomendamos agilizar el contacto para
+                                                          asegurar stock disponible!
+                                                        </span>
+                                                      )}
+                                                  </>
+                                                ) : (
+                                                  <>
+                                                    La ceremonia de graduación de esta escuela se
+                                                    llevó a cabo el día{" "}
+                                                    <span className="font-semibold text-foreground">
+                                                      {new Date(
+                                                        q.estimated_date,
+                                                      ).toLocaleDateString("es-MX", {
+                                                        day: "numeric",
+                                                        month: "long",
+                                                        year: "numeric",
+                                                      })}
+                                                    </span>
+                                                    .
+                                                  </>
+                                                )}
+                                              </p>
 
-    {activeTab === 'pricing' && (
-      /* ========================================================================= */
-      /* EDITOR DE PRECIOS Y DESCUENTOS DINÁMICOS                                   */
-      /* ========================================================================= */
-      <section className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-hairline/80 pb-4">
-          <div>
-            <h2 className="font-display text-2xl font-bold text-navy">Gestión de Tarifas y Descuentos</h2>
-            <p className="text-xs text-muted-foreground mt-0.5 font-medium">Modifica los precios unitarios base y define descuentos promocionales para cada paquete en caliente.</p>
-          </div>
-          <button
-            onClick={fetchPricing}
-            className="inline-flex items-center gap-2 border border-hairline hover:bg-cream/40 text-navy font-bold text-xs px-4 py-2.5 rounded-full transition-all active:scale-[0.98] cursor-pointer"
-            title="Recargar tarifas de la base de datos"
-          >
-            <RefreshCw className={cn("h-3.5 w-3.5", loadingPricing && "animate-spin")} />
-            Recargar Tarifas
-          </button>
-        </div>
-
-        {pricingMessage && (
-          <div
-            className={cn(
-              "flex items-center gap-3 py-3.5 px-5 rounded-2xl border text-xs font-bold transition-all animate-pulse shadow-sm",
-              pricingMessage.type === "success"
-                ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                : "bg-red-50 text-red-800 border-red-200"
-            )}
-          >
-            <div className={cn("h-2 w-2 rounded-full shrink-0", pricingMessage.type === "success" ? "bg-emerald-500" : "bg-red-500")} />
-            {pricingMessage.text}
-          </div>
-        )}
-
-        {/* Dynamic Level Segmented Pill Selector (High-End UX/UI) */}
-        <div className="bg-white p-2 rounded-2xl border border-hairline shadow-sm flex flex-wrap gap-1.5">
-          {[
-            { id: "all", label: "Todos los Niveles 🌐" },
-            { id: "preescolar", label: "Preescolar 👶" },
-            { id: "primaria", label: "Primaria 🎒" },
-            { id: "secundaria", label: "Secundaria 📚" },
-            { id: "preparatoria", label: "Preparatoria 🎓" },
-            { id: "universidad", label: "Universidad 🏛️" }
-          ].map((lvl) => {
-            const isSelected = pricingFilterLevel === lvl.id;
-            return (
-              <button
-                key={lvl.id}
-                type="button"
-                onClick={() => setPricingFilterLevel(lvl.id)}
-                className={cn(
-                  "px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer select-none active:scale-[0.98]",
-                  isSelected
-                    ? "bg-[#1E2346] text-white shadow-sm font-extrabold"
-                    : "text-muted-foreground hover:text-[#1E2346] hover:bg-cream/40 bg-transparent"
-                )}
-              >
-                {lvl.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {loadingPricing ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-hairline shadow-sm space-y-4">
-            <RefreshCw className="h-8 w-8 text-navy animate-spin" />
-            <p className="text-sm font-semibold text-muted-foreground">Sincronizando tarifas con Supabase...</p>
-          </div>
-        ) : (
-          <form onSubmit={handleSavePricing} className="space-y-6">
-            {/* Main pricing list container */}
-            <div className="bg-white rounded-2xl border border-hairline shadow-sm overflow-hidden divide-y divide-hairline">
-              {(() => {
-                // Static package metadata with school levels mapping
-                const pricingMeta = [
-                  // Preescolar (desacoplado)
-                  { key: "A_PREESCOLAR", title: "Paquete A — Básico (Preescolar)", desc: "Toga y Estola Lisa estándar para ceremonias tradicionales de Preescolar.", levels: ["preescolar"] },
-                  { key: "B_ESENCIAL_PREESCOLAR", title: "Paquete B — Esencial (Preescolar)", desc: "Estola con diseño compacto 9x12 cm en ambos lados (B.1) para Preescolar.", levels: ["preescolar"] },
-                  { key: "B_BALANCE_PREESCOLAR", title: "Paquete B — Balance (Preescolar)", desc: "Estola con logo e impresión mixta mediana (B.2) para Preescolar.", levels: ["preescolar"] },
-                  { key: "B_PREMIUM_PREESCOLAR", title: "Paquete B — Premium (Preescolar)", desc: "Estola con logo e impresión gigante completa (B.3) para Preescolar.", levels: ["preescolar"] },
-                  { key: "V_E1_PREESCOLAR", title: "Venta Preescolar — E.1 Clásica", desc: "Estola esencial para Venta en nivel preescolar.", levels: ["preescolar"] },
-                  { key: "V_E2_PREESCOLAR", title: "Venta Preescolar — E.2 Combinada", desc: "Estola híbrida para Venta en nivel preescolar.", levels: ["preescolar"] },
-                  { key: "V_E3_PREESCOLAR", title: "Venta Preescolar — E.3 Premium", desc: "Estola máxima cobertura para Venta en nivel preescolar.", levels: ["preescolar"] },
-                  { key: "V_B_DECORADO", title: "Venta Preescolar — Birrete Decorado (B.1)", desc: "Birrete decorado de preescolar para Venta.", levels: ["preescolar"] },
-                  { key: "V_B_LISO", title: "Venta Preescolar — Birrete Liso (B.2)", desc: "Birrete liso de preescolar para Venta.", levels: ["preescolar"] },
-                  { key: "V_B_BORLA_DIJE", title: "Venta Preescolar — Borla con Dije (B.1)", desc: "Borla con dije de preescolar para Venta.", levels: ["preescolar"] },
-                  { key: "V_B_BORLA_CLASICA", title: "Venta Preescolar — Borla Clásica (B.2)", desc: "Borla clásica de preescolar para Venta.", levels: ["preescolar"] },
-
-                  // Primaria (desacoplado)
-                  { key: "A_PRIMARIA", title: "Paquete A — Básico (Primaria)", desc: "Toga y Estola Lisa estándar para ceremonias tradicionales de Primaria.", levels: ["primaria"] },
-                  { key: "B_BALANCE_PRIMARIA", title: "Paquete B — Balance (Primaria)", desc: "Estola con logo e impresión mixta mediana (B.2) para Primaria.", levels: ["primaria"] },
-                  { key: "B_PREMIUM_PRIMARIA", title: "Paquete B — Premium (Primaria)", desc: "Estola con logo e impresión gigante completa (B.3) para Primaria.", levels: ["primaria"] },
-                  { key: "PRI_C", title: "Primaria — Básico Funcional", desc: "Estola con impresión sencilla en ambos lados 9 x 12 cm (B.1).", levels: ["primaria"] },
-                  { key: "PRI_B", title: "Primaria — Clásico Equilibrado", desc: "Estola mixta (impresión grande 9 x 28 cm y chica 9 x 12 cm - B.2).", levels: ["primaria"] },
-                  { key: "PRI_A", title: "Primaria — Clásico Destacado", desc: "Estola con impresión grande de gala en ambos lados 9 x 28 cm (B.3).", levels: ["primaria"] },
-
-                  // Secundaria (desacoplado)
-                  { key: "A_SECUNDARIA", title: "Paquete A — Básico (Secundaria)", desc: "Toga y Estola Lisa estándar para ceremonias tradicionales de Secundaria.", levels: ["secundaria"] },
-                  { key: "SEC_B", title: "Secundaria — Diseño B1", desc: "Estola con diseño de impresión discreta en ambos lados (B.1).", levels: ["secundaria"] },
-                  { key: "SEC_A", title: "Secundaria — Diseño B2", desc: "Estola con diseño mixto (emblema oficial + detalles en bordes - B.2).", levels: ["secundaria"] },
-
-                  // Preparatoria (desacoplado)
-                  { key: "A_PREPARATORIA", title: "Paquete A — Básico (Preparatoria)", desc: "Toga y Estola Lisa estándar para ceremonias tradicionales de Preparatoria.", levels: ["preparatoria"] },
-                  { key: "PREP_B", title: "Preparatoria — Diseño B1", desc: "Estola con diseño de impresión discreta en ambos lados (B.1).", levels: ["preparatoria"] },
-                  { key: "PREP_A", title: "Preparatoria — Diseño B2", desc: "Estola con diseño mixto (emblema oficial + detalles en bordes - B.2).", levels: ["preparatoria"] },
-                  { key: "PREP_C1", title: "Preparatoria — Diseño C1", desc: "Estola personalizada con bordado clásico de alta calidad (C.1).", levels: ["preparatoria"] },
-                  { key: "PREP_C2", title: "Preparatoria — Diseño C2", desc: "Estola bordada premium de alta definición en ambos lados (C.2).", levels: ["preparatoria"] },
-
-                  // Universidad / Posgrado
-                  { key: "UNI_A", title: "Universidad — Opción A", desc: "Renta de Toga, Birrete y Estola personalizada con impresión clásica (U.A).", levels: ["universidad"] },
-                  { key: "UNI_B", title: "Universidad — Opción B", desc: "Renta de Toga, Birrete y Estola personalizada con bordado tradicional (U.B).", levels: ["universidad"] },
-                  { key: "UNI_C", title: "Universidad — Opción C", desc: "Renta de Toga, Birrete y Estola personalizada con bordado premium (U.C).", levels: ["universidad"] }
-                ];
-
-                // Filter packages list reactively based on level selection
-                const filteredMeta = pricingMeta.filter(pkg => 
-                  pricingFilterLevel === "all" || pkg.levels.includes(pricingFilterLevel)
-                );
-
-                if (filteredMeta.length === 0) {
-                  return (
-                    <div className="p-12 text-center text-muted-foreground text-xs font-semibold">
-                      No se encontraron tarifas registradas para este nivel.
-                    </div>
-                  );
-                }
-
-                // Helper rendering for school level badges
-                const renderLevelBadges = (lvls: string[]) => {
-                  const badgeMap: Record<string, { label: string; cls: string }> = {
-                    preescolar: { label: "Preescolar", cls: "bg-amber-50 text-amber-700 border-amber-200" },
-                    primaria: { label: "Primaria", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-                    secundaria: { label: "Secundaria", cls: "bg-blue-50 text-blue-700 border-blue-200" },
-                    preparatoria: { label: "Preparatoria", cls: "bg-yellow-50 text-yellow-700 border-yellow-300" },
-                    universidad: { label: "Universidad", cls: "bg-purple-50 text-purple-700 border-purple-200" }
-                  };
-
-                  return (
-                    <div className="flex flex-wrap gap-1 mt-1.5">
-                      {lvls.map(l => {
-                        const style = badgeMap[l] || { label: l, cls: "bg-slate-50 text-slate-600" };
-                        return (
-                          <span key={l} className={cn("text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border tracking-wide uppercase", style.cls)}>
-                            {style.label}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  );
-                };
-
-                return filteredMeta.map((pkg) => {
-                  const item = pricingList.find((x) => x.key === pkg.key) || { price: 0, discount_percent: 0 };
-                  const netPrice = Math.round(item.price * (1 - item.discount_percent / 100));
-
-                  return (
-                    <div key={pkg.key} className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-cream/20 transition-all">
-                      {/* Left: Package description & badges */}
-                      <div className="flex-1 space-y-1">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-navy text-sm font-display">{pkg.title}</h4>
-                          <span className="text-[9px] bg-navy/5 text-navy px-1.5 py-0.5 rounded-full font-bold select-all tracking-wide">{pkg.key}</span>
-                        </div>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed max-w-xl">{pkg.desc}</p>
-                        {renderLevelBadges(pkg.levels)}
-                      </div>
-
-                      {/* Right: Numeric inputs & pricing outputs */}
-                      <div className="flex flex-wrap items-center gap-4.5 sm:gap-6">
-                        {/* Input 1: Base Price */}
-                        <div className="w-[125px] space-y-1">
-                          <label className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Precio Unitario ($)</label>
-                          <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">$</span>
-                            <input
-                              type="number"
-                              min={0}
-                              value={item.price}
-                              onChange={(e) => {
-                                const val = Math.max(0, parseInt(e.target.value) || 0);
-                                setPricingList((prev) =>
-                                  prev.map((x) => (x.key === pkg.key ? { ...x, price: val } : x))
-                                );
-                              }}
-                              className="w-full pl-6 pr-3 py-2.5 border border-[#E2E8F0] rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#C5A85A]/50 focus:border-transparent transition-all text-right select-all"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Input 2: Discount Percent */}
-                        <div className="w-[105px] space-y-1">
-                          <label className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Descuento (%)</label>
-                          <div className="relative">
-                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">%</span>
-                            <input
-                              type="number"
-                              min={0}
-                              max={100}
-                              value={item.discount_percent}
-                              onChange={(e) => {
-                                const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                                setPricingList((prev) =>
-                                  prev.map((x) => (x.key === pkg.key ? { ...x, discount_percent: val } : x))
-                                );
-                              }}
-                              className="w-full pl-3 pr-6 py-2.5 border border-[#E2E8F0] rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#C5A85A]/50 focus:border-transparent transition-all text-right select-all"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Output: Realtime Net Promo price */}
-                        <div className="w-[130px] flex flex-col items-end justify-center">
-                          <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Precio Neto Final</span>
-                          <span className={cn(
-                            "text-sm font-extrabold font-display tabular-nums leading-relaxed",
-                            item.discount_percent > 0 ? "text-[#C5A85A]" : "text-navy"
-                          )}>
-                            {formatMXN(netPrice)}
-                          </span>
-                          {item.discount_percent > 0 && (
-                            <span className="text-[9px] text-[#C5A85A] font-extrabold tracking-wide uppercase">
-                              -{item.discount_percent}% de ahorro
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                });
-              })()}
-            </div>
-
-            {/* Bottom floating submit bar */}
-            <div className="bg-white border border-hairline p-5 rounded-2xl shadow-sm flex items-center justify-end sticky bottom-4 z-20">
-              <button
-                type="submit"
-                disabled={savingPrices}
-                className="bg-[#1E2346] hover:bg-[#2a305c] text-white font-bold text-xs px-8 py-3.5 rounded-full shadow-md shadow-navy/10 active:scale-[0.98] transition-all cursor-pointer flex items-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {savingPrices ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    Guardando Tarifas...
-                  </>
-                ) : (
-                  <>
-                    <span>💾</span>
-                    Guardar Tarifas y Descuentos
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        )}
-      </section>
-    )}
-
-    {activeTab === 'calendar' && (
-      <div className="space-y-8 animate-fadeIn">
-        {(() => {
-          const year = currentCalendarDate.getFullYear();
-          const month = currentCalendarDate.getMonth();
-          
-          const navigateCalendar = (dir: number) => {
-            if (calendarView === 'month') {
-              setCurrentCalendarDate(new Date(year, month + dir, 1));
-            } else if (calendarView === 'week') {
-              const newDate = new Date(currentCalendarDate);
-              newDate.setDate(newDate.getDate() + (dir * 7));
-              setCurrentCalendarDate(newDate);
-            } else if (calendarView === 'day') {
-              const newDate = new Date(currentCalendarDate);
-              newDate.setDate(newDate.getDate() + dir);
-              setCurrentCalendarDate(newDate);
-            }
-          };
-          
-          // First day of the month
-          const firstDayOfMonth = new Date(year, month, 1);
-          // Days in month
-          const daysInMonth = new Date(year, month + 1, 0).getDate();
-          
-          // Day of week of first day (0 = Sun, 1 = Mon, ..., 6 = Sat)
-          // Standardise starting with Monday = 0
-          let startDayOfWeek = firstDayOfMonth.getDay() - 1;
-          if (startDayOfWeek === -1) startDayOfWeek = 6;
-          
-          // Days of previous month to fill the first week
-          const prevMonthDays = new Date(year, month, 0).getDate();
-          
-          // Build calendar days array
-          const calendarCells: { date: Date; isCurrentMonth: boolean; key: string }[] = [];
-          
-          // Filler days from previous month
-          for (let i = startDayOfWeek - 1; i >= 0; i--) {
-            const d = new Date(year, month - 1, prevMonthDays - i);
-            calendarCells.push({
-              date: d,
-              isCurrentMonth: false,
-              key: `prev-${prevMonthDays - i}`
-            });
-          }
-          
-          // Current month days
-          for (let i = 1; i <= daysInMonth; i++) {
-            const d = new Date(year, month, i);
-            calendarCells.push({
-              date: d,
-              isCurrentMonth: true,
-              key: `curr-${i}`
-            });
-          }
-          
-          // Filler days for next month to complete standard 6-row (42 cells) grid
-          const remainingCells = 42 - calendarCells.length;
-          for (let i = 1; i <= remainingCells; i++) {
-            const d = new Date(year, month + 1, i);
-            calendarCells.push({
-              date: d,
-              isCurrentMonth: false,
-              key: `next-${i}`
-            });
-          }
-          
-          // Mappings of month names in Spanish
-          const monthNames = [
-            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-          ];
-          
-          const formatDayStr = (d: Date) => {
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, "0");
-            const day = String(d.getDate()).padStart(2, "0");
-            return `${y}-${m}-${day}`;
-          };
-          
-          const getDisplayCells = () => {
-            if (calendarView === 'month') return calendarCells;
-            const currDateStr = formatDayStr(currentCalendarDate);
-            
-            if (calendarView === 'week') {
-              const idx = calendarCells.findIndex(c => formatDayStr(c.date) === currDateStr);
-              if (idx !== -1) {
-                const weekStartIdx = Math.floor(idx / 7) * 7;
-                return calendarCells.slice(weekStartIdx, weekStartIdx + 7);
-              }
-              return calendarCells.slice(0, 7);
-            }
-            if (calendarView === 'day') {
-              const cell = calendarCells.find(c => formatDayStr(c.date) === currDateStr);
-              return cell ? [cell] : [];
-            }
-            return calendarCells;
-          };
-          const displayCells = getDisplayCells();
-          
-          // Deliveries for selected calendar day
-          const selectedDayStr = selectedCalendarDay ? formatDayStr(selectedCalendarDay) : "";
-          const dayDeliveries = quotes.filter(q => {
-            if (!q.estimated_date) return false;
-            const qDateStr = formatDayStr(new Date(q.estimated_date));
-            return qDateStr === selectedDayStr;
-          });
-          
-          // Sum up contracted students count for logistic foresight
-          const totalContractedGownsForMonth = quotes.reduce((acc, q) => {
-            if (q.status !== "contracted" || !q.estimated_date) return acc;
-            const qDate = new Date(q.estimated_date);
-            if (qDate.getFullYear() === year && qDate.getMonth() === month) {
-              return acc + q.student_count;
-            }
-            return acc;
-          }, 0);
-          
-          return (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              {/* Left Column: Grid Calendar */}
-              <div className="lg:col-span-8 bg-white rounded-2xl border border-hairline shadow-sm overflow-hidden p-6 space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-hairline/80 pb-5">
-                  <div className="flex items-center gap-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const t = new Date();
-                        setCurrentCalendarDate(t);
-                        setSelectedCalendarDay(t);
-                        if (calendarView === 'month') setCalendarView('month');
-                      }}
-                      className="px-4 py-2 border border-hairline hover:bg-slate-50 text-navy text-sm font-semibold rounded-lg transition-all cursor-pointer bg-white shadow-sm"
-                      title="Ir a Hoy"
-                    >
-                      Hoy
-                    </button>
-                    
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => navigateCalendar(-1)}
-                        className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all cursor-pointer"
-                        title="Anterior"
-                      >
-                        <ChevronLeft className="h-5 w-5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => navigateCalendar(1)}
-                        className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all cursor-pointer"
-                        title="Siguiente"
-                      >
-                        <ChevronRight className="h-5 w-5" />
-                      </button>
-                    </div>
-
-                    <h2 className="font-display text-2xl font-normal text-slate-800 min-w-[200px] capitalize">
-                      {monthNames[month]} {year}
-                    </h2>
-                  </div>
-                  
-                  {/* Calendar View Toggle */}
-                  <div className="flex bg-slate-100/80 p-1 rounded-lg border border-slate-200/50">
-                    {(['month', 'week', 'day'] as const).map(view => (
-                      <button
-                        key={view}
-                        onClick={() => setCalendarView(view)}
-                        className={cn(
-                          "px-4 py-1.5 text-xs font-semibold rounded-md transition-all capitalize",
-                          calendarView === view ? "bg-white text-navy shadow-sm border border-slate-200/50" : "text-slate-500 hover:text-navy hover:bg-slate-200/50"
-                        )}
-                      >
-                        {view === 'month' ? 'Mes' : view === 'week' ? 'Semana' : 'Día'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Month level statistics badge row */}
-                <div className="bg-[#C5A85A]/5 border border-[#C5A85A]/15 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                  <div className="space-y-0.5">
-                    <div className="text-[10px] uppercase tracking-wider font-extrabold text-[#8c712b]">
-                      Proyección de Stock Mensual
-                    </div>
-                    <div className="text-xs text-muted-foreground font-semibold">
-                      Togas comprometidas para contratos cerrados en {monthNames[month]}:
-                    </div>
-                  </div>
-                  <div className="bg-white border border-[#C5A85A]/20 px-4 py-2 rounded-xl text-center self-stretch sm:self-auto flex items-center justify-center gap-2">
-                    <span className="text-xl">🎓</span>
-                    <div className="text-left">
-                      <div className="text-sm font-extrabold text-navy tabular-nums">{totalContractedGownsForMonth}</div>
-                      <div className="text-[8px] uppercase tracking-wider font-bold text-muted-foreground">Togas / Birretes</div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Color Legend */}
-                <div className="flex flex-wrap items-center gap-4 px-2 py-1 mb-2">
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
-                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Contratos Cerrados
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
-                    <span className="h-2.5 w-2.5 rounded-full bg-blue-500"></span> Contactados
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
-                    <span className="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Pendientes (Sin Contactar)
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
-                    <span className="h-2.5 w-2.5 rounded-full bg-slate-400"></span> Archivados / Perdidos
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto pb-4">
-                  <div className="space-y-0 text-slate-800 min-w-[700px]">
-                    {/* Days of Week Row */}
-                    {calendarView !== 'day' && (
-                      <div className="grid grid-cols-7 text-center select-none bg-slate-100 border-b border-slate-200">
-                      {["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"].map((d, i) => (
-                        <div key={d} className="text-[11px] font-semibold text-slate-600 py-2 flex flex-col border-r border-slate-200 last:border-r-0">
-                          {d}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Grid */}
-                  <div className={cn(
-                    "grid bg-slate-200 gap-px border border-slate-200 rounded-b-lg overflow-hidden",
-                    calendarView === 'day' ? "grid-cols-1" : "grid-cols-7"
-                  )}>
-                    {displayCells.map((cell) => {
-                      const cellDateStr = formatDayStr(cell.date);
-                      const isToday = formatDayStr(new Date()) === cellDateStr;
-                      const isSelected = selectedCalendarDay && formatDayStr(selectedCalendarDay) === cellDateStr;
-                      
-                      // Filter quotes for this day cell
-                      const cellQuotes = quotes.filter(q => {
-                        if (!q.estimated_date) return false;
-                        return formatDayStr(new Date(q.estimated_date)) === cellDateStr;
-                      });
-                      
-                      return (
-                        <button
-                          key={cell.key}
-                          type="button"
-                          onClick={() => setSelectedCalendarDay(cell.date)}
-                          className={cn(
-                            "flex flex-col justify-start text-left relative cursor-pointer select-none",
-                            calendarView === 'month' ? "min-h-[140px]" : "min-h-[200px]",
-                            cell.isCurrentMonth || calendarView !== 'month'
-                              ? "bg-white" 
-                              : "bg-slate-50",
-                            isSelected && "bg-blue-50/50"
-                          )}
-                        >
-                          {/* Date Number */}
-                          <div className="flex justify-center w-full mt-2 mb-1">
-                            <span className={cn(
-                              "text-[12px] font-medium flex items-center justify-center h-6 w-6 rounded-full leading-none",
-                              isToday ? "bg-blue-600 text-white" : "",
-                              !isToday && cell.isCurrentMonth && "text-slate-800",
-                              !isToday && !cell.isCurrentMonth && "text-slate-400"
-                            )}>
-                              {cell.date.getDate()}
-                            </span>
-                          </div>
-                          
-                          {/* Minimal Event Chips */}
-                          {calendarView === 'month' ? (
-                            <div className="w-full space-y-0.5 flex-1 px-1">
-                              {['contracted', 'contacted', 'pending', 'archived'].map(status => {
-                                const statusQuotes = cellQuotes.filter(q => (q.status || 'pending') === status);
-                                if (statusQuotes.length === 0) return null;
-                                const statusTogas = statusQuotes.reduce((sum, q) => sum + q.student_count, 0);
-                                
-                                const styleMap: Record<string, string> = {
-                                  contracted: "text-slate-700 font-medium",
-                                  contacted: "text-slate-700 font-medium",
-                                  pending: "bg-amber-100/50 text-slate-700 font-medium rounded px-1.5 py-0.5 mb-0.5 border border-amber-200/50",
-                                  archived: "text-slate-500",
-                                };
-                                
-                                const dotColor: Record<string, string> = {
-                                  contracted: "bg-emerald-500",
-                                  contacted: "bg-blue-500",
-                                  pending: "bg-amber-500",
-                                  archived: "bg-slate-400",
-                                };
-                                
-                                const statusLabel: Record<string, string> = {
-                                  contracted: "Contratos",
-                                  contacted: "Contactos",
-                                  pending: "Pendientes",
-                                  archived: "Archivos"
-                                };
-                                
-                                return (
-                                  <div key={status} className={cn("text-[11px] flex items-center gap-1.5 truncate hover:bg-slate-100 rounded px-1 cursor-pointer transition-colors", styleMap[status])}>
-                                    <span className={cn("h-2 w-2 rounded-full flex-shrink-0", dotColor[status])} />
-                                    <span className="truncate">{statusTogas} {statusLabel[status]}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <div className="w-full space-y-1 overflow-y-auto max-h-[600px] flex-1 px-1">
-                              {cellQuotes.length === 0 && (
-                                <div className="text-[10px] text-slate-400 text-center mt-2">
-                                  Sin eventos
-                                </div>
+                                              {/* Progress Bar Element */}
+                                              <div className="space-y-1">
+                                                <div className="relative h-2 w-full bg-white border border-hairline rounded-full overflow-hidden shadow-inner">
+                                                  <div
+                                                    className={cn(
+                                                      "absolute top-0 left-0 h-full rounded-full transition-all duration-500",
+                                                      statusColor,
+                                                    )}
+                                                    style={{ width: `${progressPercent}%` }}
+                                                  />
+                                                </div>
+                                                <div className="flex justify-between text-[9px] text-muted-foreground font-semibold uppercase tracking-wider select-none">
+                                                  <span>
+                                                    Creado (
+                                                    {createdDate.toLocaleDateString("es-MX", {
+                                                      day: "numeric",
+                                                      month: "short",
+                                                    })}
+                                                    )
+                                                  </span>
+                                                  {daysRemaining >= 0 &&
+                                                    daysRemaining < totalDays && (
+                                                      <span className="text-navy font-bold">
+                                                        Hoy
+                                                      </span>
+                                                    )}
+                                                  <span>
+                                                    Graduación (
+                                                    {estDate.toLocaleDateString("es-MX", {
+                                                      day: "numeric",
+                                                      month: "short",
+                                                    })}
+                                                    )
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </>
+                                      );
+                                    })()}
+                                  </td>
+                                </tr>
                               )}
-                              {cellQuotes.map(q => {
-                                const curStatus = q.status || "pending";
-                                const styleMap: Record<string, string> = {
-                                  contracted: "text-slate-700 bg-white border border-slate-200 rounded px-1.5 py-1",
-                                  contacted: "text-slate-700 bg-white border border-slate-200 rounded px-1.5 py-1",
-                                  pending: "bg-amber-50 border border-amber-200 text-slate-800 rounded px-1.5 py-1",
-                                  archived: "text-slate-500 bg-slate-50 border border-slate-200 rounded px-1.5 py-1",
-                                };
-                                const dotColor: Record<string, string> = {
-                                  contracted: "bg-emerald-500",
-                                  contacted: "bg-blue-500",
-                                  pending: "bg-amber-500",
-                                  archived: "bg-slate-400",
-                                };
-                                return (
-                                  <div key={q.id} className={cn("text-[11px] flex items-start gap-1.5 hover:shadow-sm transition-shadow cursor-pointer", styleMap[curStatus])}>
-                                    <span className={cn("h-2 w-2 rounded-full flex-shrink-0 mt-1", dotColor[curStatus])} />
-                                    <div className="flex flex-col overflow-hidden">
-                                      <span className="truncate font-semibold">{q.institution_name}</span>
-                                      <span className="text-[10px] opacity-80 truncate">{q.student_count} togas • {q.city?.substring(0,3).toUpperCase()}</span>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
+                            </>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
-                </div>
-                </div>
+
+                  {/* Premium Pagination Control Footer */}
+                  {filteredQuotes.length > 0 && (
+                    <div className="bg-white border-x border-b border-hairline/80 px-6 py-4.5 rounded-b-2xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 -mt-6 z-10 relative">
+                      {/* Rows per page selector */}
+                      <div className="flex items-center gap-2.5 text-xs text-[#1E2346] font-medium order-2 sm:order-1">
+                        <span className="text-muted-foreground">Filas por página:</span>
+                        <div className="relative">
+                          <select
+                            value={rowsPerPage}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setRowsPerPage(val === "all" ? "all" : parseInt(val));
+                              setCurrentPage(1);
+                            }}
+                            className="bg-cream/10 hover:bg-cream/20 border border-hairline rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-navy font-bold text-navy cursor-pointer appearance-none pr-8"
+                          >
+                            <option value={10}>10 por página</option>
+                            <option value={25}>25 por página</option>
+                            <option value={50}>50 por página</option>
+                            <option value="all">Ver Todas</option>
+                          </select>
+                          <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-navy text-[8px] font-bold">
+                            ▼
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Showing Range status */}
+                      <div className="text-xs text-muted-foreground font-medium order-1 sm:order-2">
+                        Mostrando{" "}
+                        <span className="font-bold text-navy">
+                          {Math.min(
+                            (currentPage - 1) *
+                              (rowsPerPage === "all" ? filteredQuotes.length : rowsPerPage) +
+                              1,
+                            filteredQuotes.length,
+                          )}
+                        </span>{" "}
+                        –{" "}
+                        <span className="font-bold text-navy">
+                          {Math.min(
+                            currentPage *
+                              (rowsPerPage === "all" ? filteredQuotes.length : rowsPerPage),
+                            filteredQuotes.length,
+                          )}
+                        </span>{" "}
+                        de <span className="font-bold text-navy">{filteredQuotes.length}</span>{" "}
+                        cotizaciones
+                      </div>
+
+                      {/* Navigation controls */}
+                      <div className="flex items-center gap-1.5 order-3">
+                        <button
+                          type="button"
+                          disabled={currentPage === 1 || rowsPerPage === "all"}
+                          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                          className="px-3 py-1.5 rounded-lg border border-hairline hover:bg-cream/10 active:scale-[0.96] disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100 transition-all text-xs font-bold text-navy cursor-pointer"
+                        >
+                          Anterior
+                        </button>
+
+                        {rowsPerPage !== "all" &&
+                          Array.from({ length: totalPages }).map((_, i) => {
+                            const pageNum = i + 1;
+                            // Render page numbers or ellipses
+                            if (
+                              totalPages > 6 &&
+                              Math.abs(currentPage - pageNum) > 1 &&
+                              pageNum !== 1 &&
+                              pageNum !== totalPages
+                            ) {
+                              if (pageNum === 2 || pageNum === totalPages - 1) {
+                                return (
+                                  <span
+                                    key={pageNum}
+                                    className="px-1 text-muted-foreground text-xs font-semibold"
+                                  >
+                                    ...
+                                  </span>
+                                );
+                              }
+                              return null;
+                            }
+                            return (
+                              <button
+                                type="button"
+                                key={pageNum}
+                                onClick={() => setCurrentPage(pageNum)}
+                                className={cn(
+                                  "h-8 w-8 rounded-lg text-xs font-extrabold transition-all cursor-pointer",
+                                  currentPage === pageNum
+                                    ? "bg-[#1E2346] text-white shadow-md shadow-navy/10"
+                                    : "border border-hairline hover:bg-cream/10 text-navy",
+                                )}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          })}
+
+                        <button
+                          type="button"
+                          disabled={currentPage === totalPages || rowsPerPage === "all"}
+                          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                          className="px-3 py-1.5 rounded-lg border border-hairline hover:bg-cream/10 active:scale-[0.96] disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100 transition-all text-xs font-bold text-navy cursor-pointer"
+                        >
+                          Siguiente
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </section>
+          </div>
+        )}
+
+        {activeTab === "stats" && (
+          <div className="space-y-8 animate-fadeIn">
+            {/* Metric Cards Row */}
+            {renderMetricCards()}
+
+            {/* Charts Row */}
+            {filteredQuotes.length > 0 ? (
+              <div className="space-y-6">
+                {/* Row 1: Core Distribution */}
+                <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Levels Distribution Chart */}
+                  <div className="bg-white border border-hairline rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-display text-base text-navy font-bold flex items-center gap-2">
+                        <span>🏫</span> Demanda por Nivel Escolar
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-0.5 mb-6">
+                        Participación de mercado por niveles educativos cotizados.
+                      </p>
+                    </div>
+                    <div className="h-[280px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={levelChartData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={90}
+                            paddingAngle={3}
+                            dataKey="value"
+                          >
+                            {levelChartData.map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={CHART_PIE_COLORS[index % CHART_PIE_COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            contentStyle={{
+                              background: "#1E2346",
+                              borderRadius: "8px",
+                              color: "#FFFFFF",
+                              border: "none",
+                            }}
+                            itemStyle={{ color: "#FFFFFF" }}
+                          />
+                          <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Service Distribution Chart */}
+                  <div className="bg-white border border-hairline rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-display text-base text-navy font-bold flex items-center gap-2">
+                        <span>🔄</span> Distribución Renta vs Venta
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-0.5 mb-6">
+                        Comparativa de cotizaciones según modalidad comercial elegida.
+                      </p>
+                    </div>
+                    <div className="h-[280px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={serviceChartData}
+                          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                        >
+                          <XAxis
+                            dataKey="name"
+                            stroke="#64748B"
+                            strokeWidth={0.5}
+                            style={{ fontSize: "11px" }}
+                          />
+                          <YAxis stroke="#64748B" strokeWidth={0.5} style={{ fontSize: "11px" }} />
+                          <Tooltip
+                            cursor={{ fill: "rgba(30, 35, 70, 0.02)" }}
+                            contentStyle={{
+                              background: "#1E2346",
+                              borderRadius: "8px",
+                              color: "#FFFFFF",
+                              border: "none",
+                            }}
+                            itemStyle={{ color: "#FFFFFF" }}
+                          />
+                          <Bar dataKey="Cotizaciones" fill="#1E2346" radius={[8, 8, 0, 0]}>
+                            <Cell fill="#1E2346" />
+                            <Cell fill="#C5A85A" />
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Row 2: Predictive & Logistics Insights */}
+                <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Event demand logistics timeline */}
+                  <div className="bg-white border border-hairline rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-display text-base text-navy font-bold flex items-center gap-2">
+                        <span>📅</span> Proyección de Demanda Logística Mensual (Picos)
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-0.5 mb-6">
+                        Togas totales requeridas en el calendario según la fecha de graduación de
+                        los eventos cotizados.
+                      </p>
+                    </div>
+                    <div className="h-[280px]">
+                      {eventTimelineData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart
+                            data={eventTimelineData}
+                            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                          >
+                            <XAxis
+                              dataKey="month"
+                              stroke="#64748B"
+                              strokeWidth={0.5}
+                              style={{ fontSize: "10px" }}
+                            />
+                            <YAxis
+                              stroke="#64748B"
+                              strokeWidth={0.5}
+                              style={{ fontSize: "11px" }}
+                            />
+                            <Tooltip
+                              cursor={{ fill: "rgba(30, 35, 70, 0.02)" }}
+                              contentStyle={{
+                                background: "#1E2346",
+                                borderRadius: "8px",
+                                color: "#FFFFFF",
+                                border: "none",
+                              }}
+                              itemStyle={{ color: "#FFFFFF" }}
+                            />
+                            <Bar
+                              dataKey="Togas"
+                              fill="#C5A85A"
+                              name="Togas Requeridas"
+                              radius={[8, 8, 0, 0]}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-xs text-muted-foreground italic">
+                          Ingresa fechas de eventos en tus cotizaciones para visualizar esta
+                          proyección.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Manufacturing Color popularity trend */}
+                  <div className="bg-white border border-hairline rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-display text-base text-navy font-bold flex items-center gap-2">
+                        <span>🎨</span> Tendencia de Colores Solicitados (Textil & Stock)
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-0.5 mb-6">
+                        Ranking del volumen de togas requeridas por color para planificar compras de
+                        telas e insumos.
+                      </p>
+                    </div>
+                    <div className="h-[280px]">
+                      {colorChartData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart
+                            data={colorChartData}
+                            layout="vertical"
+                            margin={{ top: 10, right: 20, left: 10, bottom: 5 }}
+                          >
+                            <XAxis
+                              type="number"
+                              stroke="#64748B"
+                              strokeWidth={0.5}
+                              style={{ fontSize: "10px" }}
+                            />
+                            <YAxis
+                              type="category"
+                              dataKey="name"
+                              stroke="#64748B"
+                              strokeWidth={0.5}
+                              style={{ fontSize: "10px" }}
+                              width={95}
+                            />
+                            <Tooltip
+                              contentStyle={{
+                                background: "#1E2346",
+                                borderRadius: "8px",
+                                color: "#FFFFFF",
+                                border: "none",
+                              }}
+                              itemStyle={{ color: "#FFFFFF" }}
+                            />
+                            <Bar
+                              dataKey="Togas"
+                              fill="#1E2346"
+                              name="Togas"
+                              radius={[0, 6, 6, 0]}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-xs text-muted-foreground italic">
+                          No hay información de colores disponible.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </section>
               </div>
-              
-              {/* Right Column: Selected Day Detail list */}
-              <div className="lg:col-span-4 space-y-6 sticky top-24 self-start max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
-                <div className="bg-white rounded-2xl border border-hairline shadow-sm overflow-hidden p-6 space-y-6">
-                  {/* Agenda Title */}
-                  <div className="border-b border-hairline pb-4.5">
-                    <h3 className="font-display text-lg font-bold text-navy">
-                      Entregas del Día
-                    </h3>
-                    <p className="text-xs text-muted-foreground font-semibold mt-1">
-                      {selectedCalendarDay ? selectedCalendarDay.toLocaleDateString("es-MX", {
-                        weekday: "long",
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric"
-                      }) : "Seleccione un día"}
+            ) : (
+              <div className="bg-white border border-hairline rounded-2xl p-12 text-center text-muted-foreground shadow-sm">
+                <p className="text-sm">
+                  No hay suficientes cotizaciones con los filtros seleccionados para generar
+                  análisis estadístico.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "pricing" && (
+          /* ========================================================================= */
+          /* EDITOR DE PRECIOS Y DESCUENTOS DINÁMICOS (UX/UI REDESIGN)                 */
+          /* ========================================================================= */
+          <section className="space-y-6">
+            {/* Header Title & Actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-hairline/80 pb-4">
+              <div>
+                <h2 className="font-display text-2xl font-bold text-navy flex items-center gap-2">
+                  Gestión de Tarifas y Descuentos
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5 font-medium">
+                  Configura y actualiza en tiempo real las tarifas del cotizador de Renta y el Catálogo de Venta.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={fetchPricing}
+                  className="inline-flex items-center gap-2 border border-hairline hover:bg-cream/40 text-navy font-bold text-xs px-4 py-2.5 rounded-full transition-all active:scale-[0.98] cursor-pointer"
+                  title="Recargar tarifas de la base de datos"
+                >
+                  <RefreshCw className={cn("h-3.5 w-3.5", loadingPricing && "animate-spin")} />
+                  Recargar Tarifas
+                </button>
+              </div>
+            </div>
+
+            {pricingMessage && (
+              <div
+                className={cn(
+                  "flex items-center gap-3 py-3.5 px-5 rounded-2xl border text-xs font-bold transition-all animate-pulse shadow-sm",
+                  pricingMessage.type === "success"
+                    ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                    : "bg-red-50 text-red-800 border-red-200",
+                )}
+              >
+                <div
+                  className={cn(
+                    "h-2 w-2 rounded-full shrink-0",
+                    pricingMessage.type === "success" ? "bg-emerald-500" : "bg-red-500",
+                  )}
+                />
+                {pricingMessage.text}
+              </div>
+            )}
+
+            {/* KPI Summary Cards */}
+            {(() => {
+              const staticKeys = [
+                { key: "A_PREESCOLAR", service: "renta" },
+                { key: "B_ESENCIAL_PREESCOLAR", service: "renta" },
+                { key: "B_BALANCE_PREESCOLAR", service: "renta" },
+                { key: "B_PREMIUM_PREESCOLAR", service: "renta" },
+                { key: "V_E1_PREESCOLAR", service: "venta" },
+                { key: "V_E2_PREESCOLAR", service: "venta" },
+                { key: "V_E3_PREESCOLAR", service: "venta" },
+                { key: "V_B_DECORADO", service: "venta" },
+                { key: "V_B_LISO", service: "venta" },
+                { key: "V_B_BORLA_DIJE", service: "venta" },
+                { key: "V_B_BORLA_CLASICA", service: "venta" },
+                { key: "A_PRIMARIA", service: "renta" },
+                { key: "B_BALANCE_PRIMARIA", service: "renta" },
+                { key: "B_PREMIUM_PRIMARIA", service: "renta" },
+                { key: "PRI_C", service: "renta" },
+                { key: "PRI_B", service: "renta" },
+                { key: "PRI_A", service: "renta" },
+                { key: "A_SECUNDARIA", service: "renta" },
+                { key: "SEC_B", service: "renta" },
+                { key: "SEC_A", service: "renta" },
+                { key: "A_PREPARATORIA", service: "renta" },
+                { key: "PREP_B", service: "renta" },
+                { key: "PREP_A", service: "renta" },
+                { key: "PREP_C1", service: "renta" },
+                { key: "PREP_C2", service: "renta" },
+                { key: "UNI_A", service: "renta" },
+                { key: "UNI_B", service: "renta" },
+                { key: "UNI_C", service: "renta" },
+              ];
+
+              const totalCount = staticKeys.length;
+              const rentaCount = staticKeys.filter((x) => x.service === "renta").length;
+              const ventaCount = staticKeys.filter((x) => x.service === "venta").length;
+              const activePromosCount = pricingList.filter((x) => x.discount_percent > 0).length;
+
+              return (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                  <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-hairline shadow-sm">
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+                      Total Tarifas
+                    </p>
+                    <p className="text-xl font-extrabold text-navy font-display mt-0.5">
+                      {totalCount}
                     </p>
                   </div>
-                  
-                  {/* Delivery agenda list */}
-                  {dayDeliveries.length === 0 ? (
-                    <div className="text-center py-16 space-y-4">
-                      <div className="h-14 w-14 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-300">
-                        <Calendar className="h-6 w-6" />
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="font-semibold text-xs text-navy uppercase tracking-wider">Sin Entregas</h4>
-                        <p className="text-xs text-muted-foreground leading-relaxed max-w-[200px] mx-auto">
-                          No hay ceremonias agendadas para esta fecha.
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
-                      {dayDeliveries.map((q) => {
-                        const curStatus = q.status || "pending";
-                        const configs: Record<string, { label: string; cls: string }> = {
-                          pending: { label: "Pendiente 🟡", cls: "bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-100/70" },
-                          contacted: { label: "Contactado 🔵", cls: "bg-blue-50 text-blue-700 border-blue-200/50 hover:bg-blue-100/70" },
-                          contracted: { label: "Contratado 🟢", cls: "bg-emerald-50 text-emerald-700 border-emerald-200/50 hover:bg-emerald-100/70" },
-                          archived: { label: "Archivado ⚫", cls: "bg-slate-50 text-slate-600 border-slate-200/50 hover:bg-slate-100/70" }
-                        };
-                        const cfg = configs[curStatus] || configs.pending;
-                        
-                        return (
-                          <div 
-                            key={q.id} 
-                            className={cn(
-                              "border border-hairline/80 rounded-2xl p-4.5 space-y-4 hover:shadow-sm transition-all",
-                              curStatus === "contracted" ? "bg-emerald-50/5 border-emerald-200/40" : "bg-white"
-                            )}
-                          >
-                            {/* School & package kind header */}
-                            <div className="space-y-1">
-                              <div className="flex items-start justify-between gap-2">
-                                <h4 className="font-bold text-[#1E2346] text-xs uppercase tracking-wider line-clamp-2">
-                                  {q.institution_name}
-                                </h4>
-                                <span className="text-[10px] font-bold text-navy bg-cream/40 px-2 py-0.5 rounded-full select-all">
-                                  #{q.quote_number}
-                                </span>
-                              </div>
-                              <p className="text-[11px] text-[#C5A85A] font-bold font-sans">
-                                {levelLabel(q.school_level)} — {packageLabel(q.package_kind, q.package_variant, q.school_level)}
-                              </p>
-                            </div>
-                            
-                            {/* Delivery logistical stats */}
-                            <div className="grid grid-cols-2 gap-3 bg-slate-50 border border-slate-100 rounded-xl p-3 text-[11px]">
-                              <div>
-                                <span className="text-muted-foreground block text-[10px]">Cant. Alumnos</span>
-                                <span className="font-extrabold text-navy tabular-nums">{q.student_count} togas</span>
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground block text-[10px]">Sede</span>
-                                <span className="font-bold text-navy uppercase">
-                                  {q.city === "tijuana" ? "Tijuana 📍" : "Ensenada 📍"}
-                                </span>
-                              </div>
-                              <div className="col-span-2 border-t border-slate-200/50 pt-2 flex items-center justify-between">
-                                <div>
-                                  <span className="text-muted-foreground text-[10px] block">Colores de Gala</span>
-                                  <div className="flex gap-1.5 mt-1">
-                                    <span className="text-[9px] font-semibold text-foreground uppercase bg-white border px-1.5 py-0.2 rounded">T: {q.toga_color || "Gris"}</span>
-                                    <span className="text-[9px] font-semibold text-foreground uppercase bg-white border px-1.5 py-0.2 rounded">E: {q.stola_color || "Gris"}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {/* Contact Person Details */}
-                            <div className="text-[11px] space-y-1 bg-[#1E2346]/5 rounded-xl p-3 border border-[#1E2346]/10">
-                              <div className="font-semibold text-navy truncate">👤 {q.contact_name}</div>
-                              <div className="text-muted-foreground text-[10px] truncate">📞 {q.contact_phone}</div>
-                            </div>
-                            
-                            {/* Interactive Status Management in calendar side drawer */}
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1" onClick={(e) => e.stopPropagation()}>
-                              {/* Status update selector */}
-                              <div className="relative inline-flex items-center w-full sm:w-auto">
-                                <select
-                                  value={curStatus}
-                                  disabled={updatingStatusId === q.id}
-                                  onChange={(e) => handleUpdateStatus(q.id, e.target.value)}
-                                  className={cn(
-                                    "appearance-none inline-flex items-center justify-center rounded-full pl-3.5 pr-7.5 py-1.5 text-xs font-bold border leading-none tracking-wide transition-all shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-navy/20 w-full sm:w-auto",
-                                    cfg.cls
-                                  )}
-                                >
-                                  <option value="pending" className="bg-white text-amber-700 font-bold">Pendiente 🟡</option>
-                                  <option value="contacted" className="bg-white text-blue-700 font-bold">Contactado 🔵</option>
-                                  <option value="contracted" className="bg-white text-emerald-700 font-bold">Contratado 🟢</option>
-                                  <option value="archived" className="bg-white text-slate-600 font-bold">Archivado ⚫</option>
-                                </select>
-                                {updatingStatusId === q.id ? (
-                                  <RefreshCw className="absolute right-2.5 h-3 w-3 animate-spin text-navy" />
-                                ) : (
-                                  <span className="absolute right-2.5 pointer-events-none text-[8px] font-extrabold opacity-70">▼</span>
-                                )}
-                              </div>
-                              
-                              {/* Quick contact and documents download */}
-                              <div className="flex items-center gap-1.5 self-end sm:self-auto">
-                                <button
-                                  type="button"
-                                  onClick={() => generateQuotePDF({
-                                    level: q.school_level as any,
-                                    city: q.city as any,
-                                    pkg: { kind: q.package_kind as any, variant: q.package_variant as any },
-                                    quantity: q.student_count,
-                                    school: q.institution_name,
-                                    contact: q.contact_name,
-                                    phone: q.contact_phone,
-                                    date: q.estimated_date || "",
-                                    email: q.contact_email || "",
-                                    quoteNumber: q.quote_number,
-                                    togaColor: q.toga_color || undefined,
-                                    stolaColor: q.stola_color || undefined
-                                  })}
-                                  className="p-2 bg-navy/5 text-navy hover:bg-navy/15 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
-                                  title="Descargar PDF de la Cotización"
-                                >
-                                  <Download className="h-4 w-4" />
-                                </button>
-                                
-                                <a
-                                  href={getWhatsAppLink(q)}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="p-2 bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
-                                  title="Hacer seguimiento por WhatsApp"
-                                >
-                                  <MessageSquare className="h-4 w-4" />
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                  <div className="bg-blue-50/50 p-3.5 sm:p-4 rounded-2xl border border-blue-100 shadow-sm">
+                    <p className="text-[10px] uppercase font-bold text-blue-700 tracking-wider flex items-center gap-1">
+                      <span>🏷️</span> Catálogo Renta
+                    </p>
+                    <p className="text-xl font-extrabold text-blue-900 font-display mt-0.5">
+                      {rentaCount} <span className="text-xs font-normal text-blue-600">paquetes</span>
+                    </p>
+                  </div>
+                  <div className="bg-emerald-50/50 p-3.5 sm:p-4 rounded-2xl border border-emerald-100 shadow-sm">
+                    <p className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider flex items-center gap-1">
+                      <span>🛍️</span> Catálogo Venta
+                    </p>
+                    <p className="text-xl font-extrabold text-emerald-900 font-display mt-0.5">
+                      {ventaCount} <span className="text-xs font-normal text-emerald-600">productos</span>
+                    </p>
+                  </div>
+                  <div className="bg-amber-50/50 p-3.5 sm:p-4 rounded-2xl border border-amber-100 shadow-sm">
+                    <p className="text-[10px] uppercase font-bold text-amber-700 tracking-wider flex items-center gap-1">
+                      <span>🔥</span> Con Descuento
+                    </p>
+                    <p className="text-xl font-extrabold text-amber-900 font-display mt-0.5">
+                      {activePromosCount} <span className="text-xs font-normal text-amber-600">promos</span>
+                    </p>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Senior UX Control Panel: Primary Service Selector + Secondary Level Filter + Live Search */}
+            <div className="bg-white p-4 rounded-2xl border border-hairline shadow-sm space-y-3.5">
+              {/* Row 1: Primary Mode Toggle (Renta vs Venta) */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/80 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setPricingServiceFilter("all")}
+                    className={cn(
+                      "flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer",
+                      pricingServiceFilter === "all"
+                        ? "bg-white text-navy shadow-sm"
+                        : "text-muted-foreground hover:text-navy",
+                    )}
+                  >
+                    🌐 Ver Todos
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPricingServiceFilter("renta")}
+                    className={cn(
+                      "flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1.5",
+                      pricingServiceFilter === "renta"
+                        ? "bg-navy text-white shadow-sm"
+                        : "text-muted-foreground hover:text-navy",
+                    )}
+                  >
+                    🏷️ Catálogo de Renta
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPricingServiceFilter("venta")}
+                    className={cn(
+                      "flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1.5",
+                      pricingServiceFilter === "venta"
+                        ? "bg-emerald-600 text-white shadow-sm"
+                        : "text-muted-foreground hover:text-emerald-700",
+                    )}
+                  >
+                    🛍️ Catálogo de Venta
+                  </button>
+                </div>
+
+                {/* Search Input Box */}
+                <div className="relative w-full sm:w-72">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Buscar producto o código..."
+                    value={pricingSearchQuery}
+                    onChange={(e) => setPricingSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 border border-[#E2E8F0] rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-navy/20 transition-all"
+                  />
+                  {pricingSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setPricingSearchQuery("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-xs font-bold px-1"
+                    >
+                      ×
+                    </button>
                   )}
                 </div>
               </div>
-            </div>
-          );
-        })()}
-      </div>
-    )}
 
-    {/* Inactivity Warning Modal (Premium Design) */}
-    {showInactivityModal && (
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-        {/* Backdrop Blur overlay */}
-        <div className="absolute inset-0 bg-[#0F1225]/60 backdrop-blur-md transition-opacity duration-300" />
-        
-        {/* Modal Content Card */}
-        <div className="relative w-full max-w-md bg-white border border-[#E2E8F0] rounded-3xl p-8 shadow-2xl shadow-navy/20 animate-scaleIn space-y-6 text-center">
-          {/* Warning Icon Container */}
-          <div className="h-16 w-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto border border-amber-100 shadow-inner">
-            <Clock className="h-8 w-8 text-[#C5A85A] animate-pulse" />
-          </div>
-          
-          {/* Text Details */}
-          <div className="space-y-2">
-            <h3 className="font-display text-xl font-bold text-navy">¿Sigues ahí?</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed px-4">
-              Tu sesión de administrador está a punto de expirar por inactividad. Te desconectaremos automáticamente por seguridad en:
-            </p>
-          </div>
-          
-          {/* Countdown Clock Display */}
-          <div className="flex flex-col items-center justify-center py-2">
-            <div className="text-4xl font-extrabold font-display text-navy tracking-tight tabular-nums flex items-center justify-center gap-1.5">
-              <span>00</span>
-              <span className="animate-pulse">:</span>
-              <span className={cn(
-                inactivityCountdown <= 10 ? "text-red-500 font-black animate-bounce" : "text-[#C5A85A]"
-              )}>
-                {String(inactivityCountdown).padStart(2, "0")}
-              </span>
+              {/* Row 2: Level Segmented Pill Selector */}
+              <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-1.5">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mr-1">
+                  Nivel:
+                </span>
+                {[
+                  { id: "all", label: "Todos" },
+                  { id: "preescolar", label: "Preescolar 👶" },
+                  { id: "primaria", label: "Primaria 🎒" },
+                  { id: "secundaria", label: "Secundaria 📚" },
+                  { id: "preparatoria", label: "Preparatoria 🎓" },
+                  { id: "universidad", label: "Universidad 🏛️" },
+                ].map((lvl) => {
+                  const isSelected = pricingFilterLevel === lvl.id;
+                  return (
+                    <button
+                      key={lvl.id}
+                      type="button"
+                      onClick={() => setPricingFilterLevel(lvl.id)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none active:scale-[0.98]",
+                        isSelected
+                          ? "bg-navy/10 text-navy font-extrabold border border-navy/20"
+                          : "text-muted-foreground hover:text-navy hover:bg-slate-100 bg-transparent",
+                      )}
+                    >
+                      {lvl.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            {/* Visual Progress Bar */}
-            <div className="w-full max-w-[200px] h-1.5 bg-slate-100 rounded-full mt-3 overflow-hidden">
-              <div 
-                className={cn(
-                  "h-full rounded-full transition-all duration-1000 ease-linear",
-                  inactivityCountdown <= 10 ? "bg-red-500" : "bg-[#C5A85A]"
-                )}
-                style={{ width: `${(inactivityCountdown / 60) * 100}%` }}
-              />
-            </div>
-          </div>
-          
-          {/* Buttons Row */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => {
-                handleLogout();
-                setShowInactivityModal(false);
-              }}
-              className="flex-1 border border-[#E2E8F0] hover:bg-slate-50 text-[#64748B] hover:text-[#1E2346] font-bold text-xs py-3.5 rounded-full transition-all cursor-pointer uppercase tracking-wider"
-            >
-              Cerrar Sesión
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setShowInactivityModal(false);
-                setInactivityCountdown(60);
-              }}
-              className="flex-1 bg-[#1E2346] hover:bg-[#2a305c] text-white font-bold text-xs py-3.5 rounded-full shadow-lg shadow-navy/10 active:scale-[0.98] transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-2"
-            >
-              <span>✨</span> Continuar Sesión
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
 
-  </main>
-</div>
-);
+            {loadingPricing ? (
+              <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-hairline shadow-sm space-y-4">
+                <RefreshCw className="h-8 w-8 text-navy animate-spin" />
+                <p className="text-sm font-semibold text-muted-foreground">
+                  Sincronizando tarifas con Supabase...
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSavePricing} className="space-y-6">
+                {/* Main pricing list container */}
+                <div className="bg-white rounded-2xl border border-hairline shadow-sm overflow-hidden divide-y divide-hairline">
+                  {(() => {
+                    // Static package metadata with school levels & service type mapping
+                    const pricingMeta = [
+                      // RENTA - Preescolar
+                      {
+                        key: "A_PREESCOLAR",
+                        service: "renta",
+                        title: "Paquete A — Básico (Preescolar)",
+                        desc: "Toga y Estola Lisa estándar para ceremonias tradicionales de Preescolar.",
+                        levels: ["preescolar"],
+                      },
+                      {
+                        key: "B_ESENCIAL_PREESCOLAR",
+                        service: "renta",
+                        title: "Paquete B — Esencial (Preescolar)",
+                        desc: "Estola con diseño compacto 9x12 cm en ambos lados (B.1) para Preescolar.",
+                        levels: ["preescolar"],
+                      },
+                      {
+                        key: "B_BALANCE_PREESCOLAR",
+                        service: "renta",
+                        title: "Paquete B — Balance (Preescolar)",
+                        desc: "Estola con logo e impresión mixta mediana (B.2) para Preescolar.",
+                        levels: ["preescolar"],
+                      },
+                      {
+                        key: "B_PREMIUM_PREESCOLAR",
+                        service: "renta",
+                        title: "Paquete B — Premium (Preescolar)",
+                        desc: "Estola con logo e impresión gigante completa (B.3) para Preescolar.",
+                        levels: ["preescolar"],
+                      },
+
+                      // VENTA - Preescolar
+                      {
+                        key: "V_E1_PREESCOLAR",
+                        service: "venta",
+                        title: "Venta Preescolar — Estola E.1 Clásica",
+                        desc: "Estola esencial sublimada para Venta en nivel preescolar.",
+                        levels: ["preescolar"],
+                      },
+                      {
+                        key: "V_E2_PREESCOLAR",
+                        service: "venta",
+                        title: "Venta Preescolar — Estola E.2 Combinada",
+                        desc: "Estola híbrida para Venta en nivel preescolar.",
+                        levels: ["preescolar"],
+                      },
+                      {
+                        key: "V_E3_PREESCOLAR",
+                        service: "venta",
+                        title: "Venta Preescolar — Estola E.3 Premium",
+                        desc: "Estola máxima cobertura para Venta en nivel preescolar.",
+                        levels: ["preescolar"],
+                      },
+                      {
+                        key: "V_B_DECORADO",
+                        service: "venta",
+                        title: "Venta Preescolar — Birrete Decorado (B.1)",
+                        desc: "Birrete decorado a mano para Venta.",
+                        levels: ["preescolar"],
+                      },
+                      {
+                        key: "V_B_LISO",
+                        service: "venta",
+                        title: "Venta Preescolar — Birrete Liso (B.2)",
+                        desc: "Birrete liso en color de tu elección para Venta.",
+                        levels: ["preescolar"],
+                      },
+                      {
+                        key: "V_B_BORLA_DIJE",
+                        service: "venta",
+                        title: "Venta Preescolar — Borla con Dije (B.1)",
+                        desc: "Borla personalizada con dije metálico de graduación.",
+                        levels: ["preescolar"],
+                      },
+                      {
+                        key: "V_B_BORLA_CLASICA",
+                        service: "venta",
+                        title: "Venta Preescolar — Borla Clásica (B.2)",
+                        desc: "Borla tradicional con charm de año.",
+                        levels: ["preescolar"],
+                      },
+
+                      // RENTA - Primaria
+                      {
+                        key: "A_PRIMARIA",
+                        service: "renta",
+                        title: "Paquete A — Básico (Primaria)",
+                        desc: "Toga y Estola Lisa estándar para ceremonias tradicionales de Primaria.",
+                        levels: ["primaria"],
+                      },
+                      {
+                        key: "B_BALANCE_PRIMARIA",
+                        service: "renta",
+                        title: "Paquete B — Balance (Primaria)",
+                        desc: "Estola con logo e impresión mixta mediana (B.2) para Primaria.",
+                        levels: ["primaria"],
+                      },
+                      {
+                        key: "B_PREMIUM_PRIMARIA",
+                        service: "renta",
+                        title: "Paquete B — Premium (Primaria)",
+                        desc: "Estola con logo e impresión gigante completa (B.3) para Primaria.",
+                        levels: ["primaria"],
+                      },
+                      {
+                        key: "PRI_C",
+                        service: "renta",
+                        title: "Primaria — Básico Funcional",
+                        desc: "Estola con impresión sencilla en ambos lados 9 x 12 cm (B.1).",
+                        levels: ["primaria"],
+                      },
+                      {
+                        key: "PRI_B",
+                        service: "renta",
+                        title: "Primaria — Clásico Equilibrado",
+                        desc: "Estola mixta (impresión grande 9 x 28 cm y chica 9 x 12 cm - B.2).",
+                        levels: ["primaria"],
+                      },
+                      {
+                        key: "PRI_A",
+                        service: "renta",
+                        title: "Primaria — Clásico Destacado",
+                        desc: "Estola con impresión grande de gala en ambos lados 9 x 28 cm (B.3).",
+                        levels: ["primaria"],
+                      },
+
+                      // RENTA - Secundaria
+                      {
+                        key: "A_SECUNDARIA",
+                        service: "renta",
+                        title: "Paquete A — Básico (Secundaria)",
+                        desc: "Toga y Estola Lisa estándar para ceremonias tradicionales de Secundaria.",
+                        levels: ["secundaria"],
+                      },
+                      {
+                        key: "SEC_B",
+                        service: "renta",
+                        title: "Secundaria — Diseño B1",
+                        desc: "Estola con diseño de impresión discreta en ambos lados (B.1).",
+                        levels: ["secundaria"],
+                      },
+                      {
+                        key: "SEC_A",
+                        service: "renta",
+                        title: "Secundaria — Diseño B2",
+                        desc: "Estola con diseño mixto (emblema oficial + detalles en bordes - B.2).",
+                        levels: ["secundaria"],
+                      },
+
+                      // RENTA - Preparatoria
+                      {
+                        key: "A_PREPARATORIA",
+                        service: "renta",
+                        title: "Paquete A — Básico (Preparatoria)",
+                        desc: "Toga y Estola Lisa estándar para ceremonias tradicionales de Preparatoria.",
+                        levels: ["preparatoria"],
+                      },
+                      {
+                        key: "PREP_B",
+                        service: "renta",
+                        title: "Preparatoria — Diseño B1",
+                        desc: "Estola con diseño de impresión discreta en ambos lados (B.1).",
+                        levels: ["preparatoria"],
+                      },
+                      {
+                        key: "PREP_A",
+                        service: "renta",
+                        title: "Preparatoria — Diseño B2",
+                        desc: "Estola con diseño mixto (emblema oficial + detalles en bordes - B.2).",
+                        levels: ["preparatoria"],
+                      },
+                      {
+                        key: "PREP_C1",
+                        service: "renta",
+                        title: "Preparatoria — Diseño C1",
+                        desc: "Estola personalizada con bordado clásico de alta calidad (C.1).",
+                        levels: ["preparatoria"],
+                      },
+                      {
+                        key: "PREP_C2",
+                        service: "renta",
+                        title: "Preparatoria — Diseño C2",
+                        desc: "Estola bordada premium de alta definición en ambos lados (C.2).",
+                        levels: ["preparatoria"],
+                      },
+
+                      // RENTA - Universidad
+                      {
+                        key: "UNI_A",
+                        service: "renta",
+                        title: "Universidad — Opción A",
+                        desc: "Renta de Toga, Birrete y Estola personalizada con impresión clásica (U.A).",
+                        levels: ["universidad"],
+                      },
+                      {
+                        key: "UNI_B",
+                        service: "renta",
+                        title: "Universidad — Opción B",
+                        desc: "Renta de Toga, Birrete y Estola personalizada con bordado tradicional (U.B).",
+                        levels: ["universidad"],
+                      },
+                      {
+                        key: "UNI_C",
+                        service: "renta",
+                        title: "Universidad — Opción C",
+                        desc: "Renta de Toga, Birrete y Estola personalizada con bordado premium (U.C).",
+                        levels: ["universidad"],
+                      },
+                    ];
+
+                    // Filter packages list reactively based on service, level, and search query
+                    const queryLower = pricingSearchQuery.toLowerCase().trim();
+                    const filteredMeta = pricingMeta.filter((pkg) => {
+                      const matchesService =
+                        pricingServiceFilter === "all" || pkg.service === pricingServiceFilter;
+                      const matchesLevel =
+                        pricingFilterLevel === "all" || pkg.levels.includes(pricingFilterLevel);
+                      const matchesSearch =
+                        !queryLower ||
+                        pkg.title.toLowerCase().includes(queryLower) ||
+                        pkg.key.toLowerCase().includes(queryLower) ||
+                        pkg.desc.toLowerCase().includes(queryLower);
+
+                      return matchesService && matchesLevel && matchesSearch;
+                    });
+
+                    if (filteredMeta.length === 0) {
+                      return (
+                        <div className="p-12 text-center text-muted-foreground text-xs font-semibold space-y-2">
+                          <p className="text-base">🔍 No se encontraron tarifas</p>
+                          <p>
+                            Prueba cambiando los filtros de servicio ({pricingServiceFilter}), nivel o
+                            limpiando el buscador.
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    // Helper rendering for school level badges
+                    const renderBadges = (lvls: string[], service: string) => {
+                      const badgeMap: Record<string, { label: string; cls: string }> = {
+                        preescolar: {
+                          label: "Preescolar",
+                          cls: "bg-amber-50 text-amber-700 border-amber-200",
+                        },
+                        primaria: {
+                          label: "Primaria",
+                          cls: "bg-emerald-50 text-emerald-700 border-emerald-200",
+                        },
+                        secundaria: {
+                          label: "Secundaria",
+                          cls: "bg-blue-50 text-blue-700 border-blue-200",
+                        },
+                        preparatoria: {
+                          label: "Preparatoria",
+                          cls: "bg-yellow-50 text-yellow-700 border-yellow-300",
+                        },
+                        universidad: {
+                          label: "Universidad",
+                          cls: "bg-purple-50 text-purple-700 border-purple-200",
+                        },
+                      };
+
+                      return (
+                        <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                          {/* Service Type Tag */}
+                          <span
+                            className={cn(
+                              "text-[9px] font-extrabold px-2 py-0.5 rounded-full border tracking-wide uppercase flex items-center gap-1",
+                              service === "venta"
+                                ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                                : "bg-blue-50 text-blue-800 border-blue-300",
+                            )}
+                          >
+                            {service === "venta" ? "🛍️ Venta" : "🏷️ Renta"}
+                          </span>
+
+                          {lvls.map((l) => {
+                            const style = badgeMap[l] || {
+                              label: l,
+                              cls: "bg-slate-50 text-slate-600",
+                            };
+                            return (
+                              <span
+                                key={l}
+                                className={cn(
+                                  "text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border tracking-wide uppercase",
+                                  style.cls,
+                                )}
+                              >
+                                {style.label}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      );
+                    };
+
+                    // Group items by service type to render clear section headers (Industry Standard)
+                    const rentaItems = filteredMeta.filter((x) => x.service === "renta");
+                    const ventaItems = filteredMeta.filter((x) => x.service === "venta");
+
+                    const renderItemCard = (pkg: (typeof pricingMeta)[0]) => {
+                      const item = pricingList.find((x) => x.key === pkg.key) || {
+                        price: 0,
+                        discount_percent: 0,
+                      };
+                      const netPrice = Math.round(item.price * (1 - item.discount_percent / 100));
+
+                      return (
+                        <div
+                          key={pkg.key}
+                          className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-cream/20 transition-all"
+                        >
+                          {/* Left: Package description & badges */}
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-bold text-navy text-sm font-display">
+                                {pkg.title}
+                              </h4>
+                              <span className="text-[9px] bg-navy/5 text-navy px-1.5 py-0.5 rounded-full font-bold select-all tracking-wide border border-navy/10">
+                                {pkg.key}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground leading-relaxed max-w-xl">
+                              {pkg.desc}
+                            </p>
+                            {renderBadges(pkg.levels, pkg.service)}
+                          </div>
+
+                          {/* Right: Numeric inputs & pricing outputs */}
+                          <div className="flex flex-wrap items-center gap-4.5 sm:gap-6">
+                            {/* Input 1: Base Price */}
+                            <div className="w-[125px] space-y-1">
+                              <label className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">
+                                Precio Unitario ($)
+                              </label>
+                              <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">
+                                  $
+                                </span>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  value={item.price}
+                                  onChange={(e) => {
+                                    const val = Math.max(0, parseInt(e.target.value) || 0);
+                                    setPricingList((prev) =>
+                                      prev.map((x) =>
+                                        x.key === pkg.key ? { ...x, price: val } : x,
+                                      ),
+                                    );
+                                  }}
+                                  className="w-full pl-6 pr-3 py-2.5 border border-[#E2E8F0] rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#C5A85A]/50 focus:border-transparent transition-all text-right select-all"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Input 2: Discount Percent */}
+                            <div className="w-[105px] space-y-1">
+                              <label className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">
+                                Descuento (%)
+                              </label>
+                              <div className="relative">
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">
+                                  %
+                                </span>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={100}
+                                  value={item.discount_percent}
+                                  onChange={(e) => {
+                                    const val = Math.min(
+                                      100,
+                                      Math.max(0, parseInt(e.target.value) || 0),
+                                    );
+                                    setPricingList((prev) =>
+                                      prev.map((x) =>
+                                        x.key === pkg.key ? { ...x, discount_percent: val } : x,
+                                      ),
+                                    );
+                                  }}
+                                  className="w-full pl-3 pr-6 py-2.5 border border-[#E2E8F0] rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#C5A85A]/50 focus:border-transparent transition-all text-right select-all"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Output: Realtime Net Promo price */}
+                            <div className="w-[130px] flex flex-col items-end justify-center">
+                              <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">
+                                Precio Neto Final
+                              </span>
+                              <span
+                                className={cn(
+                                  "text-sm font-extrabold font-display tabular-nums leading-relaxed",
+                                  item.discount_percent > 0 ? "text-[#C5A85A]" : "text-navy",
+                                )}
+                              >
+                                {formatMXN(netPrice)}
+                              </span>
+                              {item.discount_percent > 0 && (
+                                <span className="text-[9px] text-[#C5A85A] font-extrabold tracking-wide uppercase">
+                                  -{item.discount_percent}% de ahorro
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    };
+
+                    return (
+                      <div className="divide-y divide-hairline">
+                        {rentaItems.length > 0 && (
+                          <div>
+                            <div className="bg-slate-100/90 px-5 py-3 border-y border-slate-200 flex items-center justify-between">
+                              <span className="text-xs font-extrabold text-navy uppercase tracking-wider flex items-center gap-2">
+                                <span>🏷️</span> Paquetes del Catálogo de Renta
+                              </span>
+                              <span className="text-[10px] font-bold text-navy/70 bg-white px-2.5 py-0.5 rounded-full border border-slate-200">
+                                {rentaItems.length} tarifas
+                              </span>
+                            </div>
+                            <div className="divide-y divide-hairline">
+                              {rentaItems.map(renderItemCard)}
+                            </div>
+                          </div>
+                        )}
+
+                        {ventaItems.length > 0 && (
+                          <div>
+                            <div className="bg-emerald-100/80 px-5 py-3 border-y border-emerald-200 flex items-center justify-between">
+                              <span className="text-xs font-extrabold text-emerald-900 uppercase tracking-wider flex items-center gap-2">
+                                <span>🛍️</span> Productos del Catálogo de Venta
+                              </span>
+                              <span className="text-[10px] font-bold text-emerald-800 bg-white px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                {ventaItems.length} productos
+                              </span>
+                            </div>
+                            <div className="divide-y divide-hairline">
+                              {ventaItems.map(renderItemCard)}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Floating/Bottom Action Bar for Saving Prices */}
+                <div className="sticky bottom-6 z-30 bg-navy/95 backdrop-blur-md p-4 rounded-2xl border border-navy/20 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="text-white text-xs">
+                    <p className="font-bold">Guarda los cambios para aplicarlos en vivo</p>
+                    <p className="text-slate-300 text-[11px]">
+                      Las actualizaciones se aplicarán instantáneamente al cotizador de Renta y Venta.
+                    </p>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={savingPrices}
+                    className="bg-[#1E2346] hover:bg-[#2a305c] text-white font-bold text-xs px-8 py-3.5 rounded-full shadow-md shadow-navy/10 active:scale-[0.98] transition-all cursor-pointer flex items-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {savingPrices ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                        Guardando Tarifas...
+                      </>
+                    ) : (
+                      <>
+                        <span>💾</span>
+                        Guardar Tarifas y Descuentos
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </section>
+        )}
+
+        {activeTab === "calendar" && (
+          <div className="space-y-8 animate-fadeIn">
+            {(() => {
+              const year = currentCalendarDate.getFullYear();
+              const month = currentCalendarDate.getMonth();
+
+              const navigateCalendar = (dir: number) => {
+                if (calendarView === "month") {
+                  setCurrentCalendarDate(new Date(year, month + dir, 1));
+                } else if (calendarView === "week") {
+                  const newDate = new Date(currentCalendarDate);
+                  newDate.setDate(newDate.getDate() + dir * 7);
+                  setCurrentCalendarDate(newDate);
+                } else if (calendarView === "day") {
+                  const newDate = new Date(currentCalendarDate);
+                  newDate.setDate(newDate.getDate() + dir);
+                  setCurrentCalendarDate(newDate);
+                }
+              };
+
+              // First day of the month
+              const firstDayOfMonth = new Date(year, month, 1);
+              // Days in month
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+              // Day of week of first day (0 = Sun, 1 = Mon, ..., 6 = Sat)
+              // Standardise starting with Monday = 0
+              let startDayOfWeek = firstDayOfMonth.getDay() - 1;
+              if (startDayOfWeek === -1) startDayOfWeek = 6;
+
+              // Days of previous month to fill the first week
+              const prevMonthDays = new Date(year, month, 0).getDate();
+
+              // Build calendar days array
+              const calendarCells: { date: Date; isCurrentMonth: boolean; key: string }[] = [];
+
+              // Filler days from previous month
+              for (let i = startDayOfWeek - 1; i >= 0; i--) {
+                const d = new Date(year, month - 1, prevMonthDays - i);
+                calendarCells.push({
+                  date: d,
+                  isCurrentMonth: false,
+                  key: `prev-${prevMonthDays - i}`,
+                });
+              }
+
+              // Current month days
+              for (let i = 1; i <= daysInMonth; i++) {
+                const d = new Date(year, month, i);
+                calendarCells.push({
+                  date: d,
+                  isCurrentMonth: true,
+                  key: `curr-${i}`,
+                });
+              }
+
+              // Filler days for next month to complete standard 6-row (42 cells) grid
+              const remainingCells = 42 - calendarCells.length;
+              for (let i = 1; i <= remainingCells; i++) {
+                const d = new Date(year, month + 1, i);
+                calendarCells.push({
+                  date: d,
+                  isCurrentMonth: false,
+                  key: `next-${i}`,
+                });
+              }
+
+              // Mappings of month names in Spanish
+              const monthNames = [
+                "Enero",
+                "Febrero",
+                "Marzo",
+                "Abril",
+                "Mayo",
+                "Junio",
+                "Julio",
+                "Agosto",
+                "Septiembre",
+                "Octubre",
+                "Noviembre",
+                "Diciembre",
+              ];
+
+              const formatDayStr = (d: Date) => {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, "0");
+                const day = String(d.getDate()).padStart(2, "0");
+                return `${y}-${m}-${day}`;
+              };
+
+              const getDisplayCells = () => {
+                if (calendarView === "month") return calendarCells;
+                const currDateStr = formatDayStr(currentCalendarDate);
+
+                if (calendarView === "week") {
+                  const idx = calendarCells.findIndex((c) => formatDayStr(c.date) === currDateStr);
+                  if (idx !== -1) {
+                    const weekStartIdx = Math.floor(idx / 7) * 7;
+                    return calendarCells.slice(weekStartIdx, weekStartIdx + 7);
+                  }
+                  return calendarCells.slice(0, 7);
+                }
+                if (calendarView === "day") {
+                  const cell = calendarCells.find((c) => formatDayStr(c.date) === currDateStr);
+                  return cell ? [cell] : [];
+                }
+                return calendarCells;
+              };
+              const displayCells = getDisplayCells();
+
+              // Deliveries for selected calendar day
+              const selectedDayStr = selectedCalendarDay ? formatDayStr(selectedCalendarDay) : "";
+              const dayDeliveries = quotes.filter((q) => {
+                if (!q.estimated_date) return false;
+                const qDateStr = formatDayStr(new Date(q.estimated_date));
+                return qDateStr === selectedDayStr;
+              });
+
+              // Sum up contracted students count for logistic foresight
+              const totalContractedGownsForMonth = quotes.reduce((acc, q) => {
+                if (q.status !== "contracted" || !q.estimated_date) return acc;
+                const qDate = new Date(q.estimated_date);
+                if (qDate.getFullYear() === year && qDate.getMonth() === month) {
+                  return acc + q.student_count;
+                }
+                return acc;
+              }, 0);
+
+              return (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                  {/* Left Column: Grid Calendar */}
+                  <div className="lg:col-span-8 bg-white rounded-2xl border border-hairline shadow-sm overflow-hidden p-6 space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-hairline/80 pb-5">
+                      <div className="flex items-center gap-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const t = new Date();
+                            setCurrentCalendarDate(t);
+                            setSelectedCalendarDay(t);
+                            if (calendarView === "month") setCalendarView("month");
+                          }}
+                          className="px-4 py-2 border border-hairline hover:bg-slate-50 text-navy text-sm font-semibold rounded-lg transition-all cursor-pointer bg-white shadow-sm"
+                          title="Ir a Hoy"
+                        >
+                          Hoy
+                        </button>
+
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => navigateCalendar(-1)}
+                            className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all cursor-pointer"
+                            title="Anterior"
+                          >
+                            <ChevronLeft className="h-5 w-5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => navigateCalendar(1)}
+                            className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all cursor-pointer"
+                            title="Siguiente"
+                          >
+                            <ChevronRight className="h-5 w-5" />
+                          </button>
+                        </div>
+
+                        <h2 className="font-display text-2xl font-normal text-slate-800 min-w-[200px] capitalize">
+                          {monthNames[month]} {year}
+                        </h2>
+                      </div>
+
+                      {/* Calendar View Toggle */}
+                      <div className="flex bg-slate-100/80 p-1 rounded-lg border border-slate-200/50">
+                        {(["month", "week", "day"] as const).map((view) => (
+                          <button
+                            key={view}
+                            onClick={() => setCalendarView(view)}
+                            className={cn(
+                              "px-4 py-1.5 text-xs font-semibold rounded-md transition-all capitalize",
+                              calendarView === view
+                                ? "bg-white text-navy shadow-sm border border-slate-200/50"
+                                : "text-slate-500 hover:text-navy hover:bg-slate-200/50",
+                            )}
+                          >
+                            {view === "month" ? "Mes" : view === "week" ? "Semana" : "Día"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Month level statistics badge row */}
+                    <div className="bg-[#C5A85A]/5 border border-[#C5A85A]/15 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                      <div className="space-y-0.5">
+                        <div className="text-[10px] uppercase tracking-wider font-extrabold text-[#8c712b]">
+                          Proyección de Stock Mensual
+                        </div>
+                        <div className="text-xs text-muted-foreground font-semibold">
+                          Togas comprometidas para contratos cerrados en {monthNames[month]}:
+                        </div>
+                      </div>
+                      <div className="bg-white border border-[#C5A85A]/20 px-4 py-2 rounded-xl text-center self-stretch sm:self-auto flex items-center justify-center gap-2">
+                        <span className="text-xl">🎓</span>
+                        <div className="text-left">
+                          <div className="text-sm font-extrabold text-navy tabular-nums">
+                            {totalContractedGownsForMonth}
+                          </div>
+                          <div className="text-[8px] uppercase tracking-wider font-bold text-muted-foreground">
+                            Togas / Birretes
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Color Legend */}
+                    <div className="flex flex-wrap items-center gap-4 px-2 py-1 mb-2">
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                        <span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Contratos
+                        Cerrados
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                        <span className="h-2.5 w-2.5 rounded-full bg-blue-500"></span> Contactados
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                        <span className="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Pendientes
+                        (Sin Contactar)
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                        <span className="h-2.5 w-2.5 rounded-full bg-slate-400"></span> Archivados /
+                        Perdidos
+                      </div>
+                    </div>
+
+                    <div className="overflow-x-auto pb-4">
+                      <div className="space-y-0 text-slate-800 min-w-[700px]">
+                        {/* Days of Week Row */}
+                        {calendarView !== "day" && (
+                          <div className="grid grid-cols-7 text-center select-none bg-slate-100 border-b border-slate-200">
+                            {["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"].map((d, i) => (
+                              <div
+                                key={d}
+                                className="text-[11px] font-semibold text-slate-600 py-2 flex flex-col border-r border-slate-200 last:border-r-0"
+                              >
+                                {d}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Grid */}
+                        <div
+                          className={cn(
+                            "grid bg-slate-200 gap-px border border-slate-200 rounded-b-lg overflow-hidden",
+                            calendarView === "day" ? "grid-cols-1" : "grid-cols-7",
+                          )}
+                        >
+                          {displayCells.map((cell) => {
+                            const cellDateStr = formatDayStr(cell.date);
+                            const isToday = formatDayStr(new Date()) === cellDateStr;
+                            const isSelected =
+                              selectedCalendarDay &&
+                              formatDayStr(selectedCalendarDay) === cellDateStr;
+
+                            // Filter quotes for this day cell
+                            const cellQuotes = quotes.filter((q) => {
+                              if (!q.estimated_date) return false;
+                              return formatDayStr(new Date(q.estimated_date)) === cellDateStr;
+                            });
+
+                            return (
+                              <button
+                                key={cell.key}
+                                type="button"
+                                onClick={() => setSelectedCalendarDay(cell.date)}
+                                className={cn(
+                                  "flex flex-col justify-start text-left relative cursor-pointer select-none",
+                                  calendarView === "month" ? "min-h-[140px]" : "min-h-[200px]",
+                                  cell.isCurrentMonth || calendarView !== "month"
+                                    ? "bg-white"
+                                    : "bg-slate-50",
+                                  isSelected && "bg-blue-50/50",
+                                )}
+                              >
+                                {/* Date Number */}
+                                <div className="flex justify-center w-full mt-2 mb-1">
+                                  <span
+                                    className={cn(
+                                      "text-[12px] font-medium flex items-center justify-center h-6 w-6 rounded-full leading-none",
+                                      isToday ? "bg-blue-600 text-white" : "",
+                                      !isToday && cell.isCurrentMonth && "text-slate-800",
+                                      !isToday && !cell.isCurrentMonth && "text-slate-400",
+                                    )}
+                                  >
+                                    {cell.date.getDate()}
+                                  </span>
+                                </div>
+
+                                {/* Minimal Event Chips */}
+                                {calendarView === "month" ? (
+                                  <div className="w-full space-y-0.5 flex-1 px-1">
+                                    {["contracted", "contacted", "pending", "archived"].map(
+                                      (status) => {
+                                        const statusQuotes = cellQuotes.filter(
+                                          (q) => (q.status || "pending") === status,
+                                        );
+                                        if (statusQuotes.length === 0) return null;
+                                        const statusTogas = statusQuotes.reduce(
+                                          (sum, q) => sum + q.student_count,
+                                          0,
+                                        );
+
+                                        const styleMap: Record<string, string> = {
+                                          contracted: "text-slate-700 font-medium",
+                                          contacted: "text-slate-700 font-medium",
+                                          pending:
+                                            "bg-amber-100/50 text-slate-700 font-medium rounded px-1.5 py-0.5 mb-0.5 border border-amber-200/50",
+                                          archived: "text-slate-500",
+                                        };
+
+                                        const dotColor: Record<string, string> = {
+                                          contracted: "bg-emerald-500",
+                                          contacted: "bg-blue-500",
+                                          pending: "bg-amber-500",
+                                          archived: "bg-slate-400",
+                                        };
+
+                                        const statusLabel: Record<string, string> = {
+                                          contracted: "Contratos",
+                                          contacted: "Contactos",
+                                          pending: "Pendientes",
+                                          archived: "Archivos",
+                                        };
+
+                                        return (
+                                          <div
+                                            key={status}
+                                            className={cn(
+                                              "text-[11px] flex items-center gap-1.5 truncate hover:bg-slate-100 rounded px-1 cursor-pointer transition-colors",
+                                              styleMap[status],
+                                            )}
+                                          >
+                                            <span
+                                              className={cn(
+                                                "h-2 w-2 rounded-full flex-shrink-0",
+                                                dotColor[status],
+                                              )}
+                                            />
+                                            <span className="truncate">
+                                              {statusTogas} {statusLabel[status]}
+                                            </span>
+                                          </div>
+                                        );
+                                      },
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="w-full space-y-1 overflow-y-auto max-h-[600px] flex-1 px-1">
+                                    {cellQuotes.length === 0 && (
+                                      <div className="text-[10px] text-slate-400 text-center mt-2">
+                                        Sin eventos
+                                      </div>
+                                    )}
+                                    {cellQuotes.map((q) => {
+                                      const curStatus = q.status || "pending";
+                                      const styleMap: Record<string, string> = {
+                                        contracted:
+                                          "text-slate-700 bg-white border border-slate-200 rounded px-1.5 py-1",
+                                        contacted:
+                                          "text-slate-700 bg-white border border-slate-200 rounded px-1.5 py-1",
+                                        pending:
+                                          "bg-amber-50 border border-amber-200 text-slate-800 rounded px-1.5 py-1",
+                                        archived:
+                                          "text-slate-500 bg-slate-50 border border-slate-200 rounded px-1.5 py-1",
+                                      };
+                                      const dotColor: Record<string, string> = {
+                                        contracted: "bg-emerald-500",
+                                        contacted: "bg-blue-500",
+                                        pending: "bg-amber-500",
+                                        archived: "bg-slate-400",
+                                      };
+                                      return (
+                                        <div
+                                          key={q.id}
+                                          className={cn(
+                                            "text-[11px] flex items-start gap-1.5 hover:shadow-sm transition-shadow cursor-pointer",
+                                            styleMap[curStatus],
+                                          )}
+                                        >
+                                          <span
+                                            className={cn(
+                                              "h-2 w-2 rounded-full flex-shrink-0 mt-1",
+                                              dotColor[curStatus],
+                                            )}
+                                          />
+                                          <div className="flex flex-col overflow-hidden">
+                                            <span className="truncate font-semibold">
+                                              {q.institution_name}
+                                            </span>
+                                            <span className="text-[10px] opacity-80 truncate">
+                                              {q.student_count} togas •{" "}
+                                              {q.city?.substring(0, 3).toUpperCase()}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Selected Day Detail list */}
+                  <div className="lg:col-span-4 space-y-6 sticky top-24 self-start max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
+                    <div className="bg-white rounded-2xl border border-hairline shadow-sm overflow-hidden p-6 space-y-6">
+                      {/* Agenda Title */}
+                      <div className="border-b border-hairline pb-4.5">
+                        <h3 className="font-display text-lg font-bold text-navy">
+                          Entregas del Día
+                        </h3>
+                        <p className="text-xs text-muted-foreground font-semibold mt-1">
+                          {selectedCalendarDay
+                            ? selectedCalendarDay.toLocaleDateString("es-MX", {
+                                weekday: "long",
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              })
+                            : "Seleccione un día"}
+                        </p>
+                      </div>
+
+                      {/* Delivery agenda list */}
+                      {dayDeliveries.length === 0 ? (
+                        <div className="text-center py-16 space-y-4">
+                          <div className="h-14 w-14 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-300">
+                            <Calendar className="h-6 w-6" />
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="font-semibold text-xs text-navy uppercase tracking-wider">
+                              Sin Entregas
+                            </h4>
+                            <p className="text-xs text-muted-foreground leading-relaxed max-w-[200px] mx-auto">
+                              No hay ceremonias agendadas para esta fecha.
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                          {dayDeliveries.map((q) => {
+                            const curStatus = q.status || "pending";
+                            const configs: Record<string, { label: string; cls: string }> = {
+                              pending: {
+                                label: "Pendiente 🟡",
+                                cls: "bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-100/70",
+                              },
+                              contacted: {
+                                label: "Contactado 🔵",
+                                cls: "bg-blue-50 text-blue-700 border-blue-200/50 hover:bg-blue-100/70",
+                              },
+                              contracted: {
+                                label: "Contratado 🟢",
+                                cls: "bg-emerald-50 text-emerald-700 border-emerald-200/50 hover:bg-emerald-100/70",
+                              },
+                              archived: {
+                                label: "Archivado ⚫",
+                                cls: "bg-slate-50 text-slate-600 border-slate-200/50 hover:bg-slate-100/70",
+                              },
+                            };
+                            const cfg = configs[curStatus] || configs.pending;
+
+                            return (
+                              <div
+                                key={q.id}
+                                className={cn(
+                                  "border border-hairline/80 rounded-2xl p-4.5 space-y-4 hover:shadow-sm transition-all",
+                                  curStatus === "contracted"
+                                    ? "bg-emerald-50/5 border-emerald-200/40"
+                                    : "bg-white",
+                                )}
+                              >
+                                {/* School & package kind header */}
+                                <div className="space-y-1">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <h4 className="font-bold text-[#1E2346] text-xs uppercase tracking-wider line-clamp-2">
+                                      {q.institution_name}
+                                    </h4>
+                                    <span className="text-[10px] font-bold text-navy bg-cream/40 px-2 py-0.5 rounded-full select-all">
+                                      #{q.quote_number}
+                                    </span>
+                                  </div>
+                                  <p className="text-[11px] text-[#C5A85A] font-bold font-sans">
+                                    {levelLabel(q.school_level)} —{" "}
+                                    {packageLabel(
+                                      q.package_kind,
+                                      q.package_variant,
+                                      q.school_level,
+                                    )}
+                                  </p>
+                                </div>
+
+                                {/* Delivery logistical stats */}
+                                <div className="grid grid-cols-2 gap-3 bg-slate-50 border border-slate-100 rounded-xl p-3 text-[11px]">
+                                  <div>
+                                    <span className="text-muted-foreground block text-[10px]">
+                                      Cant. Alumnos
+                                    </span>
+                                    <span className="font-extrabold text-navy tabular-nums">
+                                      {q.student_count} togas
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground block text-[10px]">
+                                      Sede
+                                    </span>
+                                    <span className="font-bold text-navy uppercase">
+                                      {q.city === "tijuana" ? "Tijuana 📍" : "Ensenada 📍"}
+                                    </span>
+                                  </div>
+                                  <div className="col-span-2 border-t border-slate-200/50 pt-2 flex items-center justify-between">
+                                    <div>
+                                      <span className="text-muted-foreground text-[10px] block">
+                                        Colores de Gala
+                                      </span>
+                                      <div className="flex gap-1.5 mt-1">
+                                        <span className="text-[9px] font-semibold text-foreground uppercase bg-white border px-1.5 py-0.2 rounded">
+                                          T: {q.toga_color || "Gris"}
+                                        </span>
+                                        <span className="text-[9px] font-semibold text-foreground uppercase bg-white border px-1.5 py-0.2 rounded">
+                                          E: {q.stola_color || "Gris"}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Contact Person Details */}
+                                <div className="text-[11px] space-y-1 bg-[#1E2346]/5 rounded-xl p-3 border border-[#1E2346]/10">
+                                  <div className="font-semibold text-navy truncate">
+                                    👤 {q.contact_name}
+                                  </div>
+                                  <div className="text-muted-foreground text-[10px] truncate">
+                                    📞 {q.contact_phone}
+                                  </div>
+                                </div>
+
+                                {/* Interactive Status Management in calendar side drawer */}
+                                <div
+                                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {/* Status update selector */}
+                                  <div className="relative inline-flex items-center w-full sm:w-auto">
+                                    <select
+                                      value={curStatus}
+                                      disabled={updatingStatusId === q.id}
+                                      onChange={(e) => handleUpdateStatus(q.id, e.target.value)}
+                                      className={cn(
+                                        "appearance-none inline-flex items-center justify-center rounded-full pl-3.5 pr-7.5 py-1.5 text-xs font-bold border leading-none tracking-wide transition-all shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-navy/20 w-full sm:w-auto",
+                                        cfg.cls,
+                                      )}
+                                    >
+                                      <option
+                                        value="pending"
+                                        className="bg-white text-amber-700 font-bold"
+                                      >
+                                        Pendiente 🟡
+                                      </option>
+                                      <option
+                                        value="contacted"
+                                        className="bg-white text-blue-700 font-bold"
+                                      >
+                                        Contactado 🔵
+                                      </option>
+                                      <option
+                                        value="contracted"
+                                        className="bg-white text-emerald-700 font-bold"
+                                      >
+                                        Contratado 🟢
+                                      </option>
+                                      <option
+                                        value="archived"
+                                        className="bg-white text-slate-600 font-bold"
+                                      >
+                                        Archivado ⚫
+                                      </option>
+                                    </select>
+                                    {updatingStatusId === q.id ? (
+                                      <RefreshCw className="absolute right-2.5 h-3 w-3 animate-spin text-navy" />
+                                    ) : (
+                                      <span className="absolute right-2.5 pointer-events-none text-[8px] font-extrabold opacity-70">
+                                        ▼
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Quick contact and documents download */}
+                                  <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        generateQuotePDF({
+                                          level: q.school_level as any,
+                                          city: q.city as any,
+                                          pkg: {
+                                            kind: q.package_kind as any,
+                                            variant: q.package_variant as any,
+                                          },
+                                          quantity: q.student_count,
+                                          school: q.institution_name,
+                                          contact: q.contact_name,
+                                          phone: q.contact_phone,
+                                          date: q.estimated_date || "",
+                                          email: q.contact_email || "",
+                                          quoteNumber: q.quote_number,
+                                          togaColor: q.toga_color || undefined,
+                                          stolaColor: q.stola_color || undefined,
+                                        })
+                                      }
+                                      className="p-2 bg-navy/5 text-navy hover:bg-navy/15 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
+                                      title="Descargar PDF de la Cotización"
+                                    >
+                                      <Download className="h-4 w-4" />
+                                    </button>
+
+                                    <a
+                                      href={getWhatsAppLink(q)}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="p-2 bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
+                                      title="Hacer seguimiento por WhatsApp"
+                                    >
+                                      <MessageSquare className="h-4 w-4" />
+                                    </a>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+
+        {/* Inactivity Warning Modal (Premium Design) */}
+        {showInactivityModal && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            {/* Backdrop Blur overlay */}
+            <div className="absolute inset-0 bg-[#0F1225]/60 backdrop-blur-md transition-opacity duration-300" />
+
+            {/* Modal Content Card */}
+            <div className="relative w-full max-w-md bg-white border border-[#E2E8F0] rounded-3xl p-8 shadow-2xl shadow-navy/20 animate-scaleIn space-y-6 text-center">
+              {/* Warning Icon Container */}
+              <div className="h-16 w-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto border border-amber-100 shadow-inner">
+                <Clock className="h-8 w-8 text-[#C5A85A] animate-pulse" />
+              </div>
+
+              {/* Text Details */}
+              <div className="space-y-2">
+                <h3 className="font-display text-xl font-bold text-navy">¿Sigues ahí?</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed px-4">
+                  Tu sesión de administrador está a punto de expirar por inactividad. Te
+                  desconectaremos automáticamente por seguridad en:
+                </p>
+              </div>
+
+              {/* Countdown Clock Display */}
+              <div className="flex flex-col items-center justify-center py-2">
+                <div className="text-4xl font-extrabold font-display text-navy tracking-tight tabular-nums flex items-center justify-center gap-1.5">
+                  <span>00</span>
+                  <span className="animate-pulse">:</span>
+                  <span
+                    className={cn(
+                      inactivityCountdown <= 10
+                        ? "text-red-500 font-black animate-bounce"
+                        : "text-[#C5A85A]",
+                    )}
+                  >
+                    {String(inactivityCountdown).padStart(2, "0")}
+                  </span>
+                </div>
+                {/* Visual Progress Bar */}
+                <div className="w-full max-w-[200px] h-1.5 bg-slate-100 rounded-full mt-3 overflow-hidden">
+                  <div
+                    className={cn(
+                      "h-full rounded-full transition-all duration-1000 ease-linear",
+                      inactivityCountdown <= 10 ? "bg-red-500" : "bg-[#C5A85A]",
+                    )}
+                    style={{ width: `${(inactivityCountdown / 60) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Buttons Row */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleLogout();
+                    setShowInactivityModal(false);
+                  }}
+                  className="flex-1 border border-[#E2E8F0] hover:bg-slate-50 text-[#64748B] hover:text-[#1E2346] font-bold text-xs py-3.5 rounded-full transition-all cursor-pointer uppercase tracking-wider"
+                >
+                  Cerrar Sesión
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowInactivityModal(false);
+                    setInactivityCountdown(60);
+                  }}
+                  className="flex-1 bg-[#1E2346] hover:bg-[#2a305c] text-white font-bold text-xs py-3.5 rounded-full shadow-lg shadow-navy/10 active:scale-[0.98] transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-2"
+                >
+                  <span>✨</span> Continuar Sesión
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
 }

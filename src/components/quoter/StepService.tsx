@@ -15,9 +15,7 @@ export function StepService({ value, onChange, level }: Props) {
     <div>
       <header className="mb-10">
         <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Paso 02</p>
-        <h2 className="font-display text-3xl sm:text-4xl mt-2 text-foreground">
-          ¿Renta o venta?
-        </h2>
+        <h2 className="font-display text-3xl sm:text-4xl mt-2 text-foreground">¿Renta o venta?</h2>
         <p className="mt-3 text-muted-foreground">
           Cotiza servicio de renta para todos los niveles, o venta de estolas personalizadas.
         </p>
@@ -44,7 +42,6 @@ export function StepService({ value, onChange, level }: Props) {
             ariaLabel="Venta"
             className="py-10"
           >
-
             <ShoppingBag className="h-8 w-8 text-navy" strokeWidth={1.5} />
             <h3 className="font-display text-2xl mt-5">Venta</h3>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -67,4 +64,3 @@ export function StepService({ value, onChange, level }: Props) {
     </div>
   );
 }
-

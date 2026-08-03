@@ -9,10 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MockupVentas3RouteImport } from './routes/mockup-ventas3'
+import { Route as MockupVentas2RouteImport } from './routes/mockup-ventas2'
+import { Route as MockupVentas1RouteImport } from './routes/mockup-ventas1'
+import { Route as MockupVentasRouteImport } from './routes/mockup-ventas'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 
+const MockupVentas3Route = MockupVentas3RouteImport.update({
+  id: '/mockup-ventas3',
+  path: '/mockup-ventas3',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MockupVentas2Route = MockupVentas2RouteImport.update({
+  id: '/mockup-ventas2',
+  path: '/mockup-ventas2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MockupVentas1Route = MockupVentas1RouteImport.update({
+  id: '/mockup-ventas1',
+  path: '/mockup-ventas1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MockupVentasRoute = MockupVentasRouteImport.update({
+  id: '/mockup-ventas',
+  path: '/mockup-ventas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -33,34 +57,100 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/mockup-ventas': typeof MockupVentasRoute
+  '/mockup-ventas1': typeof MockupVentas1Route
+  '/mockup-ventas2': typeof MockupVentas2Route
+  '/mockup-ventas3': typeof MockupVentas3Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/mockup-ventas': typeof MockupVentasRoute
+  '/mockup-ventas1': typeof MockupVentas1Route
+  '/mockup-ventas2': typeof MockupVentas2Route
+  '/mockup-ventas3': typeof MockupVentas3Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/mockup-ventas': typeof MockupVentasRoute
+  '/mockup-ventas1': typeof MockupVentas1Route
+  '/mockup-ventas2': typeof MockupVentas2Route
+  '/mockup-ventas3': typeof MockupVentas3Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/mockup-ventas'
+    | '/mockup-ventas1'
+    | '/mockup-ventas2'
+    | '/mockup-ventas3'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login'
-  id: '__root__' | '/' | '/dashboard' | '/login'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/mockup-ventas'
+    | '/mockup-ventas1'
+    | '/mockup-ventas2'
+    | '/mockup-ventas3'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/mockup-ventas'
+    | '/mockup-ventas1'
+    | '/mockup-ventas2'
+    | '/mockup-ventas3'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
+  MockupVentasRoute: typeof MockupVentasRoute
+  MockupVentas1Route: typeof MockupVentas1Route
+  MockupVentas2Route: typeof MockupVentas2Route
+  MockupVentas3Route: typeof MockupVentas3Route
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/mockup-ventas3': {
+      id: '/mockup-ventas3'
+      path: '/mockup-ventas3'
+      fullPath: '/mockup-ventas3'
+      preLoaderRoute: typeof MockupVentas3RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mockup-ventas2': {
+      id: '/mockup-ventas2'
+      path: '/mockup-ventas2'
+      fullPath: '/mockup-ventas2'
+      preLoaderRoute: typeof MockupVentas2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mockup-ventas1': {
+      id: '/mockup-ventas1'
+      path: '/mockup-ventas1'
+      fullPath: '/mockup-ventas1'
+      preLoaderRoute: typeof MockupVentas1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mockup-ventas': {
+      id: '/mockup-ventas'
+      path: '/mockup-ventas'
+      fullPath: '/mockup-ventas'
+      preLoaderRoute: typeof MockupVentasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -89,6 +179,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
+  MockupVentasRoute: MockupVentasRoute,
+  MockupVentas1Route: MockupVentas1Route,
+  MockupVentas2Route: MockupVentas2Route,
+  MockupVentas3Route: MockupVentas3Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
