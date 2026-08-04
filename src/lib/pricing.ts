@@ -30,7 +30,12 @@ export type PackageBVariant =
   | "birrete_decorado"
   | "birrete_liso"
   | "borla_dije"
-  | "borla_clasica";
+  | "borla_clasica"
+  | "toga_birrete_estola"
+  | "toga_birrete_borla"
+  | "medalla_standard"
+  | "medalla_personalizada"
+  | "oso_graduacion";
 export type PackageChoice = {
   kind: "A" | "B" | "C";
   variant?: PackageBVariant;
@@ -167,6 +172,11 @@ export const PRICES = {
   V_B_LISO: 160,
   V_B_BORLA_DIJE: 50,
   V_B_BORLA_CLASICA: 25,
+  V_TOGA_BIRRETE_ESTOLA: 450,
+  V_TOGA_BIRRETE_BORLA: 380,
+  V_MEDALLA_STANDARD: 35,
+  V_MEDALLA_PERSONALIZADA: 45,
+  V_OSO_GRADUACION: 150,
 
   // Primaria (desacoplado)
   A_PRIMARIA: 350,
@@ -207,6 +217,11 @@ export const DISCOUNTS = {
   V_B_LISO: 0,
   V_B_BORLA_DIJE: 0,
   V_B_BORLA_CLASICA: 0,
+  V_TOGA_BIRRETE_ESTOLA: 0,
+  V_TOGA_BIRRETE_BORLA: 0,
+  V_MEDALLA_STANDARD: 0,
+  V_MEDALLA_PERSONALIZADA: 0,
+  V_OSO_GRADUACION: 0,
 
   A_PRIMARIA: 0,
   B_BALANCE_PRIMARIA: 0,
@@ -470,6 +485,11 @@ export function getPriceKey(
   if (pkg.variant === "birrete_liso") return "V_B_LISO";
   if (pkg.variant === "borla_dije") return "V_B_BORLA_DIJE";
   if (pkg.variant === "borla_clasica") return "V_B_BORLA_CLASICA";
+  if (pkg.variant === "toga_birrete_estola") return "V_TOGA_BIRRETE_ESTOLA";
+  if (pkg.variant === "toga_birrete_borla") return "V_TOGA_BIRRETE_BORLA";
+  if (pkg.variant === "medalla_standard") return "V_MEDALLA_STANDARD";
+  if (pkg.variant === "medalla_personalizada") return "V_MEDALLA_PERSONALIZADA";
+  if (pkg.variant === "oso_graduacion") return "V_OSO_GRADUACION";
 
   if (pkg.variant === "sec_b") return "SEC_B";
   if (pkg.variant === "sec_a") return "SEC_A";
