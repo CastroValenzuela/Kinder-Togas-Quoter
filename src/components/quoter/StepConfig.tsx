@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem, Award, Ruler, Palette, User, Gift } from "lucide-react";
+import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem, Award, Ruler, Palette, User, Gift, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 const assets = import.meta.glob('@/assets/**/*.{jpg,jpeg,png}', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 
