@@ -10,8 +10,7 @@ export function StepLevel({ value, onChange }: Props) {
   return (
     <div>
       <header className="mb-8 sm:mb-10">
-        <p className="text-[11px] uppercase tracking-[0.25em] text-[#C5A85A] font-bold">PASO 01</p>
-        <h2 className="font-serif text-3xl sm:text-4xl mt-2 text-[#1E2346] font-bold tracking-tight">
+        <h2 className="font-serif text-3xl sm:text-4xl text-[#1E2346] font-bold tracking-tight">
           ¿Para qué nivel escolar?
         </h2>
         <p className="mt-2.5 text-[#64748B] text-sm sm:text-base font-normal">

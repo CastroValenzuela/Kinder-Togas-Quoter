@@ -18,10 +18,8 @@ export function StepperBar({ step }: { step: number }) {
 
 export function StepperLabel({ step }: { step: number }) {
   return (
-    <p className="text-[11px] tracking-[0.2em] uppercase text-[#64748B] font-medium">
-      <span className="text-[#C5A85A] font-bold">PASO {step} DE 5</span>
-      <span className="mx-2 text-[#CBD5E1]">·</span>
-      <span className="text-[#1E2346] font-semibold">{LABELS[step - 1]}</span>
+    <p className="text-xs tracking-[0.2em] uppercase text-[#1E2346] font-bold">
+      {LABELS[step - 1]}
     </p>
   );
 }

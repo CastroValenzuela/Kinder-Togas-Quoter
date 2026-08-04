@@ -76,12 +76,11 @@ export function StepDetails({
 
   return (
     <div className="mx-auto max-w-xl">
-      <header className="mb-10 text-center sm:text-left">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Paso 04</p>
-        <h2 className="font-display text-3xl sm:text-4xl mt-2 text-foreground">
+      <header className="mb-8 sm:mb-10 text-center sm:text-left">
+        <h2 className="font-serif text-3xl sm:text-4xl text-[#1E2346] font-bold tracking-tight">
           Detalles de contacto
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-sm text-[#64748B]">
           Estos datos aparecerán en tu PDF oficial de cotización.
         </p>
       </header>

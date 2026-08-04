@@ -113,9 +113,8 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
 
   return (
     <div>
-      <header className="mb-10">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Paso 05</p>
-        <h2 className="font-display text-3xl sm:text-4xl mt-2 text-foreground">
+      <header className="mb-8 sm:mb-10">
+        <h2 className="font-serif text-3xl sm:text-4xl text-[#1E2346] font-bold tracking-tight">
           {quoteNumber ? "Cotización Finalizada" : "Generando Cotización..."}
         </h2>
       </header>
