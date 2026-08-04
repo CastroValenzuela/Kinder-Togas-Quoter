@@ -212,7 +212,7 @@ export function generateQuotePDF(q: QuoteData): void {
     } else if (variant === "medalla_personalizada") {
       itemDescription = `Medalla Personalizada (Venta Preescolar):\n• Medalla grabada con nombre y detalles personalizados.`;
     } else if (variant === "oso_graduacion") {
-      itemDescription = `Oso de Graduación (Venta Preescolar):\n• Oso de peluche de graduación con mini toga y birrete\n• Color del Oso: ${q.stolaColor === "azul" ? "Azul" : "Rosa"}`;
+      itemDescription = `Oso de Graduación (Venta Preescolar):\n• Oso de peluche de graduación con toga y camiseta personalizada\n• Color del Oso: ${q.stolaColor === "azul" ? "Azul" : "Rosa"}`;
     } else if (variant?.startsWith("birrete_")) {
       itemDescription = `Birrete de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Color de Birrete: ${stolaVal}`;
     } else if (variant?.startsWith("borla_")) {

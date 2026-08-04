@@ -291,7 +291,7 @@ const FEATURES_VENTA_RECUERDOS: Record<"medalla_standard" | "medalla_personaliza
     { icon: Sparkles, text: "Acabado metálico premium." }
   ],
   oso_graduacion: [
-    { icon: Shirt, text: "Oso de peluche de graduación con mini toga y birrete." },
+    { icon: Shirt, text: "Oso de peluche de graduación con toga y camiseta personalizada." },
     { icon: Palette, text: "Color de vestimenta a elegir (Azul o Rosa)." }
   ]
 };
@@ -832,7 +832,7 @@ export function StepConfig({
                       id: "oso_graduacion",
                       code: "O.1",
                       title: "Oso de Graduación",
-                      desc: "Oso de peluche con toga y birrete, color a elegir (Azul o Rosa)",
+                      desc: "Oso de peluche de graduación con toga y camiseta personalizada.",
                       price: PRICES.V_OSO_GRADUACION,
                       payload: { kind: "B", variant: "oso_graduacion" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "oso_graduacion"

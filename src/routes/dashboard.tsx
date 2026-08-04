@@ -3366,7 +3366,7 @@ export function AdminDashboard() {
                         key: "V_OSO_GRADUACION",
                         service: "venta",
                         title: "Venta Preescolar — Oso de Graduación",
-                        desc: "Oso de peluche con toga y birrete, color a elegir para Venta.",
+                        desc: "Oso de peluche de graduación con toga y camiseta personalizada.",
                         levels: ["preescolar"],
                       },
 

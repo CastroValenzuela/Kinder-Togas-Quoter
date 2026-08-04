@@ -260,7 +260,7 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
               includesText = pkgVariant === "medalla_standard" ? "Medalla conmemorativa clásica de graduación." : "Medalla grabada personalizada con nombre y detalles.";
             } else if (pkgVariant === "oso_graduacion") {
               detailsLine += `🎨 *Color del Oso:* ${stolaColor === "azul" ? "Azul" : "Rosa"}\n`;
-              includesText = "Oso de peluche con toga y birrete personalizado.";
+              includesText = "Oso de peluche de graduación con toga y camiseta personalizada.";
             } else if (pkgVariant?.startsWith("birrete_")) {
               detailsLine += `🎨 *Color de Birrete:* ${selectedStola}\n`;
               includesText = "Birrete personalizado listo para comprar y conservar.";
