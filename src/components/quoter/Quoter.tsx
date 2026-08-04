@@ -320,11 +320,11 @@ export function Quoter() {
           <div className="flex items-center gap-3">
             <img src={logo} alt="Kinder Togas Logo" className="h-10 w-10 object-contain" />
             <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3">
-              <div className="font-display text-2xl tracking-tight text-foreground whitespace-nowrap">
+              <div className="font-serif text-2xl sm:text-3xl tracking-tight text-[#1E2346] font-bold whitespace-nowrap">
                 Kinder Togas
               </div>
-              <div className="hidden sm:block h-6 w-px bg-border self-center" />
-              <div className="font-display text-2xl tracking-tight text-muted-foreground/40 whitespace-nowrap">
+              <div className="hidden sm:block h-6 w-px bg-[#E2E8F0] self-center" />
+              <div className="font-serif text-2xl sm:text-3xl tracking-tight text-[#C5A85A] font-normal whitespace-nowrap">
                 Cotizador
               </div>
             </div>
@@ -336,11 +336,11 @@ export function Quoter() {
                   variant="ghost"
                   size="sm"
                   onClick={resetQuoter}
-                  className="text-xs uppercase tracking-widest text-muted-foreground hover:text-destructive transition-colors px-2 h-8"
+                  className="text-xs uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-2 h-8"
                 >
                   Reiniciar
                 </Button>
-                <div className="h-4 w-px bg-border mx-1" />
+                <div className="h-4 w-px bg-[#E2E8F0] mx-1" />
               </>
             )}
             <Button
@@ -352,14 +352,14 @@ export function Quoter() {
                   window.location.href = "https://kindertogas.com/";
                 }, 50);
               }}
-              className="text-xs uppercase tracking-widest text-muted-foreground hover:text-navy transition-colors px-2 h-8"
+              className="text-xs uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-2 h-8"
             >
               Salir
             </Button>
           </div>
         </div>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 -mt-3 pb-3 flex justify-center">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground/60 font-medium text-center">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-[#64748B]/70 font-medium text-center">
             Momentos que se quedan para siempre
           </p>
         </div>

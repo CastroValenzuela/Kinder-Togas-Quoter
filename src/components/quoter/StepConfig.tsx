@@ -680,11 +680,11 @@ export function StepConfig({
                             }
                           }}
                           className={cn(
-                            "relative flex flex-col items-center justify-center p-3.5 rounded-2xl border text-center transition-all duration-300 cursor-pointer group shadow-[0_1px_2px_rgba(0,0,0,0.02)]",
-                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                            "relative flex flex-col items-center justify-center p-3.5 rounded-2xl border text-center transition-all duration-200 cursor-pointer group shadow-xs select-none",
+                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A85A]/50",
                             active
-                              ? "border-navy bg-cream/90 text-foreground font-semibold shadow-md scale-[1.03] -translate-y-0.5"
-                              : "border-hairline bg-card/40 hover:bg-card hover:border-navy/30 text-muted-foreground hover:text-foreground",
+                              ? "border-[#C5A85A] bg-[#FDFBF7] text-[#1E2346] font-bold shadow-xs scale-[1.02]"
+                              : "border-[#E2E8F0] bg-white hover:bg-[#FDFBF7]/40 hover:border-[#C5A85A]/50 text-[#64748B] hover:text-[#1E2346]",
                             cat.id === "recuerdos" ? "col-span-2 md:col-span-1" : "col-span-1"
                           )}
                         >
@@ -695,18 +695,18 @@ export function StepConfig({
 
                           {/* Icon Wrapper */}
                           <div className={cn(
-                            "h-9 w-9 rounded-full flex items-center justify-center mb-2 transition-all duration-300",
+                            "h-9 w-9 rounded-full flex items-center justify-center mb-2 transition-all duration-200",
                             active 
-                              ? "bg-navy text-navy-foreground" 
-                              : "bg-muted group-hover:bg-muted/80 text-muted-foreground group-hover:text-foreground"
+                              ? "bg-[#1E2346] text-white" 
+                              : "bg-slate-100 group-hover:bg-[#FDFBF7] text-[#64748B] group-hover:text-[#1E2346]"
                           )}>
                             <Icon className="h-4.5 w-4.5" strokeWidth={1.5} />
                           </div>
 
                           {/* Label */}
                           <span className={cn(
-                            "text-xs sm:text-sm font-medium tracking-wide block transition-colors duration-300",
-                            active ? "text-navy" : "text-foreground/80"
+                            "text-xs sm:text-sm font-medium tracking-wide block transition-colors duration-200 font-serif",
+                            active ? "text-[#1E2346] font-bold" : "text-[#1E2346]"
                           )}>
                             {cat.label}
                           </span>
@@ -877,11 +877,11 @@ export function StepConfig({
                           }
                         }}
                         className={cn(
-                          "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
-                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                          "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 cursor-pointer select-none",
+                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A85A]/50",
                           opt.isActive
-                            ? "border-navy bg-cream"
-                            : "border-hairline hover:border-navy/40",
+                            ? "border-[#C5A85A] bg-[#FDFBF7] shadow-xs text-[#1E2346]"
+                            : "border-[#E2E8F0] bg-white hover:border-[#C5A85A]/50 hover:bg-[#FDFBF7]/40 text-[#1E2346]",
                         )}
                       >
                         <div className="flex items-baseline gap-3 min-w-0">
@@ -893,18 +893,25 @@ export function StepConfig({
                             <p className="text-xs text-muted-foreground truncate">{opt.desc}</p>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end shrink-0 select-none">
-                          <span className="font-sans font-semibold text-base tabular-nums text-foreground whitespace-nowrap">
-                            {formatMXN(netPrice)}
-                          </span>
-                          {discount > 0 && (
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="text-[10px] line-through text-muted-foreground tabular-nums">
-                                {formatMXN(originalPrice)}
-                              </span>
-                              <span className="text-[9px] font-bold text-white bg-[#C5A85A] px-1.5 py-0.5 rounded-md tracking-wider">
-                                -{discount}%
-                              </span>
+                        <div className="flex items-center gap-3 shrink-0 select-none">
+                          <div className="flex flex-col items-end">
+                            <span className="font-sans font-semibold text-base tabular-nums text-[#1E2346] whitespace-nowrap">
+                              {formatMXN(netPrice)}
+                            </span>
+                            {discount > 0 && (
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="text-[10px] line-through text-[#64748B] tabular-nums">
+                                  {formatMXN(originalPrice)}
+                                </span>
+                                <span className="text-[9px] font-bold text-white bg-[#C5A85A] px-1.5 py-0.5 rounded-md tracking-wider">
+                                  -{discount}%
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          {opt.isActive && (
+                            <div className="h-5 w-5 rounded-full bg-[#1E2346] text-white flex items-center justify-center shadow-xs shrink-0 animate-in zoom-in-75 duration-200">
+                              <Check className="h-3 w-3 stroke-[3]" />
                             </div>
                           )}
                         </div>
