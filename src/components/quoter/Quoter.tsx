@@ -29,6 +29,7 @@ import logo from "@/assets/logo.png";
 import { supabase } from "@/lib/supabase";
 import { MEXICO_STATES } from "@/lib/mexico-locations";
 import bgStep1 from "@/assets/bg-step1.jpg";
+import bgStep1Alt from "@/assets/bg-step1.1.jpg";
 import bgStep2 from "@/assets/bg-step2.jpg";
 
 type Step = 1 | 2 | 3 | 4 | 5;
@@ -87,6 +88,7 @@ export function Quoter() {
   const [pricesLoaded, setPricesLoaded] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+  const randomBg1 = useMemo(() => Math.random() > 0.5 ? bgStep1 : bgStep1Alt, []);
 
   useEffect(() => {
     setIsMounted(true);
@@ -299,14 +301,14 @@ export function Quoter() {
     <div className={`min-h-screen flex flex-col relative ${(step === 1 || step === 2) ? 'bg-white' : 'bg-[#F8FAFC]'}`}>
       {step === 1 && (
         <div 
-          className="absolute inset-0 pointer-events-none z-0 hidden sm:block opacity-60 xl:opacity-100 transition-opacity duration-1000"
+          className="absolute inset-0 pointer-events-none z-0 hidden sm:block opacity-70 xl:opacity-100 transition-opacity duration-1000"
           style={{
-            backgroundImage: `url(${bgStep1})`,
+            backgroundImage: `url(${randomBg1})`,
             backgroundPosition: 'right center',
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
-            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
-            maskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 10%, black 30%)',
+            maskImage: 'linear-gradient(to right, transparent 0%, transparent 10%, black 30%)',
           }}
         />
       )}
