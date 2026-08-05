@@ -305,8 +305,8 @@ export function Quoter() {
             backgroundPosition: 'right center',
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
-            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 35%, black 75%)',
-            maskImage: 'linear-gradient(to right, transparent 0%, transparent 35%, black 75%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
+            maskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
           }}
         />
       )}
