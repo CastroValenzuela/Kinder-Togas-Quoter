@@ -147,14 +147,14 @@ const FEATURES_VENTA_PREESCOLAR: Record<"esencial" | "hybrid" | "max", { icon: t
   ],
 };
 
-const FEATURES_VENTA_TOGAS: Record<"toga_completa" | "toga_borla", { icon: typeof Camera; text: string }[]> = {
-  toga_completa: [
+const FEATURES_VENTA_TOGAS: Record<"toga_birrete_estola" | "toga_birrete_borla", { icon: typeof Camera; text: string }[]> = {
+  toga_birrete_estola: [
     { icon: Shirt, text: "Incluye Toga de poliéster brillante de alta calidad." },
     { icon: GraduationCap, text: "Incluye Birrete clásico forrado con botón y listón reforzado." },
     { icon: Award, text: "Incluye Borla del año con charm 2026 dorado." },
     { icon: Layers, text: "Incluye Estola de graduación premium." },
   ],
-  toga_borla: [
+  toga_birrete_borla: [
     { icon: Shirt, text: "Incluye Toga de poliéster brillante de alta calidad." },
     { icon: GraduationCap, text: "Incluye Birrete clásico forrado con botón y listón reforzado." },
     { icon: Award, text: "Incluye Borla del año con charm 2026 dorado." },
@@ -364,7 +364,7 @@ export function StepConfig({
   let features = FEATURES_A;
   if (service === "venta" && level === "preescolar") {
     if (productCategory === "togas") {
-      features = FEATURES_VENTA_TOGAS[(pkg?.variant as "toga_completa" | "toga_borla") || "toga_completa"] || FEATURES_A;
+      features = FEATURES_VENTA_TOGAS[(pkg?.variant as "toga_birrete_estola" | "toga_birrete_borla") || "toga_birrete_estola"] || FEATURES_A;
     } else if (productCategory === "birretes") {
       features = FEATURES_VENTA_BIRRETES[(pkg?.variant as "birrete_decorado" | "birrete_liso") || "birrete_decorado"] || FEATURES_A;
     } else if (productCategory === "borlas") {
@@ -414,7 +414,7 @@ export function StepConfig({
             let colorSuffix = togaColor;
             if (colorSuffix === "azul_cielo") colorSuffix = "azul";
             
-            if (pkg.variant === "toga_birrete_estola" || pkg.variant === "toga_completa") {
+            if (pkg.variant === "toga_birrete_estola") {
               if (colorSuffix === "rojo") {
                 result = getAsset(`Venta/Preescolar/Togas/T2.rojo.jpeg`);
               } else {
@@ -670,7 +670,7 @@ export function StepConfig({
                             if (!active) {
                               onProductCategory(cat.id);
                               if (cat.id === "togas") {
-                                onPkg({ kind: "B", variant: "toga_completa" });
+                                onPkg({ kind: "B", variant: "toga_birrete_borla" });
                                 onTogaColor("negro");
                                 onStolaColor("dorada");
                               } else if (cat.id === "birretes") {
@@ -770,7 +770,7 @@ export function StepConfig({
                       desc: "Toga, Birrete y Borla",
                       price: PRICES.V_TOGA_BIRRETE_BORLA,
                       payload: { kind: "B", variant: "toga_birrete_borla" } as const,
-                      isActive: pkg?.kind === "B" && (pkg.variant === "toga_birrete_borla" || pkg.variant === "toga_borla")
+                      isActive: pkg?.kind === "B" && pkg.variant === "toga_birrete_borla"
                     },
                     {
                       id: "toga_birrete_estola",
@@ -779,7 +779,7 @@ export function StepConfig({
                       desc: "Toga, Birrete, Borla y Estola",
                       price: PRICES.V_TOGA_BIRRETE_ESTOLA,
                       payload: { kind: "B", variant: "toga_birrete_estola" } as const,
-                      isActive: pkg?.kind === "B" && (pkg.variant === "toga_birrete_estola" || pkg.variant === "toga_completa")
+                      isActive: pkg?.kind === "B" && pkg.variant === "toga_birrete_estola"
                     }
                   ] : productCategory === "birretes" ? [
                     {
@@ -1149,11 +1149,11 @@ export function StepConfig({
                   }
                   return [];
                 }
-                return STOLA_COLORS.filter((s: any) => {
+                return STOLA_COLORS.filter((s: StolaColor) => {
                   if (level === "preescolar") {
                     if (service === "venta") {
                       if (productCategory === "togas") {
-                        if (pkg?.variant === "toga_borla") return false;
+                        if (pkg?.variant === "toga_birrete_borla") return false;
                         const ids = ["azul_pastel", "azul_turquesa", "azul_marino", "rosa_claro", "rosa_fiusha", "lila", "morado", "anaranjado", "verde_limon", "verde_esmeralda", "verde_bandera", "roja", "blanco", "amarillo"];
                         return ids.includes(s.id);
                       }

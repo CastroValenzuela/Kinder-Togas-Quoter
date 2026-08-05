@@ -70,13 +70,13 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
     const packageIndex = rows.findIndex(r => r.label === "Paquete");
     if (packageIndex !== -1) {
       if (service === "venta") {
-        if (pkgVariant === "toga_completa") {
+        if (pkgVariant === "toga_birrete_estola") {
           rows.splice(packageIndex + 1, 0, 
             { label: "Color Toga", value: selectedToga, step: 3 },
             { label: "Talla de Toga", value: togaSize || "M", step: 3 },
             { label: "Estola", value: stolaVal, step: 3 }
           );
-        } else if (pkgVariant === "toga_borla") {
+        } else if (pkgVariant === "toga_birrete_borla") {
           rows.splice(packageIndex + 1, 0, 
             { label: "Color Toga", value: selectedToga, step: 3 },
             { label: "Talla de Toga", value: togaSize || "M", step: 3 }
@@ -244,12 +244,12 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
           let includesText = "";
 
           if (service === "venta") {
-            if (level === "preescolar" && (pkgVariant === "toga_completa" || pkgVariant === "toga_borla")) {
+            if (level === "preescolar" && (pkgVariant === "toga_birrete_estola" || pkgVariant === "toga_birrete_borla")) {
               detailsLine += `🎨 *Color de Toga:* ${selectedToga}\n`;
               if (togaSize) {
                 detailsLine += `📏 *Talla:* ${togaSize}\n`;
               }
-              if (pkgVariant === "toga_completa") {
+              if (pkgVariant === "toga_birrete_estola") {
                 detailsLine += `🎗️ *Estola:* ${selectedStola}\n`;
                 includesText = "Toga, Birrete y Estola personalizada listos para comprar y conservar.";
               } else {
