@@ -459,9 +459,9 @@ export function Quoter() {
                   setService(s);
                   if (s === "venta" && level === "preescolar") {
                     setProductCategory("togas");
-                    setPkg({ kind: "B", variant: "toga_completa" });
-                    setTogaColor("negro");
-                    setStolaColor("dorada");
+                    setPkg({ kind: "B", variant: "toga_birrete_borla" });
+                    setTogaColor("guinda");
+                    setStolaColor("blanco");
                   } else {
                     setPkg({ kind: "A" });
                   }

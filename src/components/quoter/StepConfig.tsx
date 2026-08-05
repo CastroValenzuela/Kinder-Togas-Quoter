@@ -411,8 +411,18 @@ export function StepConfig({
       } else if (pkg?.kind === "B" && pkg?.variant) {
         if (service === "venta") {
           if (productCategory === "togas") {
-            const colorKey = togaColor === "roja" ? "rojo" : togaColor;
-            result = VENTA_PREESCOLAR_TOGAS[colorKey] || VENTA_PREESCOLAR_TOGAS.negro;
+            let colorSuffix = togaColor;
+            if (colorSuffix === "azul_cielo") colorSuffix = "azul";
+            
+            if (pkg.variant === "toga_birrete_estola" || pkg.variant === "toga_completa") {
+              if (colorSuffix === "rojo") {
+                result = getAsset(`Venta/Preescolar/Togas/T2.rojo.jpeg`);
+              } else {
+                result = getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}.jpeg`);
+              }
+            } else {
+              result = getAsset(`Venta/Preescolar/Togas/T1-${colorSuffix}.jpeg`);
+            }
           } else if (productCategory === "birretes") {
             let colorSuffix = "negro"; // default
             if (stolaColor === "azul") colorSuffix = "azul";
@@ -754,22 +764,22 @@ export function StepConfig({
                     }
                   ] : (productCategory === "togas" ? [
                     {
-                      id: "toga_completa",
-                      code: "T.1",
-                      title: "Toga Completa",
-                      desc: "Incluye Toga, Birrete y Estola",
-                      price: PRICES.V_TOGA_BIRRETE_ESTOLA,
-                      payload: { kind: "B", variant: "toga_completa" } as const,
-                      isActive: pkg?.kind === "B" && pkg.variant === "toga_completa"
+                      id: "toga_birrete_borla",
+                      code: "T1",
+                      title: "Paquete T1",
+                      desc: "Toga, Birrete y Borla",
+                      price: PRICES.V_TOGA_BIRRETE_BORLA,
+                      payload: { kind: "B", variant: "toga_birrete_borla" } as const,
+                      isActive: pkg?.kind === "B" && (pkg.variant === "toga_birrete_borla" || pkg.variant === "toga_borla")
                     },
                     {
-                      id: "toga_borla",
-                      code: "T.2",
-                      title: "Toga y Birrete con Borla",
-                      desc: "Toga y birrete con borla del año (sin estola)",
-                      price: PRICES.V_TOGA_BIRRETE_BORLA,
-                      payload: { kind: "B", variant: "toga_borla" } as const,
-                      isActive: pkg?.kind === "B" && pkg.variant === "toga_borla"
+                      id: "toga_birrete_estola",
+                      code: "T2",
+                      title: "Paquete T2",
+                      desc: "Toga, Birrete, Borla y Estola",
+                      price: PRICES.V_TOGA_BIRRETE_ESTOLA,
+                      payload: { kind: "B", variant: "toga_birrete_estola" } as const,
+                      isActive: pkg?.kind === "B" && (pkg.variant === "toga_birrete_estola" || pkg.variant === "toga_completa")
                     }
                   ] : productCategory === "birretes" ? [
                     {
@@ -1095,7 +1105,12 @@ export function StepConfig({
                   Color de Toga
                 </p>
                 <div className="flex flex-wrap gap-2.5">
-                  {(service === "venta" ? VENTA_PREESCOLAR_TOGA_COLORS : TOGA_COLORS.filter((c) => level === "preescolar" || c.id === "negro")).map((c) => {
+                  {TOGA_COLORS.filter((c) => {
+                    if (service === "venta" && productCategory === "togas") {
+                      return ["azul", "guinda", "negro", "rojo", "rosa"].includes(c.id);
+                    }
+                    return level === "preescolar" || c.id === "negro";
+                  }).map((c) => {
                     const active = togaColor === c.id;
                     return (
                       <button
