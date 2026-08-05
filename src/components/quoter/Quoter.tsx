@@ -29,7 +29,6 @@ import logo from "@/assets/logo.png";
 import { supabase } from "@/lib/supabase";
 import { MEXICO_STATES } from "@/lib/mexico-locations";
 import bgStep1 from "@/assets/bg-step1.jpg";
-import bgStep1Alt from "@/assets/bg-step1.1.jpg";
 import bgStep2 from "@/assets/bg-step2.jpg";
 
 type Step = 1 | 2 | 3 | 4 | 5;
@@ -88,7 +87,6 @@ export function Quoter() {
   const [pricesLoaded, setPricesLoaded] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [isMounted, setIsMounted] = useState(false);
-  const randomBg1 = useMemo(() => Math.random() > 0.5 ? bgStep1 : bgStep1Alt, []);
 
   useEffect(() => {
     setIsMounted(true);
@@ -303,7 +301,7 @@ export function Quoter() {
         <div 
           className="absolute inset-0 pointer-events-none z-0 hidden sm:block opacity-70 xl:opacity-100 transition-opacity duration-1000"
           style={{
-            backgroundImage: `url(${randomBg1})`,
+            backgroundImage: `url(${bgStep1})`,
             backgroundPosition: 'right center',
             backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat',
