@@ -317,30 +317,30 @@ export function Quoter() {
               </Button>
             </div>
           )}
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Kinder Togas Logo" className="h-10 w-10 object-contain" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <img src={logo} alt="Kinder Togas Logo" className="h-8 w-8 sm:h-10 sm:w-10 object-contain" />
             <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3">
-              <div className="font-serif text-2xl sm:text-3xl tracking-tight text-[#1E2346] font-bold whitespace-nowrap">
+              <div className="font-serif text-xl sm:text-3xl tracking-tight text-[#1E2346] font-bold whitespace-nowrap">
                 Kinder Togas
               </div>
               <div className="hidden sm:block h-6 w-px bg-[#E2E8F0] self-center" />
-              <div className="font-serif text-2xl sm:text-3xl tracking-tight text-[#C5A85A] font-normal whitespace-nowrap">
+              <div className="font-serif text-xl sm:text-3xl tracking-tight text-[#C5A85A] font-normal whitespace-nowrap leading-none mt-0.5 sm:mt-0">
                 Cotizador
               </div>
             </div>
           </div>
-          <div className="absolute right-4 sm:right-6 flex items-center gap-2">
+          <div className="absolute right-2 sm:right-6 flex items-center gap-1 sm:gap-2">
             {(step > 1 || level || service) && step < 5 && (
               <>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={resetQuoter}
-                  className="text-xs uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-2 h-8"
+                  className="text-[10px] sm:text-xs uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-1 sm:px-2 h-8"
                 >
                   Reiniciar
                 </Button>
-                <div className="h-4 w-px bg-[#E2E8F0] mx-1" />
+                <div className="h-3 sm:h-4 w-px bg-[#E2E8F0] mx-0.5 sm:mx-1" />
               </>
             )}
             <Button
@@ -352,7 +352,7 @@ export function Quoter() {
                   window.location.href = "https://kindertogas.com/";
                 }, 50);
               }}
-              className="text-xs uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-2 h-8"
+              className="text-[10px] sm:text-xs uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-1 sm:px-2 h-8"
             >
               Salir
             </Button>
