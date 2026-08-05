@@ -61,6 +61,8 @@ export const TOGA_COLORS: TogaColorOption[] = [
   { id: "magenta", label: "Turquesa", hex: "#06B6D4" },
   { id: "rojo", label: "Rojo", hex: "#DC2626" },
   { id: "verde", label: "Verde", hex: "#16A34A" },
+  { id: "guinda", label: "Guinda", hex: "#7B1113" },
+  { id: "rosa", label: "Rosa", hex: "#FBCFE8" },
 ];
 
 export function colorLabel(color?: string): string {

@@ -546,10 +546,10 @@ export function Quoter() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-hairline bg-background mt-auto">
+      <footer className="border-t border-[#E5E0D8] bg-[#FCFBF8] mt-auto">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 flex items-center justify-center gap-3">
           <img src={logo} alt="Kinder Togas" className="h-7 w-7 object-contain" />
-          <p className="text-sm text-muted-foreground whitespace-nowrap">
+          <p className="text-sm text-navy whitespace-nowrap">
             © {new Date().getFullYear()} Kinder Togas. Todos los derechos reservados.
           </p>
         </div>

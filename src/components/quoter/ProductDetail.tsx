@@ -38,6 +38,10 @@ export function ProductDetail({ category, onBack, variant = "default" }: Product
     } else if (category === "borlas") {
       setPkg({ kind: "B", variant: "borla_dije" });
       setStolaColor("dorada");
+    } else if (category === "togas") {
+      setPkg({ kind: "B", variant: "toga_birrete_borla" });
+      setTogaColor("guinda");
+      setStolaColor("blanco");
     } else {
       setPkg({ kind: "B", variant: "esencial" });
       setStolaColor("blanco");
