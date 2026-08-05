@@ -28,6 +28,8 @@ import {
 import logo from "@/assets/logo.png";
 import { supabase } from "@/lib/supabase";
 import { MEXICO_STATES } from "@/lib/mexico-locations";
+import bgStep1 from "@/assets/bg-step1.jpg";
+import bgStep2 from "@/assets/bg-step2.jpg";
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -294,7 +296,34 @@ export function Quoter() {
   const wide = step === 3;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+    <div className={`min-h-screen flex flex-col relative ${(step === 1 || step === 2) ? 'bg-white' : 'bg-[#F8FAFC]'}`}>
+      {step === 1 && (
+        <div 
+          className="absolute inset-0 pointer-events-none z-0 hidden sm:block opacity-60 xl:opacity-100 transition-opacity duration-1000"
+          style={{
+            backgroundImage: `url(${bgStep1})`,
+            backgroundPosition: 'right center',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 35%, black 75%)',
+            maskImage: 'linear-gradient(to right, transparent 0%, transparent 35%, black 75%)',
+          }}
+        />
+      )}
+      {step === 2 && (
+        <div 
+          className="absolute inset-0 pointer-events-none z-0 hidden sm:block opacity-60 xl:opacity-100 transition-opacity duration-1000"
+          style={{
+            backgroundImage: `url(${bgStep2})`,
+            backgroundPosition: 'right center',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 35%, black 75%)',
+            maskImage: 'linear-gradient(to right, transparent 0%, transparent 35%, black 75%)',
+          }}
+        />
+      )}
+      
       {/* Header — centered logo, full-width progress bar, label */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-slate-100/50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-4 pb-3">
@@ -373,7 +402,7 @@ export function Quoter() {
       </header>
 
       {/* Content */}
-      <main className="w-full pt-6 pb-16 flex-1">
+      <main className="w-full pt-6 pb-16 flex-1 relative z-10">
         {/* Selection Summary Pills */}
         {((level && step > 1) || (service && step > 2) || ((city || pkg) && step > 3)) && step < 5 && (
           <div className="mx-auto max-w-3xl px-4 sm:px-6 mb-8 animate-in fade-in slide-in-from-top-2 duration-500">
@@ -549,7 +578,7 @@ export function Quoter() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[#E5E0D8] bg-[#FCFBF8] mt-auto">
+      <footer className="border-t border-[#E5E0D8] bg-[#FCFBF8] mt-auto relative z-10">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 flex items-center justify-center gap-3">
           <img src={logo} alt="Kinder Togas" className="h-7 w-7 object-contain" />
           <p className="text-sm text-navy whitespace-nowrap">

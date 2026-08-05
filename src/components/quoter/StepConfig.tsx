@@ -290,7 +290,7 @@ const FEATURES_VENTA_RECUERDOS: Record<"medalla_standard" | "medalla_personaliza
   ],
   oso_graduacion: [
     { icon: Shirt, text: "Oso de peluche de graduación con toga y camiseta personalizada." },
-    { icon: Palette, text: "Color de vestimenta a elegir (Azul o Rosa)." }
+    { icon: Palette, text: "Color de oso a elegir (Azul o Rosa)." }
   ]
 };
 
