@@ -113,18 +113,18 @@ const FEATURES_A = [
 
 const FEATURES_B: Record<"esencial" | "hybrid" | "max", { icon: typeof Camera; text: string }[]> = {
   esencial: [
-    { icon: Camera, text: "Diseño compacto 9x12 cm en ambos lados." },
-    { icon: Shirt, text: "Incluye toga premium, birrete, borla del año y estola." },
+    { icon: Shirt, text: "Renta de toga, birrete con borla 2026." },
+    { icon: Camera, text: "Estola personalizada con impresión sencilla y clara en ambos lados." },
     { icon: Truck, text: "Entrega y recolección coordinadas." },
   ],
   hybrid: [
     { icon: Camera, text: "Impresión combinada 9×12 cm + 9×35 cm panorámica." },
-    { icon: Shirt, text: "Toga premium, birrete, borla del año y estola." },
+    { icon: Shirt, text: "Renta de toga, birrete con borla 2026 y estola." },
     { icon: Truck, text: "Entrega y recolección coordinadas." },
   ],
   max: [
     { icon: Camera, text: "Impresión 9×35 cm panorámica en ambos lados." },
-    { icon: Shirt, text: "Toga premium, birrete, borla del año y estola." },
+    { icon: Shirt, text: "Renta de toga, birrete con borla 2026 y estola." },
     { icon: Layers, text: "Máxima calidad de impresión profesional." },
   ],
 };
@@ -187,13 +187,13 @@ const FEATURES_B_SEC: Record<"sec_a" | "sec_b", { icon: typeof Camera; text: str
 
 const FEATURES_B_PREP: Record<"prep_a" | "prep_b", { icon: typeof Camera; text: string }[]> = {
   prep_a: [
-    { icon: Camera, text: "Impresión mixta: institucional + datos discretos." },
+    { icon: Camera, text: "Estola con impresión mixta: institucional + datos discretos." },
     { icon: Shirt, text: "Toga, birrete, borla y estola personalizada." },
     { icon: Sparkles, text: "Presencia visual con equilibrio formal." },
     { icon: Gem, text: "Calidad premium en cada detalle." },
   ],
   prep_b: [
-    { icon: Camera, text: "Impresión discreta, sobria en ambos lados." },
+    { icon: Camera, text: "Estola con impresión discreta, sobria en ambos lados." },
     { icon: Shirt, text: "Toga, birrete, borla y estola personalizada." },
     { icon: Truck, text: "Entrega y recolección coordinadas." },
     { icon: Gem, text: "Calidad premium en cada detalle." },
@@ -227,8 +227,8 @@ const FEATURES_B_PRI: Record<"pri_a" | "pri_b" | "pri_c", { icon: typeof Camera;
     { icon: Truck, text: "Entrega y recolección coordinadas." },
   ],
   pri_c: [
-    { icon: Camera, text: "Impresión sencilla y clara en ambos lados." },
-    { icon: Shirt, text: "Toga, birrete, borla y estola básica funcional." },
+    { icon: Camera, text: "Estola personalizada con impresión sencilla en ambos lados." },
+    { icon: Shirt, text: "Renta de toga, birrete y borla del año." },
     { icon: Truck, text: "Entrega y recolección coordinadas." },
   ],
 };
@@ -241,17 +241,15 @@ const FEATURES_UNI_A = [
 ];
 
 const FEATURES_UNI_B = [
-  { icon: Shirt, text: "Renta de toga premium" },
-  { icon: GraduationCap, text: "Birrete con borla institucional" },
-  { icon: Layers, text: "Estola satinada con impresión de alta calidad a color en ambos lados" },
+  { icon: Shirt, text: "Renta de toga premium y Birrete con borla del año." },
+  { icon: Layers, text: "Estola personalizada satinada con impresión de alta calidad a color en ambos lados" },
   { icon: Truck, text: "Entrega y recolección coordinadas" },
   { icon: Users, text: "Atención personalizada y asesoría" },
 ];
 
 const FEATURES_UNI_C = [
-  { icon: Shirt, text: "Renta de toga premium" },
-  { icon: GraduationCap, text: "Birrete con borla institucional" },
-  { icon: Layers, text: "Estola satinada con bordado de alta calidad en ambos lados" },
+  { icon: Shirt, text: "Renta de toga premium y Birrete con borla institucional" },
+  { icon: Layers, text: "Estola personalizada satinada con bordado de alta calidad en ambos lados" },
   { icon: Truck, text: "Entrega y recolección coordinadas" },
   { icon: Users, text: "Atención personalizada y asesoría" },
 ];
@@ -358,7 +356,9 @@ export function StepConfig({
       return v.id === "prep_a" || v.id === "prep_b";
     }
     if (isUni) return v.id.startsWith("uni_");
-    return !v.id.startsWith("sec_") && !v.id.startsWith("pri_") && !v.id.startsWith("prep_") && !v.id.startsWith("uni_");
+    
+    // Para Preescolar Renta (y cualquier otro caso no contemplado)
+    return ["esencial", "hybrid", "max"].includes(v.id);
   });
 
   let features = FEATURES_A;
