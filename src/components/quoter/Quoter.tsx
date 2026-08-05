@@ -305,7 +305,7 @@ export function Quoter() {
           style={{
             backgroundImage: `url(${randomBg1})`,
             backgroundPosition: 'right center',
-            backgroundSize: 'cover',
+            backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat',
             WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 10%, black 30%)',
             maskImage: 'linear-gradient(to right, transparent 0%, transparent 10%, black 30%)',
