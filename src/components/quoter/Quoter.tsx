@@ -297,15 +297,75 @@ export function Quoter() {
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
       {/* Header — centered logo, full-width progress bar, label */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-6 pb-4 flex items-center justify-center relative">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-4 pb-2 flex flex-col sm:flex-row items-center justify-center relative gap-2 sm:gap-0">
           {isMounted && !(typeof window !== "undefined" && (window as any).__PLAYWRIGHT_TEST__) && import.meta.env.VITE_TURNSTILE_SITE_KEY && (
             <Turnstile
               siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
               onSuccess={(token) => setTurnstileToken(token)}
             />
           )}
+
+          {/* MOBILE TOP NAV (Hidden on desktop) */}
+          <div className="flex w-full items-center justify-between sm:hidden">
+            <div className="flex-1">
+              {step > 1 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={step === 5 ? resetQuoter : goBack}
+                  className="gap-1 text-muted-foreground hover:text-foreground h-8 -ml-2 px-2"
+                >
+                  {step === 5 ? <Plus className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
+                </Button>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              {(step > 1 || level || service) && step < 5 && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={resetQuoter}
+                    className="text-[10px] uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-1.5 h-8"
+                  >
+                    Reiniciar
+                  </Button>
+                  <div className="h-3 w-px bg-[#E2E8F0] mx-0.5" />
+                </>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => { 
+                  resetQuoter(); 
+                  setTimeout(() => {
+                    window.location.href = "https://kindertogas.com/";
+                  }, 50);
+                }}
+                className="text-[10px] uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-1.5 h-8"
+              >
+                Salir
+              </Button>
+            </div>
+          </div>
+
+          {/* CENTER LOGO (Always visible) */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <img src={logo} alt="Kinder Togas Logo" className="h-9 w-9 sm:h-10 sm:w-10 object-contain" />
+            <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3 text-center sm:text-left">
+              <div className="font-serif text-xl sm:text-3xl tracking-tight text-[#1E2346] font-bold whitespace-nowrap">
+                Kinder Togas
+              </div>
+              <div className="hidden sm:block h-6 w-px bg-[#E2E8F0] self-center" />
+              <div className="font-serif text-[17px] sm:text-3xl tracking-tight text-[#C5A85A] font-normal whitespace-nowrap leading-none mt-0.5 sm:mt-0">
+                Cotizador
+              </div>
+            </div>
+          </div>
+
+          {/* DESKTOP SIDE NAV (Hidden on mobile) */}
           {step > 1 && (
-            <div className="absolute left-4 sm:left-6">
+            <div className="hidden sm:block absolute left-6">
               <Button
                 variant="ghost"
                 size="sm"
@@ -313,34 +373,22 @@ export function Quoter() {
                 className="gap-2 text-muted-foreground hover:text-foreground h-10 -ml-2"
               >
                 {step === 5 ? <Plus className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
-                <span className="hidden sm:inline">{step === 5 ? "Nueva cotización" : "Regresar"}</span>
+                <span>{step === 5 ? "Nueva cotización" : "Regresar"}</span>
               </Button>
             </div>
           )}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <img src={logo} alt="Kinder Togas Logo" className="h-8 w-8 sm:h-10 sm:w-10 object-contain" />
-            <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3">
-              <div className="font-serif text-xl sm:text-3xl tracking-tight text-[#1E2346] font-bold whitespace-nowrap">
-                Kinder Togas
-              </div>
-              <div className="hidden sm:block h-6 w-px bg-[#E2E8F0] self-center" />
-              <div className="font-serif text-xl sm:text-3xl tracking-tight text-[#C5A85A] font-normal whitespace-nowrap leading-none mt-0.5 sm:mt-0">
-                Cotizador
-              </div>
-            </div>
-          </div>
-          <div className="absolute right-2 sm:right-6 flex items-center gap-1 sm:gap-2">
+          <div className="hidden sm:flex absolute right-6 items-center gap-2">
             {(step > 1 || level || service) && step < 5 && (
               <>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={resetQuoter}
-                  className="text-[10px] sm:text-xs uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-1 sm:px-2 h-8"
+                  className="text-xs uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-2 h-8"
                 >
                   Reiniciar
                 </Button>
-                <div className="h-3 sm:h-4 w-px bg-[#E2E8F0] mx-0.5 sm:mx-1" />
+                <div className="h-4 w-px bg-[#E2E8F0] mx-1" />
               </>
             )}
             <Button
@@ -352,13 +400,14 @@ export function Quoter() {
                   window.location.href = "https://kindertogas.com/";
                 }, 50);
               }}
-              className="text-[10px] sm:text-xs uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-1 sm:px-2 h-8"
+              className="text-xs uppercase tracking-widest text-[#64748B] hover:text-[#1E2346] transition-colors px-2 h-8"
             >
               Salir
             </Button>
           </div>
         </div>
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 -mt-3 pb-3 flex justify-center">
+        
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 -mt-1 pb-3 flex justify-center">
           <p className="text-[10px] uppercase tracking-[0.25em] text-[#64748B]/70 font-medium text-center">
             Momentos que se quedan para siempre
           </p>
