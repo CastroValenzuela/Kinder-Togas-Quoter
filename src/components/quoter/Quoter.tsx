@@ -55,14 +55,38 @@ export function Quoter() {
   // SSR-safe localStorage helper
   const ls = (key: string) => typeof window !== "undefined" ? localStorage.getItem(key) : null;
 
+  // Check URL query parameters for direct level linking (e.g. ?level=primaria or ?nivel=primaria)
+  const getUrlLevel = (): Level | undefined => {
+    if (typeof window === "undefined") return undefined;
+    const params = new URLSearchParams(window.location.search);
+    const raw = (params.get("level") || params.get("nivel"))?.toLowerCase();
+    if (!raw) return undefined;
+    if (raw === "preescolar") return "preescolar";
+    if (raw === "primaria") return "primaria";
+    if (raw === "secundaria") return "secundaria";
+    if (raw === "prepa" || raw === "preparatoria") return "preparatoria";
+    if (raw === "universidad" || raw === "posgrado" || raw === "doctorado") return "universidad";
+    return undefined;
+  };
+
+  const initialUrlLevel = getUrlLevel();
+
   const [step, setStep] = useState<Step>(() => {
+    if (initialUrlLevel) return 2;
     const saved = ls("kt-quote-step");
     return saved ? (Number(saved) as Step) : 1;
   });
-  const [level, setLevel] = useState<Level | undefined>(() => (ls("kt-quote-level") as Level) || undefined);
-  const [service, setService] = useState<ServiceType | undefined>(() => (ls("kt-quote-service") as ServiceType) || undefined);
+  const [level, setLevel] = useState<Level | undefined>(() => {
+    if (initialUrlLevel) return initialUrlLevel;
+    return (ls("kt-quote-level") as Level) || undefined;
+  });
+  const [service, setService] = useState<ServiceType | undefined>(() => {
+    if (initialUrlLevel) return undefined;
+    return (ls("kt-quote-service") as ServiceType) || undefined;
+  });
   const [city, setCity] = useState<City | undefined>(() => (ls("kt-quote-city") as City) || "ensenada");
   const [pkg, setPkg] = useState<PackageChoice | undefined>(() => {
+    if (initialUrlLevel) return { kind: "A" };
     const saved = ls("kt-quote-pkg");
     return saved ? JSON.parse(saved) : { kind: "A" };
   });
@@ -74,8 +98,14 @@ export function Quoter() {
   const [date, setDate] = useState(() => ls("kt-quote-date") || "");
   const [email, setEmail] = useState(() => ls("kt-quote-email") || "");
   const [quoteNumber, setQuoteNumber] = useState(() => ls("kt-quote-number") || "");
-  const [togaColor, setTogaColor] = useState<string>(() => ls("kt-quote-toga-color") || "negro");
-  const [stolaColor, setStolaColor] = useState<string>(() => ls("kt-quote-stola-color") || "dorada");
+  const [togaColor, setTogaColor] = useState<string>(() => {
+    if (initialUrlLevel && initialUrlLevel !== "preescolar") return "negro";
+    return ls("kt-quote-toga-color") || "negro";
+  });
+  const [stolaColor, setStolaColor] = useState<string>(() => {
+    if (initialUrlLevel && initialUrlLevel !== "preescolar") return "dorada";
+    return ls("kt-quote-stola-color") || "dorada";
+  });
   const [togaSize, setTogaSize] = useState<string>(() => ls("kt-quote-toga-size") || "M");
   const [productCategory, setProductCategory] = useState<"togas" | "estolas" | "birretes" | "borlas" | "recuerdos">(() => (ls("kt-quote-product-category") as "togas" | "estolas" | "birretes" | "borlas" | "recuerdos") || "togas");
   const [stateSelected, setStateSelected] = useState(() => ls("kt-quote-state-selected") || "");
