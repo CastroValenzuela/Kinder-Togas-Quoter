@@ -122,9 +122,9 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
         }
       } else {
         // service === "renta"
-        const togaColorText = (level !== "preescolar" || pkg?.kind === "A") ? selectedToga : "Negro";
+        const togaColorText = level === "preescolar" ? selectedToga : "Negro";
         rows.splice(packageIndex + 1, 0, 
-          { label: "Color Toga", value: togaColorText, step: (pkg?.kind === "A" || level !== "preescolar") ? 3 : null },
+          { label: "Color Toga", value: togaColorText, step: level === "preescolar" ? 3 : null },
           { label: "Estola", value: stolaVal, step: 3 }
         );
       }

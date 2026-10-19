@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { AnimatePresence, motion, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem, Award, Palette, User, Gift, Check, X, ShoppingBag } from "lucide-react";
+import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem, Award, Palette, User, Gift, Check, X, ShoppingBag, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 const assets = import.meta.glob('@/assets/**/*.{jpg,jpeg,png}', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 
@@ -256,7 +256,7 @@ const FEATURES_UNI_B = [
 
 const FEATURES_UNI_C = [
   { icon: Shirt, text: "Renta de toga premium y Birrete con borla institucional" },
-  { icon: Layers, text: "Estola personalizada satinada con bordado de alta calidad en ambos lados" },
+  { icon: Layers, text: "Estola bordada con logotipo, nombre, licenciatura y generación." },
   { icon: Truck, text: "Entrega y recolección coordinadas" },
   { icon: Users, text: "Atención personalizada y asesoría" },
 ];
@@ -827,8 +827,8 @@ export function StepConfig({
                     {
                       id: "uni_c",
                       code: "C",
-                      title: "Opción C — Bordado de Alta Calidad",
-                      desc: "Estola personalizada con bordado de alta resolución",
+                      title: "Opción C — Bordado Premium",
+                      desc: "Estola bordada con logotipo, nombre, licenciatura y generación.",
                       payload: { kind: "B", variant: "uni_c" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "uni_c"
                     }
@@ -998,6 +998,14 @@ export function StepConfig({
                       </button>
                     );
                   })}
+                  {isUni && pkg?.kind === "B" && pkg.variant === "uni_c" && (
+                    <div className="mt-2.5 flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600 animate-in fade-in duration-200">
+                      <Info className="h-4 w-4 text-[#C5A85A] shrink-0" />
+                      <span className="font-medium text-slate-600 text-[11px] sm:text-xs">
+                        «Incluye un logotipo. Logotipos adicionales tienen costo extra»
+                      </span>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>
@@ -1164,12 +1172,7 @@ export function StepConfig({
 
             {/* Color de Toga */}
             {((service === "venta" && level === "preescolar" && productCategory === "togas") ||
-              (service !== "venta" &&
-              ((pkg?.kind === "A" && level === "preescolar") ||
-              level === "primaria" ||
-              level === "secundaria" ||
-              level === "preparatoria" ||
-              level === "universidad"))) && (
+              (service !== "venta" && !!level)) && (
               <section className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
                   Color de Toga
@@ -1238,6 +1241,7 @@ export function StepConfig({
                       return ids.includes(s.id);
                     }
                     if (pkg?.kind === "A") return s.isBasic;
+                    if (pkg?.kind === "B") return true;
                     return false;
                   }
                   if (pkg?.kind === "B" || pkg?.kind === "C") return true;

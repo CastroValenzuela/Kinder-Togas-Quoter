@@ -221,7 +221,7 @@ export const PRICES = {
   // Universidad / Posgrado
   UNI_A: 350,
   UNI_B: 600,
-  UNI_C: 720,
+  UNI_C: 680,
 };
 
 // Descuentos editables (% de descuento) — Objeto mutable
@@ -366,8 +366,8 @@ export const B_VARIANTS: {
   {
     id: "uni_c",
     code: "U.C",
-    title: "Opción C — Bordado de Alta Calidad",
-    desc: "Estola personalizada con bordado de alta resolución",
+    title: "Opción C — Bordado Premium",
+    desc: "Estola bordada con logotipo, nombre, licenciatura y generación.",
     price: PRICES.UNI_C,
   },
   {
@@ -666,7 +666,7 @@ export function getItemInfo(item: {
     }
   } else {
     // Renta
-    const togaColorText = (item.level !== "preescolar" || item.pkg?.kind === "A") ? selectedToga : "Negro";
+    const togaColorText = item.level === "preescolar" ? selectedToga : "Negro";
     parts.push(`Toga: ${togaColorText}`);
     parts.push(`Estola: ${selectedStola}`);
   }
