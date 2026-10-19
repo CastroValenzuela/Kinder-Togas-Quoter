@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { AnimatePresence, motion, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem, Award, Ruler, Palette, User, Gift, Check } from "lucide-react";
+import { Minus, Plus, ArrowRight, Camera, Shirt, Sparkles, Layers, Truck, GraduationCap, Users, Gem, Award, Palette, User, Gift, Check, X, ShoppingBag } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 const assets = import.meta.glob('@/assets/**/*.{jpg,jpeg,png}', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 
@@ -77,10 +77,12 @@ import {
   unitPrice,
   unitOriginalPrice,
   getDiscountPercent,
+  getItemInfo,
   type City,
   type PackageChoice,
   type PackageBVariant,
   type Level,
+  type QuoteItem,
 } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
@@ -94,6 +96,7 @@ type Props = {
   togaColor: string;
   stolaColor: string;
   togaSize?: string;
+  items?: QuoteItem[];
   onCity: (c: City) => void;
   onPkg: (p: PackageChoice) => void;
   onProductCategory?: (cat: "togas" | "estolas" | "birretes" | "borlas" | "recuerdos") => void;
@@ -101,6 +104,10 @@ type Props = {
   onTogaColor: (color: string) => void;
   onStolaColor: (color: string) => void;
   onTogaSize?: (size: string) => void;
+  onAddItem?: (item: QuoteItem) => void;
+  onRemoveItem?: (id: string) => void;
+  onSetItems?: (items: QuoteItem[]) => void;
+  onOpenCart?: () => void;
   canContinue: boolean;
   onContinue: () => void;
 };
@@ -304,6 +311,7 @@ export function StepConfig({
   togaColor,
   stolaColor,
   togaSize,
+  items = [],
   onCity,
   onPkg,
   onProductCategory,
@@ -311,10 +319,15 @@ export function StepConfig({
   onTogaColor,
   onStolaColor,
   onTogaSize,
+  onAddItem,
+  onRemoveItem,
+  onSetItems,
+  onOpenCart,
   canContinue,
   onContinue,
 }: Props) {
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [showAddSuccess, setShowAddSuccess] = useState(false);
   const isPreescolar = level === "preescolar";
   const isPrimaria = level === "primaria";
   const isSecundaria = level === "secundaria";
@@ -398,7 +411,64 @@ export function StepConfig({
     }
   }
 
-  const total = unitPrice(pkg, level, service) * quantity;
+  const currentTotal = unitPrice(pkg, level, service) * quantity;
+  const itemsTotal = items.reduce((acc, it) => acc + it.totalPrice, 0);
+  // En SaaS de primera línea: Si hay productos en la cotización, el total acumulado refleja exactamente los productos agregados
+  const grandTotal = items.length > 0 ? itemsTotal : currentTotal;
+  const totalUnits = items.length > 0 ? items.reduce((acc, it) => acc + it.quantity, 0) : quantity;
+
+  // Producto configurado en tiempo real
+  const currentItem = useMemo(() => {
+    if (!pkg) return null;
+    const info = getItemInfo({
+      pkg,
+      level,
+      service,
+      productCategory,
+      togaColor,
+      stolaColor,
+      togaSize,
+    });
+    const unit = unitPrice(pkg, level, service);
+    const origUnit = unitOriginalPrice(pkg, level, service);
+    const disc = getDiscountPercent(pkg, level, service);
+    return {
+      id: `item-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      category: productCategory,
+      pkg: { ...pkg },
+      quantity,
+      level,
+      service,
+      togaColor,
+      stolaColor,
+      togaSize: (service === "venta" && productCategory === "togas") ? togaSize : undefined,
+      unitPrice: unit,
+      originalUnitPrice: origUnit,
+      discountPercent: disc,
+      totalPrice: unit * quantity,
+      label: info.label,
+      details: info.details,
+    };
+  }, [pkg, level, service, productCategory, togaColor, stolaColor, togaSize, quantity]);
+
+  const handleAddProduct = () => {
+    if (!canContinue || !onAddItem || !currentItem) return;
+    onAddItem(currentItem);
+    setShowAddSuccess(true);
+    setTimeout(() => setShowAddSuccess(false), 2500);
+    if (onOpenCart) {
+      setTimeout(() => onOpenCart(), 200);
+    }
+  };
+
+  const handleProceed = () => {
+    // Si la cotización está vacía, agrega el producto actual para no dejarla en blanco
+    if (items.length === 0 && currentItem && onAddItem) {
+      onAddItem(currentItem);
+    }
+    // Si ya hay artículos en la cotización, avanza directamente respetando los artículos del carrito
+    onContinue();
+  };
 
   // Get dynamic image showcase based on level and selected configuration
   const showcaseMedia = useMemo(() => {
@@ -479,25 +549,25 @@ export function StepConfig({
   }, [level, pkg, togaColor, stolaColor, service]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 sm:px-6">
-      <header className="mb-8 sm:mb-10">
-        <h2 className="font-display text-3xl sm:text-4xl text-foreground tracking-tight">
+    <div className="mx-auto max-w-5xl px-4 sm:px-6">
+      <header className="mb-4 sm:mb-5">
+        <h2 className="font-serif text-2xl sm:text-3xl text-[#1E2346] tracking-tight">
           Configura tu cotización
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Personaliza ciudad, paquete y cantidad. El total se actualiza en vivo.
+        <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+          Personaliza tu paquete y cantidad. El total se actualiza en vivo.
         </p>
       </header>
 
       <div className="rounded-2xl border border-hairline bg-card overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.04),0_20px_50px_-30px_rgba(17,34,68,0.18)]">
         <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr]">
           {/* LEFT — Visual showcase */}
-          <div className="relative bg-cream/60 lg:sticky lg:top-0 lg:self-start perspective-[1000px]">
+          <div className="relative bg-cream/60 lg:sticky lg:top-20 lg:self-start perspective-[1000px]">
             <motion.div 
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
               style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-              className="aspect-[4/5] lg:aspect-auto lg:h-[680px] w-full overflow-hidden relative flex items-center justify-center p-0 cursor-crosshair"
+              className="aspect-[4/3] sm:aspect-[4/5] max-h-[280px] sm:max-h-[380px] lg:max-h-none w-full overflow-hidden relative flex items-center justify-center p-3 sm:p-4 cursor-crosshair"
             >
               
               {/* Premium Skeleton Loader */}
@@ -610,7 +680,7 @@ export function StepConfig({
           </div>
 
           {/* RIGHT — Control panel */}
-          <div className="p-6 sm:p-10 space-y-10">
+          <div className="p-5 sm:p-7 space-y-6">
             {/* Ciudad — Only for Renta */}
             {service === "renta" && (
               <section>
@@ -1211,46 +1281,38 @@ export function StepConfig({
               );
             })()}
 
-            {/* Talla de Toga (Solo Venta Preescolar Togas) */}
-            {service === "venta" && level === "preescolar" && productCategory === "togas" && onTogaSize && (
+            {/* Talla de Toga — Only for Preescolar Venta Togas */}
+            {service === "venta" && level === "preescolar" && productCategory === "togas" && (
               <section className="animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-2.5">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                     Talla de Toga
                   </p>
                   <button
                     type="button"
                     onClick={() => setIsSizeGuideOpen(true)}
-                    className="text-[10px] uppercase tracking-wider text-navy font-semibold flex items-center gap-1 hover:underline cursor-pointer focus:outline-none"
+                    className="text-xs text-[#1E2346] hover:underline font-medium cursor-pointer flex items-center gap-1"
                   >
-                    <Ruler className="h-3.5 w-3.5 text-navy" strokeWidth={1.5} /> Ver guía de medidas
+                    <span>Ver guía de medidas</span>
                   </button>
                 </div>
-                <div className="flex flex-wrap gap-2.5">
-                  {["XS", "S", "M", "L", "XL"].map((sz) => {
-                    const active = togaSize === sz;
-                    const heightHelper: Record<string, string> = {
-                      XS: "91-97 cm",
-                      S: "99-105 cm",
-                      M: "106-112 cm",
-                      L: "114-119 cm",
-                      XL: "122-127 cm",
-                    };
+                <div className="grid grid-cols-5 gap-2">
+                  {(["XS", "S", "M", "L", "XL"] as const).map((t) => {
+                    const active = (togaSize || "M") === t;
                     return (
                       <button
-                        key={sz}
+                        key={t}
                         type="button"
-                        onClick={() => onTogaSize(sz)}
+                        onClick={() => onTogaSize && onTogaSize(t)}
                         className={cn(
-                          "flex flex-col items-center justify-center px-4 py-2.5 rounded-xl border text-sm font-medium transition-all cursor-pointer relative min-w-[75px]",
-                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                          "py-2 rounded-xl border text-sm font-semibold transition-all cursor-pointer text-center",
+                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2346]/20",
                           active
-                            ? "border-navy bg-cream text-foreground font-semibold"
-                            : "border-hairline text-foreground/80 hover:border-navy/40",
+                            ? "bg-[#1E2346] text-white border-[#1E2346] shadow-xs"
+                            : "border-hairline text-foreground/80 hover:border-[#1E2346]/40 hover:bg-muted/30"
                         )}
                       >
-                        <span>{sz}</span>
-                        <span className="text-[9px] text-muted-foreground font-normal">{heightHelper[sz]}</span>
+                        {t}
                       </button>
                     );
                   })}
@@ -1258,18 +1320,84 @@ export function StepConfig({
               </section>
             )}
 
+            {/* Cantidad de Alumnos / Graduados con Selección Rápida */}
+            <section className="pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                  Cantidad de Graduados
+                </p>
+                <span className="text-xs font-bold text-[#1E2346] tabular-nums">
+                  {quantity} {quantity === 1 ? "alumno" : "alumnos"}
+                </span>
+              </div>
+
+              {/* Botones rápidos para grupos escolares */}
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2.5">
+                {[15, 20, 25, 30, 40, 50].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => onQty(preset)}
+                    className={cn(
+                      "px-2.5 sm:px-3 py-1 rounded-xl border text-xs font-semibold transition-all cursor-pointer",
+                      quantity === preset
+                        ? "bg-[#1E2346] text-white border-[#1E2346] shadow-xs scale-[1.03]"
+                        : "border-hairline text-slate-600 hover:border-[#1E2346]/40 hover:bg-slate-50"
+                    )}
+                  >
+                    {preset} alumnos
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                <div className="inline-flex items-center gap-1.5 bg-slate-50 border border-hairline rounded-full px-2 py-0.5 shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => onQty(Math.max(1, quantity - 1))}
+                    className="h-6 w-6 rounded-full hover:bg-slate-200/70 flex items-center justify-center text-slate-700 transition cursor-pointer"
+                    aria-label="Disminuir cantidad"
+                  >
+                    <Minus className="h-3 w-3" />
+                  </button>
+                  <input
+                    type="number"
+                    min={1}
+                    value={quantity}
+                    onChange={(e) => {
+                      const n = parseInt(e.target.value, 10);
+                      onQty(Number.isFinite(n) && n >= 1 ? n : 1);
+                    }}
+                    className="font-sans font-bold text-xs sm:text-sm w-10 text-center bg-transparent border-0 focus:outline-none focus:ring-0 tabular-nums"
+                    aria-label="Cantidad"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onQty(quantity + 1)}
+                    className="h-6 w-6 rounded-full hover:bg-slate-200/70 flex items-center justify-center text-slate-700 transition cursor-pointer"
+                    aria-label="Aumentar cantidad"
+                  >
+                    <Plus className="h-3 w-3" />
+                  </button>
+                </div>
+                <span className="text-[11px] text-muted-foreground">
+                  Ajusta la cantidad exacta o usa las opciones rápidas.
+                </span>
+              </div>
+            </section>
+
             {/* Features */}
-            <section>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
+            <section className="pt-1">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-2.5">
                 Incluye
               </p>
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {features.map((f, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="mt-0.5 h-8 w-8 rounded-full border border-hairline flex items-center justify-center shrink-0">
-                      <f.icon className="h-4 w-4 text-navy" strokeWidth={1.5} />
+                    <span className="mt-0.5 h-7 w-7 rounded-full border border-hairline flex items-center justify-center shrink-0">
+                      <f.icon className="h-3.5 w-3.5 text-[#1E2346]" strokeWidth={1.5} />
                     </span>
-                    <span className="text-sm text-foreground/80 leading-relaxed pt-1">
+                    <span className="text-xs sm:text-sm text-foreground/80 leading-relaxed pt-0.5">
                       {f.text}
                     </span>
                   </li>
@@ -1281,55 +1409,165 @@ export function StepConfig({
 
         {/* Sticky footer */}
         <div className="border-t border-hairline bg-background/95 backdrop-blur sticky bottom-0 z-30">
-          <div className="px-6 sm:px-10 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-            <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                Total estimado
-              </p>
-              <p className="font-sans font-semibold text-2xl sm:text-3xl text-foreground tabular-nums leading-tight">
-                {formatMXN(total)}{" "}
-                <span className="text-xs font-sans text-muted-foreground">MXN</span>
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3 sm:ml-auto">
-              <button
-                type="button"
-                onClick={() => onQty(Math.max(1, quantity - 1))}
-                className="h-10 w-10 rounded-full border border-hairline hover:border-navy/50 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
-                aria-label="Disminuir"
+          {showAddSuccess && (
+            <div className="bg-[#1E2346]/5 border-b border-[#1E2346]/10 text-[#1E2346] px-5 sm:px-8 py-2 text-xs font-medium flex items-center justify-between animate-in fade-in duration-200">
+              <span className="flex items-center gap-2">
+                <Check className="h-3.5 w-3.5 text-[#C5A85A]" />
+                Producto agregado a la cotización. Puedes seleccionar otro o continuar.
+              </span>
+              <button 
+                type="button" 
+                onClick={() => setShowAddSuccess(false)}
+                className="text-muted-foreground hover:text-foreground text-xs"
               >
-                <Minus className="h-4 w-4" />
-              </button>
-              <input
-                type="number"
-                min={1}
-                value={quantity}
-                onChange={(e) => {
-                  const n = parseInt(e.target.value, 10);
-                  onQty(Number.isFinite(n) && n >= 1 ? n : 1);
-                }}
-                className="font-sans font-semibold text-xl w-14 text-center bg-transparent border-0 focus:outline-none focus:ring-0 tabular-nums"
-                aria-label="Cantidad de alumnos"
-              />
-              <button
-                type="button"
-                onClick={() => onQty(quantity + 1)}
-                className="h-10 w-10 rounded-full border border-hairline hover:border-navy/50 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
-                aria-label="Aumentar"
-              >
-                <Plus className="h-4 w-4" />
+                ✕
               </button>
             </div>
+          )}
 
-            <button
-              type="button"
-              onClick={onContinue}
-              disabled={!canContinue}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-navy text-navy-foreground px-6 py-3 text-sm font-medium hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              Continuar <ArrowRight className="h-4 w-4" />
-            </button>
+          <div className="px-4 sm:px-8 py-3 sm:py-3.5">
+            {/* Main bar: Total on left, Stepper & Buttons on tablet/desktop, Stepper on mobile right */}
+            <div className="flex items-center justify-between gap-3 sm:gap-4">
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                  {items.length > 0 ? "Total acumulado" : "Total estimado"}
+                </p>
+                <div className="flex items-baseline gap-2">
+                  <p className="font-sans font-semibold text-xl sm:text-2xl text-foreground tabular-nums leading-tight">
+                    {formatMXN(grandTotal)}{" "}
+                    <span className="text-xs font-sans text-muted-foreground font-normal">MXN</span>
+                  </p>
+                  {items.length > 0 && onOpenCart && (
+                    <button
+                      type="button"
+                      onClick={onOpenCart}
+                      className="text-xs text-[#C5A85A] hover:underline font-semibold cursor-pointer ml-1 inline-flex items-center gap-1"
+                    >
+                      <span>Ver cotización ({items.length})</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Stepper on mobile (top right of footer) */}
+              <div className="flex sm:hidden items-center gap-1 bg-slate-50 border border-hairline rounded-full px-1.5 py-0.5">
+                <button
+                  type="button"
+                  onClick={() => onQty(Math.max(1, quantity - 1))}
+                  className="h-7 w-7 rounded-full hover:bg-slate-200/60 flex items-center justify-center text-slate-700 transition cursor-pointer"
+                  aria-label="Disminuir cantidad"
+                >
+                  <Minus className="h-3 w-3" />
+                </button>
+                <input
+                  type="number"
+                  min={1}
+                  value={quantity}
+                  onChange={(e) => {
+                    const n = parseInt(e.target.value, 10);
+                    onQty(Number.isFinite(n) && n >= 1 ? n : 1);
+                  }}
+                  className="font-sans font-bold text-sm w-9 text-center bg-transparent border-0 focus:outline-none focus:ring-0 tabular-nums"
+                  aria-label="Cantidad"
+                />
+                <button
+                  type="button"
+                  onClick={() => onQty(quantity + 1)}
+                  className="h-7 w-7 rounded-full hover:bg-slate-200/60 flex items-center justify-center text-slate-700 transition cursor-pointer"
+                  aria-label="Aumentar cantidad"
+                >
+                  <Plus className="h-3 w-3" />
+                </button>
+              </div>
+
+              {/* Desktop & Tablet actions */}
+              <div className="hidden sm:flex items-center gap-3">
+                {/* Stepper de cantidad */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onQty(Math.max(1, quantity - 1))}
+                    className="h-9 w-9 rounded-full border border-hairline hover:border-[#1E2346]/50 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+                    aria-label="Disminuir cantidad"
+                  >
+                    <Minus className="h-3.5 w-3.5" />
+                  </button>
+                  <input
+                    type="number"
+                    min={1}
+                    value={quantity}
+                    onChange={(e) => {
+                      const n = parseInt(e.target.value, 10);
+                      onQty(Number.isFinite(n) && n >= 1 ? n : 1);
+                    }}
+                    className="font-sans font-semibold text-base w-12 text-center bg-transparent border-0 focus:outline-none focus:ring-0 tabular-nums"
+                    aria-label="Cantidad"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onQty(quantity + 1)}
+                    className="h-9 w-9 rounded-full border border-hairline hover:border-[#1E2346]/50 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+                    aria-label="Aumentar cantidad"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                {/* Botón "+ Agregar a mi cotización" */}
+                {onAddItem && (
+                  <button
+                    type="button"
+                    onClick={handleAddProduct}
+                    disabled={!canContinue}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#1E2346] text-[#1E2346] hover:bg-[#1E2346] hover:text-white px-4 py-2.5 text-xs font-semibold transition disabled:opacity-40 cursor-pointer shadow-2xs"
+                    title="Agregar este producto a tu cotización y ver el resumen"
+                  >
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    <span>+ Agregar a mi cotización</span>
+                  </button>
+                )}
+
+                {/* Botón Continuar */}
+                <button
+                  type="button"
+                  onClick={handleProceed}
+                  disabled={!canContinue && items.length === 0}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1E2346] text-white px-6 py-2.5 text-sm font-semibold hover:bg-[#1E2346]/90 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-2xs"
+                >
+                  <span>Continuar</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile bottom buttons row */}
+            <div className="flex sm:hidden items-center gap-2 mt-2.5 pt-2 border-t border-slate-100">
+              {onAddItem && (
+                <button
+                  type="button"
+                  onClick={handleAddProduct}
+                  disabled={!canContinue}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full border border-[#1E2346] text-[#1E2346] hover:bg-[#1E2346] hover:text-white py-2 px-3 text-xs font-semibold transition disabled:opacity-40 cursor-pointer"
+                  title="Agregar este producto a tu cotización"
+                >
+                  <ShoppingBag className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">+ Agregar</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={handleProceed}
+                disabled={!canContinue && items.length === 0}
+                className={cn(
+                  "inline-flex items-center justify-center gap-1.5 rounded-full bg-[#1E2346] text-white py-2 px-4 text-xs font-semibold hover:bg-[#1E2346]/90 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-2xs",
+                  onAddItem ? "flex-1" : "w-full"
+                )}
+              >
+                <span>Continuar</span>
+                <ArrowRight className="h-3.5 w-3.5 shrink-0" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

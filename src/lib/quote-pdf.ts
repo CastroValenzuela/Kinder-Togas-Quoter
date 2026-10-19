@@ -5,6 +5,7 @@ import {
   type City,
   type PackageChoice,
   type ServiceType,
+  type QuoteItem,
   unitPrice,
   unitOriginalPrice,
   getDiscountPercent,
@@ -33,14 +34,49 @@ export type QuoteData = {
   togaColor?: string;
   stolaColor?: string;
   togaSize?: string;
+  items?: QuoteItem[];
 };
 
 export function buildSummaryText(q: QuoteData): string {
+  const cityText = q.city === "tijuana" ? "Tijuana" : (q.city === "ensenada" ? "Ensenada" : cityLabel(q.city));
+
+  if (q.items && q.items.length > 1) {
+    const totalQty = q.items.reduce((sum, it) => sum + it.quantity, 0);
+    const grandTotal = q.items.reduce((sum, it) => sum + it.totalPrice, 0);
+
+    const rows = [
+      `Cotización Kinder Togas - Folio: ${q.quoteNumber || 'N/A'}`,
+      "",
+      `Nivel: ${levelLabel(q.level)}`,
+      `Institución: ${q.school}`,
+      `Solicitante: ${q.contact}`,
+      `Teléfono: ${q.phone}`,
+      `Fecha evento: ${q.date ? formatDate(q.date) : 'N/A'}`,
+      `Sede / Ciudad: ${cityText}`,
+      "",
+      `*Productos cotizados (${q.items.length}):*`,
+    ];
+
+    q.items.forEach((it, idx) => {
+      const detailsStr = it.details ? ` (${it.details})` : "";
+      rows.push(`${idx + 1}. ${it.quantity}x ${it.label}${detailsStr} — ${formatMXN(it.totalPrice)}`);
+    });
+
+    rows.push(
+      "",
+      `Cantidad total: ${totalQty} artículos`,
+      `*Total Cotización: ${formatMXN(grandTotal)} MXN*`,
+      "",
+      "Cotización válida 15 días."
+    );
+
+    return rows.join("\n");
+  }
+
   const unit = unitPrice(q.pkg, q.level, q.service);
   const total = unit * q.quantity;
   const selectedToga = colorLabel(q.togaColor);
   const stolaVal = stolaLabel(q.stolaColor);
-  const cityText = q.city === "tijuana" ? "Tijuana" : (q.city === "ensenada" ? "Ensenada" : cityLabel(q.city));
   const variant = q.pkg && "variant" in q.pkg ? q.pkg.variant : undefined;
 
   const rows = [
@@ -189,52 +225,70 @@ export function generateQuotePDF(q: QuoteData): void {
   currentY += 30;
 
   // --- PRICING TABLE (Minimalist style) ---
-  const unit = unitPrice(q.pkg, q.level, q.service);
-  const originalUnit = unitOriginalPrice(q.pkg, q.level, q.service);
-  const discountPercent = getDiscountPercent(q.pkg, q.level, q.service);
-  const total = unit * q.quantity;
-
-  const selectedToga = colorLabel(q.togaColor);
-  const stolaVal = stolaLabel(q.stolaColor);
-  const togaSizeStr = q.togaSize ? `\n• Talla: ${q.togaSize}` : "";
-  const variant = q.pkg && "variant" in q.pkg ? q.pkg.variant : undefined;
-
-  let itemDescription = "";
-  if (q.service === "venta") {
-    if (q.level === "preescolar" && (variant === "toga_birrete_estola" || variant === "toga_birrete_borla")) {
-      if (variant === "toga_birrete_estola") {
-        itemDescription = `Paquete Toga Completa (Venta Preescolar):\n• Incluye Toga, Birrete y Estola\n• Color de Toga: ${selectedToga}${togaSizeStr}\n• Color de Estola: ${stolaVal}`;
-      } else {
-        itemDescription = `Paquete Toga y Birrete (Venta Preescolar):\n• Incluye Toga y Birrete con Borla del Año (Sin Estola)\n• Color de Toga: ${selectedToga}${togaSizeStr}`;
-      }
-    } else if (variant === "medalla_standard") {
-      itemDescription = `Medalla Estándar (Venta Preescolar):\n• Medalla conmemorativa clásica de graduación.`;
-    } else if (variant === "medalla_personalizada") {
-      itemDescription = `Medalla Personalizada (Venta Preescolar):\n• Medalla grabada con nombre y detalles personalizados.`;
-    } else if (variant === "oso_graduacion") {
-      itemDescription = `Oso de Graduación (Venta Preescolar):\n• Oso de peluche de graduación con toga y camiseta personalizada\n• Color del Oso: ${q.stolaColor === "azul" ? "Azul" : "Rosa"}`;
-    } else if (variant?.startsWith("birrete_")) {
-      itemDescription = `Birrete de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Color de Birrete: ${stolaVal}`;
-    } else if (variant?.startsWith("borla_")) {
-      itemDescription = `Borla conmemorativa: ${packageLabel(q.pkg, q.level, q.service)}\n• Color de Borla: ${stolaVal}`;
-    } else {
-      itemDescription = `Estola personalizada de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Estola color: ${stolaVal}\n• Impresión/acabado premium.`;
-    }
-  } else {
-    const togaColorText = (q.level !== "preescolar" || q.pkg?.kind === "A") ? selectedToga : "Negro";
-    itemDescription = `Servicio integral de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Toga color: ${togaColorText}\n• Estola color: ${stolaVal}\n• Incluye birrete premium.`;
-  }
-
+  const isMultiItem = q.items && q.items.length > 1;
   const tableBody: any[] = [];
-  if (discountPercent > 0) {
-    const originalTotal = originalUnit * q.quantity;
-    const savings = (originalUnit - unit) * q.quantity;
-    tableBody.push(
-      [itemDescription, q.quantity.toString(), formatMXN(originalUnit), formatMXN(originalTotal)],
-      [{ content: `Descuento Especial Aplicado (${discountPercent}%)`, styles: { fontStyle: "italic", textColor: [184, 158, 105] as [number, number, number] } }, "1", `-${formatMXN(originalUnit - unit)}`, `-${formatMXN(savings)}`]
-    );
+  let grandTotal = 0;
+
+  if (isMultiItem) {
+    grandTotal = q.items!.reduce((acc, it) => acc + it.totalPrice, 0);
+    q.items!.forEach((it) => {
+      const detailsStr = it.details ? `\n• ${it.details}` : "";
+      const desc = `${it.label}${detailsStr}`;
+      tableBody.push([
+        desc,
+        it.quantity.toString(),
+        formatMXN(it.unitPrice),
+        formatMXN(it.totalPrice),
+      ]);
+    });
   } else {
-    tableBody.push([itemDescription, q.quantity.toString(), formatMXN(unit), formatMXN(total)]);
+    const unit = unitPrice(q.pkg, q.level, q.service);
+    const originalUnit = unitOriginalPrice(q.pkg, q.level, q.service);
+    const discountPercent = getDiscountPercent(q.pkg, q.level, q.service);
+    const total = unit * q.quantity;
+    grandTotal = total;
+
+    const selectedToga = colorLabel(q.togaColor);
+    const stolaVal = stolaLabel(q.stolaColor);
+    const togaSizeStr = q.togaSize ? `\n• Talla: ${q.togaSize}` : "";
+    const variant = q.pkg && "variant" in q.pkg ? q.pkg.variant : undefined;
+
+    let itemDescription = "";
+    if (q.service === "venta") {
+      if (q.level === "preescolar" && (variant === "toga_birrete_estola" || variant === "toga_birrete_borla")) {
+        if (variant === "toga_birrete_estola") {
+          itemDescription = `Paquete Toga Completa (Venta Preescolar):\n• Incluye Toga, Birrete y Estola\n• Color de Toga: ${selectedToga}${togaSizeStr}\n• Color de Estola: ${stolaVal}`;
+        } else {
+          itemDescription = `Paquete Toga y Birrete (Venta Preescolar):\n• Incluye Toga y Birrete con Borla del Año (Sin Estola)\n• Color de Toga: ${selectedToga}${togaSizeStr}`;
+        }
+      } else if (variant === "medalla_standard") {
+        itemDescription = `Medalla Estándar (Venta Preescolar):\n• Medalla conmemorativa clásica de graduación.`;
+      } else if (variant === "medalla_personalizada") {
+        itemDescription = `Medalla Personalizada (Venta Preescolar):\n• Medalla grabada con nombre y detalles personalizados.`;
+      } else if (variant === "oso_graduacion") {
+        itemDescription = `Oso de Graduación (Venta Preescolar):\n• Oso de peluche de graduación con toga y camiseta personalizada\n• Color del Oso: ${q.stolaColor === "azul" ? "Azul" : "Rosa"}`;
+      } else if (variant?.startsWith("birrete_")) {
+        itemDescription = `Birrete de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Color de Birrete: ${stolaVal}`;
+      } else if (variant?.startsWith("borla_")) {
+        itemDescription = `Borla conmemorativa: ${packageLabel(q.pkg, q.level, q.service)}\n• Color de Borla: ${stolaVal}`;
+      } else {
+        itemDescription = `Estola personalizada de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Estola color: ${stolaVal}\n• Impresión/acabado premium.`;
+      }
+    } else {
+      const togaColorText = (q.level !== "preescolar" || q.pkg?.kind === "A") ? selectedToga : "Negro";
+      itemDescription = `Servicio integral de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Toga color: ${togaColorText}\n• Estola color: ${stolaVal}\n• Incluye birrete premium.`;
+    }
+
+    if (discountPercent > 0) {
+      const originalTotal = originalUnit * q.quantity;
+      const savings = (originalUnit - unit) * q.quantity;
+      tableBody.push(
+        [itemDescription, q.quantity.toString(), formatMXN(originalUnit), formatMXN(originalTotal)],
+        [{ content: `Descuento Especial Aplicado (${discountPercent}%)`, styles: { fontStyle: "italic", textColor: [184, 158, 105] as [number, number, number] } }, "1", `-${formatMXN(originalUnit - unit)}`, `-${formatMXN(savings)}`]
+      );
+    } else {
+      tableBody.push([itemDescription, q.quantity.toString(), formatMXN(unit), formatMXN(total)]);
+    }
   }
 
   autoTable(doc, {
@@ -242,7 +296,7 @@ export function generateQuotePDF(q: QuoteData): void {
     margin: { left: margin, right: margin },
     head: [["DESCRIPCIÓN", "CANTIDAD", "UNITARIO", "TOTAL"]],
     body: tableBody,
-    foot: [["", "", "TOTAL:", formatMXN(total)]],
+    foot: [["", "", "TOTAL:", formatMXN(grandTotal)]],
     theme: "plain", // No backgrounds
     styles: { 
       font: "helvetica", 

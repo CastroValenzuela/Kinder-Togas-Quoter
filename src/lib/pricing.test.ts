@@ -8,6 +8,8 @@ import {
   unitPrice,
   unitOriginalPrice,
   getDiscountPercent,
+  bundleToQuoteItems,
+  isSameProductConfig,
 } from "./pricing";
 
 describe("pricing helper functions", () => {
@@ -140,4 +142,128 @@ describe("pricing helper functions", () => {
       expect(unitPrice({ kind: "A" }, "preescolar")).toBe(350);
     });
   });
+
+  describe("bundleToQuoteItems", () => {
+    it("should convert a basic package without addons into a single QuoteItem", () => {
+      const items = bundleToQuoteItems({
+        pkg: { kind: "A" },
+        level: "preescolar",
+        service: "renta",
+        togaColor: "negro",
+        stolaColor: "dorada",
+        totalQuantity: 25,
+      });
+
+      expect(items).toHaveLength(1);
+      expect(items[0].id).toBe("main-package");
+      expect(items[0].quantity).toBe(25);
+      expect(items[0].totalPrice).toBe(350 * 25);
+    });
+
+    it("should include size distribution in details when enabled", () => {
+      const items = bundleToQuoteItems({
+        pkg: { kind: "A" },
+        level: "preescolar",
+        service: "renta",
+        togaColor: "negro",
+        stolaColor: "dorada",
+        totalQuantity: 25,
+        useSizeDistribution: true,
+        sizes: { XS: 5, S: 10, M: 10, L: 0, XL: 0 },
+      });
+
+      expect(items).toHaveLength(1);
+      expect(items[0].details).toContain("5 XS");
+      expect(items[0].details).toContain("10 S");
+      expect(items[0].details).toContain("10 M");
+    });
+
+    it("should generate quote items for all active addons", () => {
+      const items = bundleToQuoteItems({
+        pkg: { kind: "A" },
+        level: "preescolar",
+        service: "renta",
+        togaColor: "negro",
+        stolaColor: "dorada",
+        totalQuantity: 20,
+        addons: {
+          oso: { enabled: true, quantity: 20, color: "rosa" },
+          medalla: { enabled: true, quantity: 20, variant: "personalizada" },
+          borla: { enabled: true, quantity: 20 },
+          docente: { enabled: true, quantity: 3 },
+        },
+      });
+
+      // 1 main package + 4 addons = 5 items
+      expect(items).toHaveLength(5);
+
+      const osoItem = items.find((i: any) => i.id === "addon-oso");
+      expect(osoItem).toBeDefined();
+      expect(osoItem.quantity).toBe(20);
+      expect(osoItem.totalPrice).toBe(150 * 20);
+      expect(osoItem.details).toContain("Rosa");
+
+      const medallaItem = items.find((i: any) => i.id === "addon-medalla");
+      expect(medallaItem).toBeDefined();
+      expect(medallaItem.quantity).toBe(20);
+      expect(medallaItem.label).toContain("Personalizada");
+      expect(medallaItem.totalPrice).toBe(45 * 20);
+
+      const borlaItem = items.find((i: any) => i.id === "addon-borla");
+      expect(borlaItem).toBeDefined();
+      expect(borlaItem.totalPrice).toBe(25 * 20);
+
+      const docenteItem = items.find((i: any) => i.id === "addon-docente");
+      expect(docenteItem).toBeDefined();
+      expect(docenteItem.quantity).toBe(3);
+    });
+  });
+
+  describe("isSameProductConfig (Amazon-style deduplication)", () => {
+    it("identifies identical product configurations as matching", () => {
+      const item1: any = {
+        category: "togas",
+        level: "preescolar",
+        service: "venta",
+        pkg: { kind: "B", variant: "toga_birrete_estola" },
+        togaColor: "negro",
+        stolaColor: "dorada",
+        togaSize: "M",
+      };
+      const item2: any = {
+        category: "togas",
+        level: "preescolar",
+        service: "venta",
+        pkg: { kind: "B", variant: "toga_birrete_estola" },
+        togaColor: "negro",
+        stolaColor: "dorada",
+        togaSize: "M",
+      };
+      expect(isSameProductConfig(item1, item2)).toBe(true);
+    });
+
+    it("identifies different sizes or colors as distinct line items", () => {
+      const item1: any = {
+        category: "togas",
+        level: "preescolar",
+        service: "venta",
+        pkg: { kind: "B", variant: "toga_birrete_estola" },
+        togaColor: "negro",
+        stolaColor: "dorada",
+        togaSize: "M",
+      };
+      const itemDifferentSize: any = {
+        ...item1,
+        togaSize: "G",
+      };
+      const itemDifferentColor: any = {
+        ...item1,
+        stolaColor: "azul",
+      };
+      expect(isSameProductConfig(item1, itemDifferentSize)).toBe(false);
+      expect(isSameProductConfig(item1, itemDifferentColor)).toBe(false);
+    });
+  });
 });
+
+

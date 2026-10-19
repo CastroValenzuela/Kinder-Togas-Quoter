@@ -148,7 +148,7 @@ export function StepDetails({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0" align="start">
+                <PopoverContent className="w-[calc(100vw-3rem)] sm:w-[360px] max-w-sm p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Buscar estado..." />
                     <CommandList>
@@ -198,7 +198,7 @@ export function StepDetails({
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[300px] p-0" align="start">
+                  <PopoverContent className="w-[calc(100vw-3rem)] sm:w-[360px] max-w-sm p-0" align="start">
                     <Command>
                       <CommandInput placeholder="Buscar ciudad..." />
                       <CommandList>

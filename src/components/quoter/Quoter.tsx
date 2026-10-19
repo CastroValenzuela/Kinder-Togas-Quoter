@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Plus, RotateCcw, X as XIcon } from "lucide-react";
+import { ArrowLeft, Plus, RotateCcw, ShoppingBag, X as XIcon } from "lucide-react";
 import { Turnstile } from "@marsidev/react-turnstile";
 import { Button } from "@/components/ui/button";
 import { StepperBar, StepperLabel } from "./Stepper";
@@ -9,6 +9,8 @@ import { StepService } from "./StepService";
 import { StepConfig } from "./StepConfig";
 import { StepDetails } from "./StepDetails";
 import { StepSummary } from "./StepSummary";
+import { CartDrawer } from "./CartDrawer";
+import { cn } from "@/lib/utils";
 import {
   unitPrice,
   unitOriginalPrice,
@@ -20,10 +22,13 @@ import {
   stolaLabel,
   formatMXN,
   loadDynamicPrices,
+  getItemInfo,
+  isSameProductConfig,
   type Level,
   type ServiceType,
   type City,
   type PackageChoice,
+  type QuoteItem,
 } from "@/lib/pricing";
 import logo from "@/assets/logo.png";
 import { supabase } from "@/lib/supabase";
@@ -52,9 +57,6 @@ async function generateSequentialFolio(service: ServiceType | undefined, city: C
 }
 
 export function Quoter() {
-  // SSR-safe localStorage helper
-  const ls = (key: string) => typeof window !== "undefined" ? localStorage.getItem(key) : null;
-
   // Check URL query parameters for direct level linking (e.g. ?level=primaria or ?nivel=primaria)
   const getUrlLevel = (): Level | undefined => {
     if (typeof window === "undefined") return undefined;
@@ -69,48 +71,69 @@ export function Quoter() {
     return undefined;
   };
 
-  const initialUrlLevel = getUrlLevel();
-
-  const [step, setStep] = useState<Step>(() => {
-    if (initialUrlLevel) return 2;
-    const saved = ls("kt-quote-step");
-    return saved ? (Number(saved) as Step) : 1;
-  });
-  const [level, setLevel] = useState<Level | undefined>(() => {
-    if (initialUrlLevel) return initialUrlLevel;
-    return (ls("kt-quote-level") as Level) || undefined;
-  });
-  const [service, setService] = useState<ServiceType | undefined>(() => {
-    if (initialUrlLevel) return undefined;
-    return (ls("kt-quote-service") as ServiceType) || undefined;
-  });
-  const [city, setCity] = useState<City | undefined>(() => (ls("kt-quote-city") as City) || "ensenada");
-  const [pkg, setPkg] = useState<PackageChoice | undefined>(() => {
-    if (initialUrlLevel) return { kind: "A" };
-    const saved = ls("kt-quote-pkg");
-    return saved ? JSON.parse(saved) : { kind: "A" };
-  });
-  const [quantity, setQuantity] = useState(() => Number(ls("kt-quote-qty")) || 1);
-  const [school, setSchool] = useState(() => ls("kt-quote-school") || "");
-  const [schoolAddress, setSchoolAddress] = useState(() => ls("kt-quote-school-address") || "");
-  const [contact, setContact] = useState(() => ls("kt-quote-contact") || "");
-  const [phone, setPhone] = useState(() => ls("kt-quote-phone") || "");
-  const [date, setDate] = useState(() => ls("kt-quote-date") || "");
-  const [email, setEmail] = useState(() => ls("kt-quote-email") || "");
-  const [quoteNumber, setQuoteNumber] = useState(() => ls("kt-quote-number") || "");
-  const [togaColor, setTogaColor] = useState<string>(() => {
-    if (initialUrlLevel && initialUrlLevel !== "preescolar") return "negro";
-    return ls("kt-quote-toga-color") || "negro";
-  });
-  const [stolaColor, setStolaColor] = useState<string>(() => {
-    if (initialUrlLevel && initialUrlLevel !== "preescolar") return "dorada";
-    return ls("kt-quote-stola-color") || "dorada";
-  });
-  const [togaSize, setTogaSize] = useState<string>(() => ls("kt-quote-toga-size") || "M");
-  const [productCategory, setProductCategory] = useState<"togas" | "estolas" | "birretes" | "borlas" | "recuerdos">(() => (ls("kt-quote-product-category") as "togas" | "estolas" | "birretes" | "borlas" | "recuerdos") || "togas");
-  const [stateSelected, setStateSelected] = useState(() => ls("kt-quote-state-selected") || "");
-  const [citySelected, setCitySelected] = useState(() => ls("kt-quote-city-selected") || "");
+  const [step, setStep] = useState<Step>(1);
+  const [level, setLevel] = useState<Level | undefined>(undefined);
+  const [service, setService] = useState<ServiceType | undefined>(undefined);
+  const [city, setCity] = useState<City>("ensenada");
+  const [pkg, setPkg] = useState<PackageChoice | undefined>({ kind: "A" });
+  const [quantity, setQuantity] = useState(1);
+  const [school, setSchool] = useState("");
+  const [schoolAddress, setSchoolAddress] = useState("");
+  const [contact, setContact] = useState("");
+  const [phone, setPhone] = useState("");
+  const [date, setDate] = useState("");
+  const [email, setEmail] = useState("");
+  const [quoteNumber, setQuoteNumber] = useState("");
+  const [togaColor, setTogaColor] = useState<string>("negro");
+  const [stolaColor, setStolaColor] = useState<string>("dorada");
+  const [togaSize, setTogaSize] = useState<string>("M");
+  const [productCategory, setProductCategory] = useState<"togas" | "estolas" | "birretes" | "borlas" | "recuerdos">("togas");
+  const [stateSelected, setStateSelected] = useState("");
+  const [citySelected, setCitySelected] = useState("");
+  const [items, setItems] = useState<QuoteItem[]>([]);
   const [honeypot, setHoneypot] = useState("");
+
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Amazon-style: Si es exactamente el mismo producto/configuración, suma la cantidad
+  const handleAddItem = (item: QuoteItem) => {
+    setItems((prev) => {
+      const existingIndex = prev.findIndex((it) => isSameProductConfig(it, item));
+      if (existingIndex >= 0) {
+        return prev.map((it, idx) => {
+          if (idx !== existingIndex) return it;
+          const mergedQty = it.quantity + item.quantity;
+          return {
+            ...it,
+            quantity: mergedQty,
+            totalPrice: it.unitPrice * mergedQty,
+          };
+        });
+      }
+      return [...prev, item];
+    });
+  };
+
+  const handleUpdateQuantity = (id: string, newQty: number) => {
+    if (newQty <= 0) {
+      handleRemoveItem(id);
+      return;
+    }
+    setItems((prev) =>
+      prev.map((it) => {
+        if (it.id !== id) return it;
+        return {
+          ...it,
+          quantity: newQty,
+          totalPrice: it.unitPrice * newQty,
+        };
+      })
+    );
+  };
+
+  const handleRemoveItem = (id: string) => {
+    setItems((prev) => prev.filter((it) => it.id !== id));
+  };
   const [startTime] = useState(() => Date.now());
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -118,8 +141,77 @@ export function Quoter() {
   const [turnstileToken, setTurnstileToken] = useState("");
   const [isMounted, setIsMounted] = useState(false);
 
+  // Restore client-side state safely after hydration
   useEffect(() => {
     setIsMounted(true);
+
+    const initialUrlLevel = getUrlLevel();
+    if (initialUrlLevel) {
+      setLevel(initialUrlLevel);
+      if (initialUrlLevel !== "preescolar") {
+        setService("renta");
+        setStep(3);
+        setTogaColor("negro");
+        setStolaColor("dorada");
+      } else {
+        setStep(2);
+      }
+      return;
+    }
+
+    try {
+      const savedStep = localStorage.getItem("kt-quote-step");
+      const savedLevel = localStorage.getItem("kt-quote-level") as Level | null;
+      const savedService = localStorage.getItem("kt-quote-service") as ServiceType | null;
+      const savedCity = localStorage.getItem("kt-quote-city") as City | null;
+      const savedPkg = localStorage.getItem("kt-quote-pkg");
+      const savedQty = localStorage.getItem("kt-quote-qty");
+      const savedSchool = localStorage.getItem("kt-quote-school");
+      const savedSchoolAddress = localStorage.getItem("kt-quote-school-address");
+      const savedContact = localStorage.getItem("kt-quote-contact");
+      const savedPhone = localStorage.getItem("kt-quote-phone");
+      const savedDate = localStorage.getItem("kt-quote-date");
+      const savedEmail = localStorage.getItem("kt-quote-email");
+      const savedNumber = localStorage.getItem("kt-quote-number");
+      const savedTogaColor = localStorage.getItem("kt-quote-toga-color");
+      const savedStolaColor = localStorage.getItem("kt-quote-stola-color");
+      const savedTogaSize = localStorage.getItem("kt-quote-toga-size");
+      const savedCategory = localStorage.getItem("kt-quote-product-category") as any;
+      const savedState = localStorage.getItem("kt-quote-state-selected");
+      const savedCitySelected = localStorage.getItem("kt-quote-city-selected");
+      const savedItems = localStorage.getItem("kt-quote-items");
+
+      if (savedLevel) setLevel(savedLevel);
+      if (savedStep) {
+        const s = Number(savedStep) as Step;
+        if (savedLevel && savedLevel !== "preescolar" && s === 2) {
+          setStep(3);
+          setService("renta");
+        } else {
+          setStep(s);
+        }
+      }
+      if (savedService) setService(savedService);
+      if (savedCity) setCity(savedCity);
+      if (savedPkg) setPkg(JSON.parse(savedPkg));
+      if (savedQty) setQuantity(Number(savedQty) || 1);
+      if (savedSchool) setSchool(savedSchool);
+      if (savedSchoolAddress) setSchoolAddress(savedSchoolAddress);
+      if (savedContact) setContact(savedContact);
+      if (savedPhone) setPhone(savedPhone);
+      if (savedDate) setDate(savedDate);
+      if (savedEmail) setEmail(savedEmail);
+      if (savedNumber) setQuoteNumber(savedNumber);
+      if (savedTogaColor) setTogaColor(savedTogaColor);
+      if (savedStolaColor) setStolaColor(savedStolaColor);
+      if (savedTogaSize) setTogaSize(savedTogaSize);
+      if (savedCategory) setProductCategory(savedCategory);
+      if (savedState) setStateSelected(savedState);
+      if (savedCitySelected) setCitySelected(savedCitySelected);
+      if (savedItems) setItems(JSON.parse(savedItems));
+    } catch (e) {
+      console.warn("Could not restore stored quoter state", e);
+    }
   }, []);
 
   // Synchronize schoolAddress for Venta based on selected state and city
@@ -164,6 +256,7 @@ export function Quoter() {
 
   // Persistence
   useEffect(() => {
+    if (!isMounted) return;
     localStorage.setItem("kt-quote-step", String(step));
     if (level) localStorage.setItem("kt-quote-level", level);
     else localStorage.removeItem("kt-quote-level");
@@ -186,11 +279,18 @@ export function Quoter() {
     localStorage.setItem("kt-quote-product-category", productCategory);
     localStorage.setItem("kt-quote-state-selected", stateSelected);
     localStorage.setItem("kt-quote-city-selected", citySelected);
+    if (items.length > 0) localStorage.setItem("kt-quote-items", JSON.stringify(items));
+    else localStorage.removeItem("kt-quote-items");
     if (quoteNumber) localStorage.setItem("kt-quote-number", quoteNumber);
     else localStorage.removeItem("kt-quote-number");
-  }, [step, level, service, city, pkg, quantity, school, schoolAddress, contact, phone, date, email, quoteNumber, togaColor, stolaColor, productCategory, stateSelected, citySelected]);
+  }, [isMounted, step, level, service, city, pkg, quantity, school, schoolAddress, contact, phone, date, email, quoteNumber, togaColor, stolaColor, productCategory, stateSelected, citySelected, items]);
 
-  const total = useMemo(() => unitPrice(pkg, level, service) * quantity, [pkg, level, service, quantity, pricesLoaded]);
+  const total = useMemo(() => {
+    if (items.length > 0) {
+      return items.reduce((acc, it) => acc + it.totalPrice, 0);
+    }
+    return unitPrice(pkg, level, service) * quantity;
+  }, [items, pkg, level, service, quantity, pricesLoaded]);
 
   // Save to Supabase
   useEffect(() => {
@@ -219,6 +319,7 @@ export function Quoter() {
         }
         
         try {
+          const totalUnits = items.length > 0 ? items.reduce((acc, it) => acc + it.quantity, 0) : quantity;
           const payload = {
             quote_number: qNum,
             institution_name: school,
@@ -230,16 +331,17 @@ export function Quoter() {
             school_level: level,
             service_option: service,
             city: service === 'venta' ? citySelected : (city || null),
-            package_kind: pkg?.kind,
-            package_variant: pkg?.kind === 'B' ? pkg.variant : null,
-            student_count: quantity,
-            unit_price: unitPrice(pkg, level, service),
+            package_kind: items.length > 0 ? (items.length === 1 ? items[0].pkg.kind : "MIXTO") : pkg?.kind,
+            package_variant: items.length > 0 ? (items.length === 1 ? (items[0].pkg.variant || null) : null) : (pkg?.kind === 'B' ? pkg.variant : null),
+            student_count: totalUnits,
+            unit_price: items.length === 1 ? items[0].unitPrice : unitPrice(pkg, level, service),
             total_price: total,
-            toga_color: service === 'venta' ? (productCategory === 'togas' ? togaColor : (productCategory === 'recuerdos' ? togaColor : null)) : togaColor,
-            stola_color: stolaColor,
-            discount_percent: getDiscountPercent(pkg, level, service),
-            original_unit_price: unitOriginalPrice(pkg, level, service),
-            toga_size: service === 'venta' && productCategory === 'togas' ? togaSize : null,
+            toga_color: items.length === 1 ? (items[0].togaColor || null) : (service === 'venta' ? (productCategory === 'togas' ? togaColor : (productCategory === 'recuerdos' ? togaColor : null)) : togaColor),
+            stola_color: items.length === 1 ? (items[0].stolaColor || null) : stolaColor,
+            discount_percent: items.length === 1 ? (items[0].discountPercent || 0) : getDiscountPercent(pkg, level, service),
+            original_unit_price: items.length === 1 ? (items[0].originalUnitPrice || 0) : unitOriginalPrice(pkg, level, service),
+            toga_size: items.length === 1 ? (items[0].togaSize || null) : (service === 'venta' && productCategory === 'togas' ? togaSize : null),
+            items: items.length > 0 ? items : undefined,
           };
           
           const res = await fetch('https://qqfqwvxmhiacoyqwobjd.supabase.co/functions/v1/submit-quote', {
@@ -263,16 +365,18 @@ export function Quoter() {
       }
     }
     save();
-  }, [step, quoteNumber, isSaved, isSaving, school, contact, phone, email, level, city, pkg, quantity, date, total, service, honeypot, startTime, togaColor, stolaColor, turnstileToken, stateSelected, citySelected, productCategory, togaSize]);
+  }, [step, quoteNumber, isSaved, isSaving, school, contact, phone, email, level, city, pkg, quantity, date, total, service, honeypot, startTime, togaColor, stolaColor, turnstileToken, stateSelected, citySelected, productCategory, togaSize, items]);
   void total;
 
   const canNext: Record<Step, boolean> = {
     1: !!level,
     2: !!service,
-    3: (service === 'renta' ? !!city : true) && 
-       !!pkg && 
-       (pkg.kind === "A" || !!pkg.variant) && 
-       quantity >= 1,
+    3: items.length > 0
+       ? true
+       : ((service === 'renta' ? !!city : true) && 
+          !!pkg && 
+          (pkg.kind === "A" || !!pkg.variant) && 
+          quantity >= 1),
     4: school.trim().length >= 3 && 
        contact.trim().length >= 3 && 
        phone.replace(/\D/g, '').length === 10 && 
@@ -287,7 +391,33 @@ export function Quoter() {
   const goNext = async () => {
     if (!canNext[step]) return;
     
-    if (step === 4) {
+    if (step === 3) {
+      if (items.length === 0 && pkg) {
+        const info = getItemInfo({ pkg, level, service, productCategory, togaColor, stolaColor, togaSize });
+        const unit = unitPrice(pkg, level, service);
+        const origUnit = unitOriginalPrice(pkg, level, service);
+        const disc = getDiscountPercent(pkg, level, service);
+        const singleItem: QuoteItem = {
+          id: `item-${Date.now()}`,
+          category: productCategory,
+          pkg: { ...pkg },
+          quantity,
+          level,
+          service,
+          togaColor,
+          stolaColor,
+          togaSize: (service === "venta" && productCategory === "togas") ? togaSize : undefined,
+          unitPrice: unit,
+          originalUnitPrice: origUnit,
+          discountPercent: disc,
+          totalPrice: unit * quantity,
+          label: info.label,
+          details: info.details,
+        };
+        setItems([singleItem]);
+      }
+      setStep(4);
+    } else if (step === 4) {
       // Generate Folio early to open WhatsApp with it
       const qNum = quoteNumber || await generateSequentialFolio(service, city);
       setQuoteNumber(qNum);
@@ -296,12 +426,29 @@ export function Quoter() {
       setStep((s) => (s + 1) as Step);
     }
   };
+
   const goBack = () => {
+    if (step === 3 && level !== "preescolar") {
+      setStep(1);
+      return;
+    }
     if (step > 1) setStep((s) => (s - 1) as Step);
   };
 
+  const totalDisplaySteps = level && level !== "preescolar" ? 4 : 5;
+  const currentDisplayStep = useMemo(() => {
+    if (level && level !== "preescolar") {
+      if (step === 1) return 1;
+      if (step === 3) return 2;
+      if (step === 4) return 3;
+      if (step === 5) return 4;
+    }
+    return step;
+  }, [level, step]);
+
   const resetQuoter = () => {
     localStorage.clear(); // Simple way to clear all kt-quote-*
+    setItems([]);
     setStep(1);
     setLevel(undefined);
     setService(undefined);
@@ -354,141 +501,125 @@ export function Quoter() {
         />
       )}
       
-      {/* Header — centered logo, full-width progress bar, label */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-slate-100/50">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-4 pb-3">
+      {/* Header — centered logo with slogan, back button on left, REINICIAR | SALIR on right */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-2.5 sm:py-3 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           {isMounted && !(typeof window !== "undefined" && (window as any).__PLAYWRIGHT_TEST__) && import.meta.env.VITE_TURNSTILE_SITE_KEY && (
             <div className="absolute opacity-0 pointer-events-none">
-              <Turnstile siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY} onSuccess={(token) => setTurnstileToken(token)} />
+              <Turnstile
+                siteKey={typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "1x00000000000000000000AA" : import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                onSuccess={(token) => setTurnstileToken(token)}
+              />
             </div>
           )}
 
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-            {/* LEFT AREA: BACK */}
-            <div className="flex justify-start">
-              {step > 1 && (
-                <Button
-                  variant="ghost"
-                  onClick={step === 5 ? resetQuoter : goBack}
-                  className="h-9 px-2 sm:px-3 text-slate-500 hover:text-slate-900 rounded-full sm:rounded-md -ml-2"
-                >
-                  {step === 5 ? <Plus className="h-4 w-4 sm:mr-2" /> : <ArrowLeft className="h-5 w-5 sm:mr-2" strokeWidth={2} />}
-                  <span className="hidden sm:inline text-sm font-medium">{step === 5 ? "Nueva cotización" : "Regresar"}</span>
-                </Button>
-              )}
-            </div>
+          {/* LEFT: Regresar */}
+          <div className="flex items-center justify-start min-w-0">
+            {step > 1 && (
+              <button
+                type="button"
+                onClick={step === 5 ? resetQuoter : goBack}
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-500 hover:text-[#1E2346] transition cursor-pointer"
+                title={step === 5 ? "Nueva cotización" : "Regresar al paso anterior"}
+              >
+                {step === 5 ? <Plus className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" strokeWidth={2} />}
+                <span className="hidden sm:inline">{step === 5 ? "Nueva" : "Regresar"}</span>
+              </button>
+            )}
+          </div>
 
-            {/* CENTER AREA: BRANDING */}
-            <div className="flex justify-center items-center gap-1.5 sm:gap-3">
-              <img src={logo} alt="Logo" className="h-7 w-7 sm:h-9 sm:w-9 object-contain" />
-              <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3 items-center">
-                <div className="font-serif text-[15px] sm:text-2xl tracking-tight text-[#1E2346] font-bold leading-none">Kinder Togas</div>
-                <div className="hidden sm:block h-5 w-px bg-slate-200 self-center" />
-                <div className="font-serif text-[13px] sm:text-2xl tracking-tight text-[#C5A85A] font-normal leading-none -mt-0.5 sm:mt-0">Cotizador</div>
+          {/* CENTER: Logo + Kinder Togas | Cotizador + Slogan */}
+          <div className="flex flex-col items-center justify-center text-center">
+            <div className="flex items-center gap-2 sm:gap-2.5">
+              <img src={logo} alt="Logo" className="h-6 w-6 sm:h-7 sm:w-7 object-contain shrink-0" />
+              <div className="flex items-baseline gap-1.5 sm:gap-2">
+                <span className="font-serif text-lg sm:text-2xl font-bold text-[#1E2346] tracking-tight">
+                  Kinder Togas
+                </span>
+                <span className="text-slate-300 font-light text-base sm:text-xl">|</span>
+                <span className="font-serif text-lg sm:text-2xl font-normal text-[#C5A85A]">
+                  Cotizador
+                </span>
               </div>
             </div>
+            <p className="text-[8px] sm:text-[9.5px] uppercase tracking-[0.22em] sm:tracking-[0.25em] text-[#64748B]/80 font-medium mt-0.5">
+              Momentos que se quedan para siempre
+            </p>
+          </div>
 
-            {/* RIGHT AREA: ACTIONS */}
-            <div className="flex justify-end items-center gap-1 sm:gap-2">
-              {(step > 1 || level || service) && step < 5 && (
-                <>
-                  <Button
-                    variant="ghost"
-                    onClick={resetQuoter}
-                    className="h-9 w-9 sm:h-9 sm:w-auto sm:px-3 rounded-full sm:rounded-md text-slate-500 hover:text-slate-900 bg-slate-100/50 sm:bg-transparent"
-                    title="Reiniciar cotizador"
-                  >
-                    <RotateCcw className="h-[18px] w-[18px] sm:hidden" strokeWidth={2.5} />
-                    <span className="hidden sm:inline text-xs uppercase tracking-widest font-semibold">Reiniciar</span>
-                  </Button>
-                  <div className="hidden sm:block h-4 w-px bg-slate-200 mx-1" />
-                </>
-              )}
-              <Button
-                variant="ghost"
-                onClick={() => { 
-                  resetQuoter(); 
-                  setTimeout(() => { window.location.href = "https://kindertogas.com/"; }, 50);
-                }}
-                className="h-9 w-9 sm:h-9 sm:w-auto sm:px-3 rounded-full sm:rounded-md text-slate-500 hover:text-slate-900 bg-slate-100/50 sm:bg-transparent -mr-2 sm:mr-0"
-                title="Salir"
+          {/* RIGHT: Actions */}
+          <div className="flex items-center justify-end gap-2 sm:gap-3">
+            {/* Si ya hay productos en la cotización, botón para ver el carrito con piezas y subtotal */}
+            {isMounted && items.length > 0 && step < 5 && (
+              <button
+                type="button"
+                onClick={() => setIsCartOpen(true)}
+                className="relative h-7 sm:h-8 px-2.5 sm:px-3 rounded-full bg-[#1E2346] hover:bg-[#1E2346]/90 text-white flex items-center gap-1.5 text-xs font-semibold transition cursor-pointer shadow-2xs mr-1"
+                title="Ver desglose de mi cotización"
+                aria-label="Abrir cotización"
               >
-                <XIcon className="h-5 w-5 sm:hidden" strokeWidth={2.5} />
-                <span className="hidden sm:inline text-xs uppercase tracking-widest font-semibold">Salir</span>
-              </Button>
-            </div>
+                <ShoppingBag className="h-3.5 w-3.5 text-[#C5A85A] shrink-0" />
+                <span className="tabular-nums font-bold text-[#C5A85A]">{items.length}</span>
+                <span className="text-slate-400 text-[10px]">·</span>
+                <span className="tabular-nums text-slate-100 font-medium text-[11px] sm:text-xs">
+                  {formatMXN(total)}
+                </span>
+              </button>
+            )}
+
+            {isMounted && (step > 1 || level || service) && step < 5 && (
+              <button
+                type="button"
+                onClick={resetQuoter}
+                className="text-[10px] sm:text-[11px] font-semibold text-slate-500 hover:text-[#1E2346] uppercase tracking-wider transition cursor-pointer"
+                title="Reiniciar cotizador"
+              >
+                Reiniciar
+              </button>
+            )}
+
+            {isMounted && (step > 1 || level || service) && step < 5 && (
+              <span className="text-slate-300 hidden sm:inline">|</span>
+            )}
+
+            <button
+              type="button"
+              onClick={() => { 
+                resetQuoter(); 
+                setTimeout(() => { window.location.href = "https://kindertogas.com/"; }, 50);
+              }}
+              className="text-[10px] sm:text-[11px] font-semibold text-slate-500 hover:text-[#1E2346] uppercase tracking-wider transition cursor-pointer"
+              title="Salir a kindertogas.com"
+              aria-label="Salir"
+            >
+              Salir
+            </button>
           </div>
         </div>
 
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 -mt-1 pb-3 flex justify-center">
-          <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-[#64748B]/70 font-medium text-center">
-            Momentos que se quedan para siempre
-          </p>
-        </div>
-        <StepperBar step={step} />
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-3">
-          <StepperLabel step={step} />
+        {/* Integrated slim progress bar */}
+        <StepperBar step={step} totalSteps={totalDisplaySteps} currentStepIndex={currentDisplayStep} />
+
+        {/* Pill in the upper-left corner just below the progress bar line */}
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-2.5 pb-2">
+          <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-slate-50 border border-slate-200/80 shadow-2xs text-xs select-none">
+            <span className="text-[10px] sm:text-[11px] font-bold text-[#C5A85A] uppercase tracking-wider">
+              Paso {currentDisplayStep} de {totalDisplaySteps}
+            </span>
+            <span className="text-slate-300">·</span>
+            <span className="font-semibold text-[#1E2346]">
+              {step === 1 && "Nivel"}
+              {step === 2 && "Servicio"}
+              {step === 3 && "Configuración"}
+              {step === 4 && "Datos de contacto"}
+              {step === 5 && "Resumen"}
+            </span>
+          </div>
         </div>
       </header>
 
       {/* Content */}
-      <main className="w-full pt-6 pb-16 flex-1 relative z-10">
-        {/* Selection Summary Pills */}
-        {((level && step > 1) || (service && step > 2) || ((city || pkg) && step > 3)) && step < 5 && (
-          <div className="mx-auto max-w-3xl px-4 sm:px-6 mb-8 animate-in fade-in slide-in-from-top-2 duration-500">
-            <div className="flex flex-wrap gap-2">
-              {level && step > 1 && (
-                <button type="button" onClick={() => setStep(1)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <span className="text-[9px] text-muted-foreground/40 font-medium">Nivel:</span>
-                  <span className="text-foreground/80">{levelLabel(level)}</span>
-                </button>
-              )}
-              {service && step > 2 && (
-                <button type="button" onClick={() => setStep(2)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <span className="text-[9px] text-muted-foreground/40 font-medium">Servicio:</span>
-                  <span className="text-foreground/80">{service === "renta" ? "Renta" : "Venta"}</span>
-                </button>
-              )}
-              {service !== "venta" && city && step > 3 && (
-                <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <span className="text-[9px] text-muted-foreground/40 font-medium">Ciudad:</span>
-                  <span className="text-foreground/80">{cityLabel(city)}</span>
-                </button>
-              )}
-              {pkg && step > 3 && (
-                <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <span className="text-[9px] text-muted-foreground/40 font-medium">Paquete:</span>
-                  <span className="text-foreground/80">{packageLabel(pkg, level, service)}</span>
-                </button>
-              )}
-              {quantity > 0 && step > 3 && (
-                <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <span className="text-[9px] text-muted-foreground/40 font-medium">Paquetes:</span>
-                  <span className="text-foreground/80">{quantity}</span>
-                </button>
-              )}
-              {service !== "venta" && ((pkg?.kind === "A" && level === "preescolar") || level !== "preescolar") && togaColor && step > 3 && (
-                <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring animate-in fade-in slide-in-from-top-1 duration-300">
-                  <span className="text-[9px] text-muted-foreground/40 font-medium">Toga:</span>
-                  <span className="text-foreground/80">{colorLabel(togaColor)}</span>
-                </button>
-              )}
-              {stolaColor && step > 3 && (
-                <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-white border border-border rounded-full text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70 flex items-center gap-2 hover:bg-muted/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring animate-in fade-in slide-in-from-top-1 duration-300">
-                  <span className="text-[9px] text-muted-foreground/40 font-medium">Estola:</span>
-                  <span className="text-foreground/80">{stolaLabel(stolaColor)}</span>
-                </button>
-              )}
-              {total > 0 && step > 3 && (
-                <button type="button" onClick={() => setStep(3)} className="px-3 py-1 bg-navy border border-navy rounded-full text-[10px] uppercase tracking-wider font-bold text-navy-foreground flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <span className="text-[9px] text-navy-foreground/70 font-medium">Total:</span>
-                  <span className="text-navy-foreground tabular-nums">{formatMXN(total)}</span>
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
+      <main className="w-full pt-4 pb-12 flex-1 relative z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -504,12 +635,16 @@ export function Quoter() {
                 onChange={(l) => {
                   setLevel(l);
                   setCity("ensenada");
-                  setPkg({ kind: "A" });
                   if (l !== "preescolar") {
+                    setService("renta");
+                    setPkg({ kind: "A" });
                     setTogaColor("negro");
                     setStolaColor("dorada");
+                    setTimeout(() => setStep(3), 220);
+                  } else {
+                    setPkg({ kind: "A" });
+                    setTimeout(() => setStep(2), 220);
                   }
-                  setTimeout(() => setStep(2), 220);
                 }}
               />
             )}
@@ -542,6 +677,7 @@ export function Quoter() {
                 togaColor={togaColor}
                 stolaColor={stolaColor}
                 togaSize={togaSize}
+                items={items}
                 onCity={setCity}
                 onPkg={setPkg}
                 onProductCategory={setProductCategory}
@@ -549,6 +685,10 @@ export function Quoter() {
                 onTogaColor={setTogaColor}
                 onStolaColor={setStolaColor}
                 onTogaSize={setTogaSize}
+                onAddItem={handleAddItem}
+                onRemoveItem={handleRemoveItem}
+                onSetItems={setItems}
+                onOpenCart={() => setIsCartOpen(true)}
                 canContinue={canNext[3]}
                 onContinue={goNext}
               />
@@ -593,6 +733,7 @@ export function Quoter() {
                 togaColor={togaColor}
                 stolaColor={stolaColor}
                 togaSize={togaSize}
+                items={items}
                 onEditStep={(targetStep) => {
                   if (isSaved) {
                     setIsSaved(false);
@@ -616,6 +757,23 @@ export function Quoter() {
           </p>
         </div>
       </footer>
+
+      {/* Slide-over Cart Drawer */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        items={items}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveItem={handleRemoveItem}
+        onAddMore={() => {
+          setIsCartOpen(false);
+          if (step !== 3) setStep(3);
+        }}
+        onProceed={() => {
+          setIsCartOpen(false);
+          setStep(4);
+        }}
+      />
     </div>
   );
 }

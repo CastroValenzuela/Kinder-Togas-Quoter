@@ -41,6 +41,24 @@ export type PackageChoice = {
   variant?: PackageBVariant;
 };
 
+export interface QuoteItem {
+  id: string;
+  category?: "togas" | "estolas" | "birretes" | "borlas" | "recuerdos";
+  pkg: PackageChoice;
+  quantity: number;
+  level?: Level;
+  service?: ServiceType;
+  togaColor?: string;
+  stolaColor?: string;
+  togaSize?: string;
+  unitPrice: number;
+  originalUnitPrice?: number;
+  discountPercent?: number;
+  totalPrice: number;
+  label: string;
+  details?: string;
+}
+
 export const LEVELS: { id: Level; label: string; icon: LucideIcon }[] = [
   { id: "preescolar", label: "Preescolar", icon: Shapes },
   { id: "primaria", label: "Primaria", icon: BookOpen },
@@ -391,10 +409,6 @@ export async function loadDynamicPrices(): Promise<boolean> {
     const { data, error } = await supabase.from("pricing").select("key, price, discount_percent");
 
     if (error) {
-      console.warn(
-        "No se pudieron cargar precios de Supabase, usando valores locales:",
-        error.message,
-      );
       return false;
     }
 
@@ -552,6 +566,13 @@ export function packageLabel(pkg?: PackageChoice, level?: Level, service?: Servi
       if (pkg.variant === "esencial") return "Estola E.1 Clásica";
       if (pkg.variant === "hybrid") return "Estola E.2 Combinada";
       if (pkg.variant === "max") return "Estola E.3 Premium";
+      if (pkg.variant === "toga_birrete_estola") return "Paquete Toga, Birrete y Estola";
+      if (pkg.variant === "toga_birrete_borla") return "Paquete Toga y Birrete";
+      if (pkg.variant === "medalla_standard") return "Medalla Estándar";
+      if (pkg.variant === "medalla_personalizada") return "Medalla Personalizada";
+      if (pkg.variant === "oso_graduacion") return "Oso de Graduación";
+      if (pkg.variant === "borla_dije") return "Borla con Dije Sublimado";
+      if (pkg.variant === "borla_clasica") return "Borla Clásica";
       return "Estola Personalizada";
     }
   }
@@ -606,3 +627,241 @@ export function formatDate(d: string): string {
     return d;
   }
 }
+
+export function getItemInfo(item: {
+  pkg?: PackageChoice;
+  level?: Level;
+  service?: ServiceType;
+  productCategory?: "togas" | "estolas" | "birretes" | "borlas" | "recuerdos";
+  togaColor?: string;
+  stolaColor?: string;
+  togaSize?: string;
+}): { label: string; details: string } {
+  const lbl = packageLabel(item.pkg, item.level, item.service);
+  const parts: string[] = [];
+
+  const selectedToga = colorLabel(item.togaColor);
+  const selectedStola = stolaLabel(item.stolaColor);
+  const variant = item.pkg?.variant;
+
+  if (item.service === "venta") {
+    if (item.level === "preescolar") {
+      if (variant === "toga_birrete_estola" || variant === "toga_birrete_borla") {
+        parts.push(`Toga: ${selectedToga}`);
+        if (item.togaSize) parts.push(`Talla: ${item.togaSize}`);
+        if (variant === "toga_birrete_estola") parts.push(`Estola: ${selectedStola}`);
+      } else if (variant === "oso_graduacion") {
+        parts.push(`Color: ${item.stolaColor === "azul" ? "Azul" : "Rosa"}`);
+      } else if (variant?.startsWith("birrete_")) {
+        parts.push(`Color: ${selectedStola}`);
+      } else if (variant?.startsWith("borla_")) {
+        parts.push(`Color: ${selectedStola}`);
+      } else if (variant === "medalla_standard" || variant === "medalla_personalizada") {
+        // sin color
+      } else {
+        parts.push(`Estola: ${selectedStola}`);
+      }
+    } else {
+      parts.push(`Estola: ${selectedStola}`);
+    }
+  } else {
+    // Renta
+    const togaColorText = (item.level !== "preescolar" || item.pkg?.kind === "A") ? selectedToga : "Negro";
+    parts.push(`Toga: ${togaColorText}`);
+    parts.push(`Estola: ${selectedStola}`);
+  }
+
+  return {
+    label: lbl,
+    details: parts.join(" • "),
+  };
+}
+
+export interface SizeDistribution {
+  XS: number;
+  S: number;
+  M: number;
+  L: number;
+  XL: number;
+}
+
+export interface AddonState {
+  enabled: boolean;
+  quantity: number;
+  color?: string;
+  variant?: string;
+}
+
+export type AddonSelections = {
+  oso?: AddonState;
+  medalla?: AddonState;
+  borla?: AddonState;
+  docente?: AddonState;
+};
+
+export function bundleToQuoteItems(params: {
+  pkg?: PackageChoice;
+  level?: Level;
+  service?: ServiceType;
+  togaColor: string;
+  stolaColor: string;
+  totalQuantity: number;
+  sizes?: SizeDistribution;
+  useSizeDistribution?: boolean;
+  togaSize?: string;
+  addons?: AddonSelections;
+}): QuoteItem[] {
+  const items: QuoteItem[] = [];
+  const {
+    pkg,
+    level,
+    service,
+    togaColor,
+    stolaColor,
+    totalQuantity,
+    sizes,
+    useSizeDistribution,
+    togaSize,
+    addons,
+  } = params;
+
+  if (pkg) {
+    const unit = unitPrice(pkg, level, service);
+    const origUnit = unitOriginalPrice(pkg, level, service);
+    const disc = getDiscountPercent(pkg, level, service);
+    const info = getItemInfo({ pkg, level, service, togaColor, stolaColor, togaSize });
+
+    let detailsStr = info.details;
+    if (useSizeDistribution && sizes) {
+      const sizeEntries = Object.entries(sizes).filter(([_, qty]) => (qty as number) > 0);
+      if (sizeEntries.length > 0) {
+        const sizeBreakdown = sizeEntries.map(([sz, qty]) => `${qty} ${sz}`).join(", ");
+        detailsStr = detailsStr ? `${detailsStr} • Tallas: ${sizeBreakdown}` : `Tallas: ${sizeBreakdown}`;
+      }
+    }
+
+    items.push({
+      id: "main-package",
+      category: "togas",
+      pkg: { ...pkg },
+      quantity: totalQuantity,
+      level,
+      service,
+      togaColor,
+      stolaColor,
+      togaSize: useSizeDistribution ? undefined : togaSize,
+      unitPrice: unit,
+      originalUnitPrice: origUnit,
+      discountPercent: disc,
+      totalPrice: unit * totalQuantity,
+      label: info.label,
+      details: detailsStr,
+    });
+  }
+
+  // Addons
+  if (addons?.oso?.enabled && addons.oso.quantity > 0) {
+    const osoPkg: PackageChoice = { kind: "B", variant: "oso_graduacion" };
+    const osoPrice = PRICES.V_OSO_GRADUACION || 150;
+    const osoColor = addons.oso.color === "rosa" ? "Rosa" : "Azul";
+    items.push({
+      id: "addon-oso",
+      category: "recuerdos",
+      pkg: osoPkg,
+      quantity: addons.oso.quantity,
+      level,
+      service: "venta",
+      stolaColor: addons.oso.color || "azul",
+      unitPrice: osoPrice,
+      originalUnitPrice: osoPrice,
+      discountPercent: 0,
+      totalPrice: osoPrice * addons.oso.quantity,
+      label: "Oso de Graduación con Toga",
+      details: `Color: ${osoColor} • Con birrete y camiseta conmemorativa`,
+    });
+  }
+
+  if (addons?.medalla?.enabled && addons.medalla.quantity > 0) {
+    const isPersonalizada = addons.medalla.variant === "personalizada";
+    const medallaPkg: PackageChoice = {
+      kind: "B",
+      variant: isPersonalizada ? "medalla_personalizada" : "medalla_standard",
+    };
+    const medallaPrice = isPersonalizada
+      ? (PRICES.V_MEDALLA_PERSONALIZADA || 45)
+      : (PRICES.V_MEDALLA_STANDARD || 35);
+    items.push({
+      id: "addon-medalla",
+      category: "recuerdos",
+      pkg: medallaPkg,
+      quantity: addons.medalla.quantity,
+      level,
+      service: "venta",
+      unitPrice: medallaPrice,
+      originalUnitPrice: medallaPrice,
+      discountPercent: 0,
+      totalPrice: medallaPrice * addons.medalla.quantity,
+      label: isPersonalizada ? "Medalla de Graduación Personalizada" : "Medalla de Graduación Estándar",
+      details: isPersonalizada ? "Grabada con logo escolar, nombre y año 2026" : "Listón satinado y emblema clásico 2026",
+    });
+  }
+
+  if (addons?.borla?.enabled && addons.borla.quantity > 0) {
+    const borlaPkg: PackageChoice = { kind: "B", variant: "borla_clasica" };
+    const borlaPrice = PRICES.V_B_BORLA_CLASICA || 25;
+    items.push({
+      id: "addon-borla",
+      category: "borlas",
+      pkg: borlaPkg,
+      quantity: addons.borla.quantity,
+      level,
+      service: "venta",
+      unitPrice: borlaPrice,
+      originalUnitPrice: borlaPrice,
+      discountPercent: 0,
+      totalPrice: borlaPrice * addons.borla.quantity,
+      label: "Borla Conmemorativa Extra",
+      details: "Con dije metálico dorado 2026",
+    });
+  }
+
+  if (addons?.docente?.enabled && addons.docente.quantity > 0) {
+    const docentePkg: PackageChoice = { kind: "B", variant: "toga_birrete_borla" };
+    const docentePrice = service === "renta" ? (PRICES.A_PREESCOLAR || 350) : (PRICES.V_TOGA_BIRRETE_BORLA || 380);
+    items.push({
+      id: "addon-docente",
+      category: "togas",
+      pkg: docentePkg,
+      quantity: addons.docente.quantity,
+      level,
+      service,
+      togaColor: "negro",
+      stolaColor: "dorada",
+      unitPrice: docentePrice,
+      originalUnitPrice: docentePrice,
+      discountPercent: 0,
+      totalPrice: docentePrice * addons.docente.quantity,
+      label: "Toga de Maestro / Presídium",
+      details: "Toga negra con birrete y borla de honor",
+    });
+  }
+
+  return items;
+}
+
+/**
+ * Checks if two QuoteItems have the exact same configuration (SKU equivalence).
+ * If true, top e-commerce SaaS platforms (like Amazon/Shopify) merge them by summing quantities.
+ */
+export function isSameProductConfig(a: QuoteItem, b: Partial<QuoteItem>): boolean {
+  if ((a.category || "togas") !== (b.category || "togas")) return false;
+  if (a.level !== b.level) return false;
+  if (a.service !== b.service) return false;
+  if (a.pkg?.kind !== b.pkg?.kind) return false;
+  if ((a.pkg as any)?.variant !== (b.pkg as any)?.variant) return false;
+  if ((a.togaColor || "") !== (b.togaColor || "")) return false;
+  if ((a.stolaColor || "") !== (b.stolaColor || "")) return false;
+  if ((a.togaSize || "") !== (b.togaSize || "")) return false;
+  return true;
+}
+

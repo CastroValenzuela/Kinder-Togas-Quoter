@@ -2,8 +2,18 @@ import { motion } from "framer-motion";
 
 const LABELS = ["Nivel", "Servicio", "Configuración", "Tus Datos", "Resumen"];
 
-export function StepperBar({ step }: { step: number }) {
-  const pct = ((step - 1) / 4) * 100;
+export function StepperBar({
+  step,
+  totalSteps = 5,
+  currentStepIndex,
+}: {
+  step: number;
+  totalSteps?: number;
+  currentStepIndex?: number;
+}) {
+  const current = currentStepIndex ?? step;
+  const total = totalSteps > 1 ? totalSteps : 5;
+  const pct = Math.min(100, Math.max(0, ((current - 1) / (total - 1)) * 100));
   return (
     <div className="h-[3px] w-full overflow-hidden" style={{ backgroundColor: "#F1F5F9" }}>
       <motion.div

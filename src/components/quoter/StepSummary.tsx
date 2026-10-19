@@ -13,8 +13,9 @@ import {
   type Level,
   type City,
   type PackageChoice,
+  type QuoteItem,
 } from "@/lib/pricing";
-import { generateQuotePDF } from "@/lib/quote-pdf";
+import { generateQuotePDF, buildSummaryText } from "@/lib/quote-pdf";
 import { useState } from "react";
 
 type Props = {
@@ -31,23 +32,42 @@ type Props = {
   togaColor?: string;
   stolaColor?: string;
   togaSize?: string;
+  items?: QuoteItem[];
   onEditStep?: (step: 1 | 2 | 3 | 4 | 5) => void;
   service?: "renta" | "venta";
 };
 
-export function StepSummary({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor, togaSize, onEditStep }: Props) {
+export function StepSummary({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor, togaSize, items, onEditStep }: Props) {
+  const isMultiItem = items && items.length > 1;
   const unit = unitPrice(pkg, level, service);
   const originalUnit = unitOriginalPrice(pkg, level, service);
   const discountPercent = getDiscountPercent(pkg, level, service);
-  const total = unit * quantity;
+  const total = isMultiItem
+    ? items.reduce((acc, it) => acc + it.totalPrice, 0)
+    : unit * quantity;
+  const totalUnits = isMultiItem
+    ? items.reduce((acc, it) => acc + it.quantity, 0)
+    : quantity;
   const pkgVariant = pkg && "variant" in pkg ? pkg.variant : undefined;
+
+  const infoRows = isMultiItem ? [
+    { label: "Folio de Cotización", value: quoteNumber || "Generando...", step: null },
+    { label: "Institución", value: school, step: 4 },
+    { label: "Solicitante", value: contact, step: 4 },
+    { label: "Nivel escolar", value: levelLabel(level), step: 1 },
+    { label: "Servicio", value: service === "renta" ? "Renta" : "Venta", step: level === "preescolar" ? 2 : null },
+    { label: "Sede / Ciudad", value: city === "tijuana" ? "Tijuana" : (city === "ensenada" ? "Ensenada" : cityLabel(city)), step: 3 },
+    { label: "Total artículos", value: `${totalUnits} piezas`, step: 3 },
+    { label: "Teléfono", value: phone, step: 4 },
+  ] : [];
+  if (isMultiItem && date) infoRows.splice(3, 0, { label: "Fecha evento", value: formatDate(date), step: 4 });
 
   const rows = [
     { label: "Folio de Cotización", value: quoteNumber || "Generando...", step: null },
     { label: "Institución", value: school, step: 4 },
     { label: "Solicitante", value: contact, step: 4 },
     { label: "Nivel escolar", value: levelLabel(level), step: 1 },
-    { label: "Servicio", value: service === "renta" ? "Renta" : "Venta", step: 2 },
+    { label: "Servicio", value: service === "renta" ? "Renta" : "Venta", step: level === "preescolar" ? 2 : null },
     { label: "Sede / Ciudad", value: city === "tijuana" ? "Tijuana" : (city === "ensenada" ? "Ensenada" : cityLabel(city)), step: 3 },
     { label: "Paquete", value: packageLabel(pkg, level, service), step: 3 },
     ...(discountPercent > 0 ? [
@@ -129,46 +149,127 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
           
           {/* 1. Summary Table */}
           <div className="border-t border-hairline order-1">
-        {rows.map((r) => (
-          <div key={r.label} className="flex items-baseline justify-between gap-6 py-4 border-b border-hairline group">
-            <span className="text-sm uppercase tracking-[0.16em] text-muted-foreground">{r.label}</span>
-            {r.step && onEditStep ? (
-              <button
-                onClick={() => onEditStep(r.step as 1|2|3|4|5)}
-                className="text-base text-foreground text-right hover:text-navy hover:underline decoration-navy/30 underline-offset-4 transition-colors cursor-pointer text-left sm:text-right text-balance"
-                title={`Editar ${r.label.toLowerCase()}`}
-              >
-                {r.value}
-              </button>
+            {isMultiItem ? (
+              <>
+                {infoRows.map((r) => (
+                  <div key={r.label} className="flex items-baseline justify-between gap-6 py-3.5 border-b border-hairline group">
+                    <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">{r.label}</span>
+                    {r.step && onEditStep ? (
+                      <button
+                        onClick={() => onEditStep(r.step as 1|2|3|4|5)}
+                        className="text-sm font-medium text-foreground text-right hover:text-navy hover:underline decoration-navy/30 underline-offset-4 transition-colors cursor-pointer"
+                        title={`Editar ${r.label.toLowerCase()}`}
+                      >
+                        {r.value}
+                      </button>
+                    ) : (
+                      <span className="text-sm font-medium text-foreground text-right">{r.value}</span>
+                    )}
+                  </div>
+                ))}
+
+                {/* Desglose de partidas */}
+                <div className="pt-6 pb-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs uppercase tracking-[0.2em] font-bold text-navy">
+                      Productos Cotizados ({items.length})
+                    </span>
+                    {onEditStep && (
+                      <button
+                        onClick={() => onEditStep(3)}
+                        className="text-xs text-[#C5A85A] hover:underline font-semibold cursor-pointer"
+                      >
+                        Modificar productos
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {items.map((it) => (
+                      <div key={it.id} className="bg-white border border-slate-200 rounded-xl p-3 shadow-2xs flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-[#1E2346] bg-slate-100 px-2 py-0.5 rounded text-xs">
+                              {it.quantity}x
+                            </span>
+                            <span className="font-semibold text-slate-800 text-sm">
+                              {it.label}
+                            </span>
+                          </div>
+                          {it.details && (
+                            <p className="text-xs text-muted-foreground mt-1 ml-0.5">
+                              {it.details}
+                            </p>
+                          )}
+                          <p className="text-[11px] text-slate-500 mt-0.5 ml-0.5">
+                            Unitario: {formatMXN(it.unitPrice)} MXN
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="font-sans font-semibold text-base text-navy tabular-nums">
+                            {formatMXN(it.totalPrice)}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground block">MXN</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5 pt-6 pb-2">
+                  <div className="flex items-baseline justify-between gap-6">
+                    <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Total Neto</span>
+                    <span className="font-sans font-semibold text-4xl sm:text-5xl text-navy tabular-nums select-none">
+                      {formatMXN(total)}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground text-right mt-1">Cotización válida 15 días.</p>
+              </>
             ) : (
-              <span className="text-base text-foreground text-right">{r.value}</span>
+              <>
+                {rows.map((r) => (
+                  <div key={r.label} className="flex items-baseline justify-between gap-6 py-4 border-b border-hairline group">
+                    <span className="text-sm uppercase tracking-[0.16em] text-muted-foreground">{r.label}</span>
+                    {r.step && onEditStep ? (
+                      <button
+                        onClick={() => onEditStep(r.step as 1|2|3|4|5)}
+                        className="text-base text-foreground text-right hover:text-navy hover:underline decoration-navy/30 underline-offset-4 transition-colors cursor-pointer text-left sm:text-right text-balance"
+                        title={`Editar ${r.label.toLowerCase()}`}
+                      >
+                        {r.value}
+                      </button>
+                    ) : (
+                      <span className="text-base text-foreground text-right">{r.value}</span>
+                    )}
+                  </div>
+                ))}
+
+                <div className="flex flex-col gap-1.5 pt-8 pb-2">
+                  <div className="flex items-baseline justify-between gap-6">
+                    <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Total Neto</span>
+                    <span className="font-sans font-semibold text-4xl sm:text-5xl text-navy tabular-nums select-none">
+                      {formatMXN(total)}
+                    </span>
+                  </div>
+                  {discountPercent > 0 && (
+                    <div className="flex flex-col items-end gap-1 select-none animate-in fade-in slide-in-from-top-1 duration-200">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">Precio de Lista:</span>
+                        <span className="text-sm line-through text-muted-foreground font-sans tabular-nums">
+                          {formatMXN(originalUnit * quantity)}
+                        </span>
+                      </div>
+                      <div className="text-[10px] font-bold text-white bg-[#C5A85A] px-2 py-0.5 rounded-md tracking-wide mt-0.5">
+                        🎉 ¡Ahorro total de {formatMXN((originalUnit - unit) * quantity)} MXN!
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground text-right mt-1">Cotización válida 15 días.</p>
+              </>
             )}
           </div>
-        ))}
-
-        <div className="flex flex-col gap-1.5 pt-8 pb-2">
-          <div className="flex items-baseline justify-between gap-6">
-            <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Total Neto</span>
-            <span className="font-sans font-semibold text-4xl sm:text-5xl text-navy tabular-nums select-none">
-              {formatMXN(total)}
-            </span>
-          </div>
-          {discountPercent > 0 && (
-            <div className="flex flex-col items-end gap-1 select-none animate-in fade-in slide-in-from-top-1 duration-200">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">Precio de Lista:</span>
-                <span className="text-sm line-through text-muted-foreground font-sans tabular-nums">
-                  {formatMXN(originalUnit * quantity)}
-                </span>
-              </div>
-              <div className="text-[10px] font-bold text-white bg-[#C5A85A] px-2 py-0.5 rounded-md tracking-wide mt-0.5">
-                🎉 ¡Ahorro total de {formatMXN((originalUnit - unit) * quantity)} MXN!
-              </div>
-            </div>
-          )}
-        </div>
-        <p className="text-xs text-muted-foreground text-right mt-1">Cotización válida 15 días.</p>
-      </div>
 
       {/* 2. Thank You Card (Shows up on right for desktop, bottom for mobile) */}
       <div className="order-3 lg:order-2 pt-8 lg:pt-0 lg:pl-12 lg:border-l lg:border-hairline border-t lg:border-t-0 border-hairline flex flex-col items-center text-center h-full justify-center">
@@ -236,6 +337,29 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
       {/* 3. Action Buttons (Download & Share) */}
       {(() => {
         const handleShareWhatsApp = () => {
+          if (isMultiItem) {
+            const text = buildSummaryText({
+              level,
+              city,
+              pkg,
+              quantity: totalUnits,
+              school,
+              contact,
+              phone,
+              date,
+              email,
+              quoteNumber,
+              service,
+              togaColor,
+              stolaColor,
+              togaSize,
+              items,
+            });
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(url, "_blank", "noopener,noreferrer");
+            return;
+          }
+
           const selectedToga = colorLabel(togaColor);
           const selectedStola = stolaLabel(stolaColor);
           const serviceLabel = service === "renta" ? "Renta" : "Venta";
@@ -301,7 +425,7 @@ ${detailsLine}📦 *Cantidad:* ${quantity} graduados
           <div className="order-2 lg:order-3 lg:col-span-2 pt-8 pb-4 flex flex-col sm:flex-row justify-center items-center gap-6 lg:mt-4 lg:border-t border-hairline">
             <button
               type="button"
-              onClick={() => generateQuotePDF({ level, city, pkg, quantity, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor, togaSize })}
+              onClick={() => generateQuotePDF({ level, city, pkg, quantity: totalUnits, school, contact, phone, date, email, quoteNumber, service, togaColor, stolaColor, togaSize, items })}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-full bg-navy text-navy-foreground px-10 py-4.5 text-base font-semibold hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               <Download className="h-5 w-5" /> Descargar mi Cotización (PDF)
