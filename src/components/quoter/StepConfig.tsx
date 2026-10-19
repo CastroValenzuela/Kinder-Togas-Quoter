@@ -485,11 +485,12 @@ export function StepConfig({
             if (colorSuffix === "azul_cielo") colorSuffix = "azul";
             
             if (pkg.variant === "toga_birrete_estola") {
-              if (colorSuffix === "rojo") {
-                result = getAsset(`Venta/Preescolar/Togas/T2.rojo.jpeg`);
-              } else {
-                result = getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}.jpeg`);
-              }
+              const src = colorSuffix === "rojo"
+                ? getAsset(`Venta/Preescolar/Togas/T2.rojo.jpeg`)
+                : getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}.jpeg`);
+              const mask = getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}-mask.png`)
+                || getAsset(`Venta/Preescolar/Togas/T2-estola-mask.png`);
+              result = { src, mask };
             } else {
               result = getAsset(`Venta/Preescolar/Togas/T1-${colorSuffix}.jpeg`);
             }
