@@ -29,6 +29,26 @@ describe("quote-pdf helpers", () => {
       expect(summary).toContain("Color Toga: Negro");
     });
 
+    it("should include custom toga color for preescolar paquete B in summary", () => {
+      const mockQuote: QuoteData = {
+        level: "preescolar",
+        city: "tijuana",
+        pkg: { kind: "B", variant: "esencial" },
+        quantity: 15,
+        school: "Colegio de Prueba",
+        contact: "Juan Pérez",
+        phone: "6641234567",
+        date: "2026-07-07",
+        quoteNumber: "KT-9999",
+        service: "renta",
+        togaColor: "azul",
+        stolaColor: "dorada",
+      };
+
+      const summary = buildSummaryText(mockQuote);
+      expect(summary).toContain("Color Toga: Azul");
+    });
+
     it("should generate a multi-product summary string when items array has multiple products", () => {
       const mockMultiQuote: QuoteData = {
         level: "preescolar",

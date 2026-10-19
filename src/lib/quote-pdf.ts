@@ -112,7 +112,7 @@ export function buildSummaryText(q: QuoteData): string {
       rows.push(`Estola: ${stolaVal}`);
     }
   } else {
-    const togaColorText = (q.level !== "preescolar" || q.pkg?.kind === "A") ? selectedToga : "Negro";
+    const togaColorText = q.level === "preescolar" ? selectedToga : "Negro";
     rows.push(`Color Toga: ${togaColorText}`);
     rows.push(`Estola: ${stolaVal}`);
   }
@@ -275,7 +275,7 @@ export function generateQuotePDF(q: QuoteData): void {
         itemDescription = `Estola personalizada de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Estola color: ${stolaVal}\n• Impresión/acabado premium.`;
       }
     } else {
-      const togaColorText = (q.level !== "preescolar" || q.pkg?.kind === "A") ? selectedToga : "Negro";
+      const togaColorText = q.level === "preescolar" ? selectedToga : "Negro";
       itemDescription = `Servicio integral de graduación: ${packageLabel(q.pkg, q.level, q.service)}\n• Toga color: ${togaColorText}\n• Estola color: ${stolaVal}\n• Incluye birrete premium.`;
     }
 

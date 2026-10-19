@@ -533,7 +533,20 @@ export function StepConfig({
             result = VENTA_PREESCOLAR_PAQUETE_B[pkg.variant] || { src: getAsset('Venta/Preescolar/Estolas/E2.jpg') };
           }
         } else {
-          result = PREESCOLAR_PAQUETE_B[pkg.variant] || getAsset('Renta/Preescolar/balance.jpg');
+          // Preescolar Renta Paquete B:
+          // Si el usuario selecciona un color de toga (azul, rojo, verde, turquesa, etc.)
+          // o un color de estola específico (dorada, plateada, azul, roja), actualizamos
+          // la visualización en vivo para reflejar exactamente la combinación seleccionada,
+          // tal como en el Paquete A. Si está en blanco o predeterminado, muestra el gráfico del paquete.
+          const isColoredToga = togaColor && togaColor !== "negro";
+          const isColoredStola = stolaColor && stolaColor !== "blanco";
+
+          if (isColoredToga || isColoredStola) {
+            const colorVariants = PREESCOLAR_PAQUETE_A[togaColor] || PREESCOLAR_PAQUETE_A.negro;
+            result = colorVariants[stolaColor] || colorVariants.default;
+          } else {
+            result = PREESCOLAR_PAQUETE_B[pkg.variant] || getAsset('Renta/Preescolar/balance.jpg');
+          }
         }
       }
     } else {
@@ -577,7 +590,7 @@ export function StepConfig({
 
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={showcaseMedia.src + (stolaColor !== "blanco" ? stolaColor : "")}
+                  key={showcaseMedia.src + (stolaColor !== "blanco" ? stolaColor : "") + togaColor}
                   initial={{ opacity: 0, filter: "blur(8px)" }}
                   animate={{ opacity: 1, filter: "blur(0px)" }}
                   exit={{ opacity: 0, filter: "blur(8px)" }}
@@ -1030,7 +1043,12 @@ export function StepConfig({
                               onPkg({ kind: "C", variant });
                             } else if (k === "B") {
                               let defaultVariant: PackageBVariant | undefined = undefined;
-                              if (level === "preescolar") defaultVariant = "esencial";
+                              if (level === "preescolar") {
+                                defaultVariant = "hybrid";
+                                if (stolaColor === "dorada") {
+                                  onStolaColor("blanco");
+                                }
+                              }
                               else if (level === "primaria") defaultVariant = "pri_c";
                               else if (level === "secundaria") defaultVariant = "sec_b";
                               else if (level === "preparatoria") defaultVariant = "prep_b";
@@ -1046,6 +1064,9 @@ export function StepConfig({
                               onPkg({ kind: "B", variant });
                             } else {
                               onPkg({ kind: "A" });
+                              if (level === "preescolar" && stolaColor === "blanco") {
+                                onStolaColor("dorada");
+                              }
                             }
                           }}
                           className="relative flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -1088,7 +1109,13 @@ export function StepConfig({
                               <button
                                 key={v.id}
                                 type="button"
-                                onClick={() => onPkg({ kind: pkg?.kind || "B", variant: v.id })}
+                                onClick={() => {
+                                  onPkg({ kind: pkg?.kind || "B", variant: v.id });
+                                  if (level === "preescolar" && service !== "venta") {
+                                    onTogaColor("negro");
+                                    onStolaColor("blanco");
+                                  }
+                                }}
                                 className={cn(
                                   "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
                                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -1222,7 +1249,7 @@ export function StepConfig({
                   }
                   return [];
                 }
-                return STOLA_COLORS.filter((s: StolaColor) => {
+                const list = STOLA_COLORS.filter((s: StolaColor) => {
                   if (level === "preescolar") {
                     if (service === "venta") {
                       if (productCategory === "togas") {
@@ -1241,12 +1268,17 @@ export function StepConfig({
                       return ids.includes(s.id);
                     }
                     if (pkg?.kind === "A") return s.isBasic;
-                    if (pkg?.kind === "B") return true;
+                    if (pkg?.kind === "B") return s.isBasic || s.id === "blanco";
                     return false;
                   }
                   if (pkg?.kind === "B" || pkg?.kind === "C") return true;
                   return s.id === "dorada";
                 });
+
+                if (level === "preescolar" && pkg?.kind === "B" && service !== "venta") {
+                  return [...list].sort((a, b) => (a.id === "blanco" ? -1 : b.id === "blanco" ? 1 : 0));
+                }
+                return list;
               })();
 
               if (visibleStolas.length === 0) return null;
@@ -1259,6 +1291,7 @@ export function StepConfig({
                   <div className="flex flex-wrap gap-2.5">
                     {visibleStolas.map((s) => {
                       const active = stolaColor === s.id;
+                      const displayLabel = (level === "preescolar" && pkg?.kind === "B" && s.id === "blanco") ? "Blanco (Diseño)" : s.label;
                       return (
                         <button
                           key={s.id}
@@ -1276,7 +1309,7 @@ export function StepConfig({
                             className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
                             style={{ background: (s as any).gradient || s.hex }}
                           />
-                          <span>{s.label}</span>
+                          <span>{displayLabel}</span>
                         </button>
                       );
                     })}

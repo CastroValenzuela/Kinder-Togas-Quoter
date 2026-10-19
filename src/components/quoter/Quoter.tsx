@@ -242,8 +242,12 @@ export function Quoter() {
       if (pkg?.kind === "A" && stolaColor !== "dorada") {
         setStolaColor("dorada");
       }
+    } else if (level === "preescolar" && service === "renta") {
+      if (pkg?.kind === "A" && stolaColor === "blanco") {
+        setStolaColor("dorada");
+      }
     }
-  }, [level, pkg, togaColor, stolaColor]);
+  }, [level, service, pkg, togaColor, stolaColor]);
 
   // Default to "azul" when graduation bear is selected and no valid color is set
   useEffect(() => {
