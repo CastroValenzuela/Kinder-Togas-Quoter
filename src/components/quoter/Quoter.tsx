@@ -242,8 +242,11 @@ export function Quoter() {
       if (pkg?.kind === "A" && stolaColor !== "dorada") {
         setStolaColor("dorada");
       }
-    } else if (level === "preescolar" && service === "renta") {
-      if (pkg?.kind === "A" && stolaColor === "blanco") {
+    } else if (level === "preescolar") {
+      if (togaColor === "guinda" || togaColor === "rosa") {
+        setTogaColor("negro");
+      }
+      if (service === "renta" && pkg?.kind === "A" && stolaColor === "blanco") {
         setStolaColor("dorada");
       }
     }

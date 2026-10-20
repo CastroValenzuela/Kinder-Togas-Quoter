@@ -1134,7 +1134,7 @@ export function StepConfigTabs({
                       <div className="flex flex-wrap gap-2.5">
                         {TOGA_COLORS.filter((c) => {
                           if (service === "venta" && productCategory === "togas") {
-                            return ["azul", "guinda", "negro", "rojo", "rosa"].includes(c.id);
+                            return ["azul", "negro", "rojo"].includes(c.id);
                           }
                           return level === "preescolar" || c.id === "negro";
                         }).map(

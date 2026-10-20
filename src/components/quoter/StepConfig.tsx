@@ -43,13 +43,7 @@ const VENTA_PREESCOLAR_PAQUETE_B: Record<string, { src: string, mask?: string }>
   max: { src: getAsset('Venta/Preescolar/Estolas/E3.jpg'), mask: getAsset('Venta/Preescolar/Estolas/E3-mask.png') },
 };
 
-const VENTA_PREESCOLAR_TOGAS: Record<string, string> = {
-  azul: getAsset('Venta/Preescolar/Togas/azul.jpeg'),
-  rojo: getAsset('Venta/Preescolar/Togas/rojo.jpeg'),
-  negro: getAsset('Venta/Preescolar/Togas/negro.jpeg'),
-  rosa: getAsset('Venta/Preescolar/Togas/rosa.jpeg'),
-  azul_cielo: getAsset('Venta/Preescolar/Togas/azul-cielo.jpeg'),
-};
+
 
 const VENTA_PREESCOLAR_RECUERDOS: Record<string, string> = {
   medalla_standard: getAsset('Venta/Preescolar/Recuerdos/Medallas/medalla.jpeg'),
@@ -261,13 +255,7 @@ const FEATURES_UNI_C = [
   { icon: Users, text: "Atención personalizada y asesoría" },
 ];
 
-const VENTA_PREESCOLAR_TOGA_COLORS = [
-  { id: "azul", label: "Azul Rey", hex: "#1E40AF" },
-  { id: "rojo", label: "Rojo", hex: "#DC2626" },
-  { id: "negro", label: "Negro", hex: "#1A1A1A" },
-  { id: "rosa", label: "Rosa", hex: "#FBCFE8" },
-  { id: "azul_cielo", label: "Azul Cielo", hex: "#7DD3FC" },
-];
+
 
 const FEATURES_VENTA_BORLAS: Record<"borla_dije" | "borla_clasica", { icon: typeof Camera; text: string }[]> = {
   borla_dije: [
@@ -1196,7 +1184,7 @@ export function StepConfig({
                 <div className="flex flex-wrap gap-2.5">
                   {TOGA_COLORS.filter((c) => {
                     if (service === "venta" && productCategory === "togas") {
-                      return ["azul", "guinda", "negro", "rojo", "rosa"].includes(c.id);
+                      return ["azul", "negro", "rojo"].includes(c.id);
                     }
                     return level === "preescolar" || c.id === "negro";
                   }).map((c) => {
