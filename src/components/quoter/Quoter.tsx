@@ -639,6 +639,7 @@ export function Quoter() {
                     setPkg({ kind: "A" });
                     setTogaColor("negro");
                     setStolaColor("dorada");
+                    setProductCategory(undefined);
                     setTimeout(() => setStep(3), 220);
                   } else {
                     setPkg({ kind: "A" });
@@ -659,6 +660,7 @@ export function Quoter() {
                     setTogaColor("guinda");
                     setStolaColor("blanco");
                   } else {
+                    setProductCategory(undefined);
                     setPkg({ kind: "A" });
                   }
                   setTimeout(() => setStep(3), 220);

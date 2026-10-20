@@ -692,23 +692,6 @@ export function StepConfig({
                   })()}
                 </motion.div>
               </AnimatePresence>
-
-              {/* Badge en vivo con selección de Toga y Estola */}
-              {service === "renta" && (
-                <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md shadow-md border border-black/10 text-[11px] sm:text-xs font-medium text-navy pointer-events-none select-none">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Toga:</span>
-                    <span className="w-2.5 h-2.5 rounded-full border border-black/15 shrink-0" style={{ backgroundColor: TOGA_COLORS.find(c => c.id === togaColor)?.hex || "#1A1A1A" }} />
-                    <span className="font-semibold text-foreground">{colorLabel(togaColor)}</span>
-                  </div>
-                  <span className="text-muted-foreground/40">•</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Estola:</span>
-                    <span className="w-2.5 h-2.5 rounded-full border border-black/15 shrink-0" style={{ background: (STOLA_COLORS.find(c => c.id === stolaColor) as any)?.gradient || STOLA_COLORS.find(c => c.id === stolaColor)?.hex || "#EAB308" }} />
-                    <span className="font-semibold text-foreground">{((pkg?.kind === "B" || pkg?.kind === "C") && stolaColor === "blanco") ? "Blanco (Diseño)" : stolaLabel(stolaColor)}</span>
-                  </div>
-                </div>
-              )}
             </motion.div>
           </div>
 
@@ -1306,7 +1289,13 @@ export function StepConfig({
               return (
                 <section className="animate-in fade-in slide-in-from-top-2 duration-300">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
-                    {productCategory === "birretes" ? "Color de Birrete" : productCategory === "borlas" ? "Color de Borla" : (productCategory === "recuerdos" ? "Color del Oso" : "Color de Estola")}
+                    {service === "venta" && productCategory === "birretes"
+                      ? "Color de Birrete"
+                      : service === "venta" && productCategory === "borlas"
+                        ? "Color de Borla"
+                        : service === "venta" && productCategory === "recuerdos" && pkg?.variant === "oso_graduacion"
+                          ? "Color del Oso"
+                          : "Color de Estola"}
                   </p>
                   <div className="flex flex-wrap gap-2.5">
                     {visibleStolas.map((s) => {
