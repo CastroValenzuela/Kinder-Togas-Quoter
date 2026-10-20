@@ -71,11 +71,128 @@ export function Quoter() {
     return undefined;
   };
 
-  const [step, setStep] = useState<Step>(1);
-  const [level, setLevel] = useState<Level | undefined>(undefined);
-  const [service, setService] = useState<ServiceType | undefined>(undefined);
+  // Check URL query parameters for direct package linking (e.g. ?package=B.2 or ?paquete=B.2 or ?variant=sec_a)
+  const getUrlPackage = (lvl?: Level): PackageChoice | undefined => {
+    if (typeof window === "undefined") return undefined;
+    const params = new URLSearchParams(window.location.search);
+    const raw = (
+      params.get("package") ||
+      params.get("paquete") ||
+      params.get("pkg") ||
+      params.get("variant") ||
+      params.get("opcion") ||
+      params.get("modelo")
+    )?.toLowerCase().trim();
+    if (!raw) return undefined;
+
+    // Direct variant IDs check
+    const directVariants: PackageBVariant[] = [
+      "sec_a", "sec_b", "pri_a", "pri_b", "pri_c",
+      "prep_a", "prep_b", "prep_c1", "prep_c2",
+      "uni_b", "uni_c", "esencial", "hybrid", "max"
+    ];
+    if (directVariants.includes(raw as PackageBVariant)) {
+      if (raw === "prep_c1" || raw === "prep_c2") {
+        return { kind: "C", variant: raw as PackageBVariant };
+      }
+      return { kind: "B", variant: raw as PackageBVariant };
+    }
+
+    // Paquete A / Básico
+    if (
+      raw === "a" ||
+      raw === "uni_a" ||
+      raw.includes("paquete a") ||
+      raw.includes("opcion a") ||
+      raw.includes("opción a") ||
+      raw.includes("básico") ||
+      raw.includes("basico")
+    ) {
+      return { kind: "A" };
+    }
+
+    // Level-specific mappings
+    if (lvl === "secundaria") {
+      if (raw === "b.2" || raw === "b2" || raw.includes("b.2") || raw.includes("b2")) {
+        return { kind: "B", variant: "sec_a" };
+      }
+      if (raw === "b.1" || raw === "b1" || raw.includes("b.1") || raw.includes("b1")) {
+        return { kind: "B", variant: "sec_b" };
+      }
+      if (raw === "b") return { kind: "B", variant: "sec_a" };
+    }
+
+    if (lvl === "primaria") {
+      if (raw === "b.1" || raw === "b1" || raw.includes("b.1") || raw.includes("b1") || raw.includes("funcional")) {
+        return { kind: "B", variant: "pri_c" };
+      }
+      if (raw === "b.2" || raw === "b2" || raw.includes("b.2") || raw.includes("b2") || raw.includes("equilibrado")) {
+        return { kind: "B", variant: "pri_b" };
+      }
+      if (raw === "b.3" || raw === "b3" || raw.includes("b.3") || raw.includes("b3") || raw.includes("destacado")) {
+        return { kind: "B", variant: "pri_a" };
+      }
+      if (raw === "b") return { kind: "B", variant: "pri_c" };
+    }
+
+    if (lvl === "preparatoria") {
+      if (raw === "c.1" || raw === "c1" || raw.includes("c.1") || raw.includes("c1")) {
+        return { kind: "C", variant: "prep_c1" };
+      }
+      if (raw === "c.2" || raw === "c2" || raw.includes("c.2") || raw.includes("c2")) {
+        return { kind: "C", variant: "prep_c2" };
+      }
+      if (raw === "b.1" || raw === "b1" || raw.includes("b.1") || raw.includes("b1")) {
+        return { kind: "B", variant: "prep_b" };
+      }
+      if (raw === "b.2" || raw === "b2" || raw.includes("b.2") || raw.includes("b2")) {
+        return { kind: "B", variant: "prep_a" };
+      }
+      if (raw === "c") return { kind: "C", variant: "prep_c1" };
+      if (raw === "b") return { kind: "B", variant: "prep_b" };
+    }
+
+    if (lvl === "preescolar") {
+      if (raw === "b.1" || raw === "b1" || raw.includes("esencial")) return { kind: "B", variant: "esencial" };
+      if (raw === "b.2" || raw === "b2" || raw.includes("balance") || raw.includes("hybrid")) return { kind: "B", variant: "hybrid" };
+      if (raw === "b.3" || raw === "b3" || raw.includes("premium") || raw.includes("max")) return { kind: "B", variant: "max" };
+      if (raw === "b") return { kind: "B", variant: "hybrid" };
+    }
+
+    if (lvl === "universidad") {
+      if (raw === "b" || raw === "b.1" || raw === "b1" || raw.includes("impresion") || raw.includes("impresión") || raw === "uni_b") {
+        return { kind: "B", variant: "uni_b" };
+      }
+      if (raw === "c" || raw === "c.1" || raw === "c1" || raw.includes("bordado") || raw === "uni_c") {
+        return { kind: "B", variant: "uni_c" };
+      }
+    }
+
+    return undefined;
+  };
+
+  const [step, setStep] = useState<Step>(() => {
+    const lvl = getUrlLevel();
+    const p = getUrlPackage(lvl);
+    if (lvl) {
+      return (lvl !== "preescolar" || p) ? 3 : 2;
+    }
+    return 1;
+  });
+  const [level, setLevel] = useState<Level | undefined>(() => getUrlLevel());
+  const [service, setService] = useState<ServiceType | undefined>(() => {
+    const lvl = getUrlLevel();
+    const p = getUrlPackage(lvl);
+    if (lvl && (lvl !== "preescolar" || p)) {
+      return "renta";
+    }
+    return undefined;
+  });
   const [city, setCity] = useState<City>("ensenada");
-  const [pkg, setPkg] = useState<PackageChoice | undefined>({ kind: "A" });
+  const [pkg, setPkg] = useState<PackageChoice | undefined>(() => {
+    const lvl = getUrlLevel();
+    return getUrlPackage(lvl) || { kind: "A" };
+  });
   const [quantity, setQuantity] = useState(1);
   const [school, setSchool] = useState("");
   const [schoolAddress, setSchoolAddress] = useState("");
@@ -148,7 +265,11 @@ export function Quoter() {
     const initialUrlLevel = getUrlLevel();
     if (initialUrlLevel) {
       setLevel(initialUrlLevel);
-      if (initialUrlLevel !== "preescolar") {
+      const initialPkg = getUrlPackage(initialUrlLevel);
+      if (initialPkg) {
+        setPkg(initialPkg);
+      }
+      if (initialUrlLevel !== "preescolar" || initialPkg) {
         setService("renta");
         setStep(3);
         setTogaColor("negro");
