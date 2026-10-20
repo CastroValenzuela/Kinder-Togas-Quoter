@@ -73,8 +73,6 @@ import {
   PRICES,
   TOGA_COLORS,
   STOLA_COLORS,
-  colorLabel,
-  stolaLabel,
   formatMXN,
   unitPrice,
   unitOriginalPrice,
@@ -1044,9 +1042,6 @@ export function StepConfig({
                               );
                               const variant = hasValidCVariant ? pkg.variant : "prep_c1";
                               onPkg({ kind: "C", variant });
-                              if (service === "renta") {
-                                onStolaColor("blanco");
-                              }
                             } else if (k === "B") {
                               let defaultVariant: PackageBVariant | undefined = undefined;
                               if (level === "preescolar") defaultVariant = "hybrid";
@@ -1063,14 +1058,8 @@ export function StepConfig({
 
                               const variant = hasValidBVariant ? pkg.variant : defaultVariant;
                               onPkg({ kind: "B", variant });
-                              if (service === "renta") {
-                                onStolaColor("blanco");
-                              }
                             } else {
                               onPkg({ kind: "A" });
-                              if (stolaColor === "blanco") {
-                                onStolaColor("dorada");
-                              }
                             }
                           }}
                           className="relative flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -1115,9 +1104,6 @@ export function StepConfig({
                                 type="button"
                                 onClick={() => {
                                   onPkg({ kind: pkg?.kind || "B", variant: v.id });
-                                  if (service !== "venta") {
-                                    onStolaColor("blanco");
-                                  }
                                 }}
                                 className={cn(
                                   "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
@@ -1212,7 +1198,7 @@ export function StepConfig({
                     if (service === "venta" && productCategory === "togas") {
                       return ["azul", "guinda", "negro", "rojo", "rosa"].includes(c.id);
                     }
-                    return true;
+                    return level === "preescolar" || c.id === "negro";
                   }).map((c) => {
                     const active = togaColor === c.id;
                     return (
@@ -1252,7 +1238,7 @@ export function StepConfig({
                   }
                   return [];
                 }
-                const list = STOLA_COLORS.filter((s: StolaColor) => {
+                return STOLA_COLORS.filter((s: StolaColor) => {
                   if (level === "preescolar") {
                     if (service === "venta") {
                       if (productCategory === "togas") {
@@ -1277,11 +1263,6 @@ export function StepConfig({
                   if (pkg?.kind === "B" || pkg?.kind === "C") return true;
                   return s.id === "dorada";
                 });
-
-                if ((pkg?.kind === "B" || pkg?.kind === "C") && service !== "venta") {
-                  return [...list].sort((a, b) => (a.id === "blanco" ? -1 : b.id === "blanco" ? 1 : 0));
-                }
-                return list;
               })();
 
               if (visibleStolas.length === 0) return null;
@@ -1300,7 +1281,6 @@ export function StepConfig({
                   <div className="flex flex-wrap gap-2.5">
                     {visibleStolas.map((s) => {
                       const active = stolaColor === s.id;
-                      const displayLabel = ((pkg?.kind === "B" || pkg?.kind === "C") && s.id === "blanco") ? "Blanco (Diseño)" : s.label;
                       return (
                         <button
                           key={s.id}
@@ -1318,7 +1298,7 @@ export function StepConfig({
                             className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
                             style={{ background: (s as any).gradient || s.hex }}
                           />
-                          <span>{displayLabel}</span>
+                          <span>{s.label}</span>
                         </button>
                       );
                     })}

@@ -1136,7 +1136,7 @@ export function StepConfigTabs({
                           if (service === "venta" && productCategory === "togas") {
                             return ["azul", "guinda", "negro", "rojo", "rosa"].includes(c.id);
                           }
-                          return true;
+                          return level === "preescolar" || c.id === "negro";
                         }).map(
                           (c) => {
                             const active = togaColor === c.id;
@@ -1168,7 +1168,7 @@ export function StepConfigTabs({
 
                 {/* Color de Estola */}
                 {(() => {
-                  const rawStolas = STOLA_COLORS.filter((s: any) => {
+                  const visibleStolas = STOLA_COLORS.filter((s: any) => {
                     if (level === "preescolar") {
                       if (service === "venta") {
                         if (productCategory === "birretes") {
@@ -1217,10 +1217,6 @@ export function StepConfigTabs({
                     return s.id === "dorada";
                   });
 
-                  const visibleStolas = ((pkg?.kind === "B" || pkg?.kind === "C") && service !== "venta")
-                    ? [...rawStolas].sort((a, b) => (a.id === "blanco" ? -1 : b.id === "blanco" ? 1 : 0))
-                    : rawStolas;
-
                   if (visibleStolas.length === 0) return null;
 
                   return (
@@ -1235,7 +1231,6 @@ export function StepConfigTabs({
                       <div className="flex flex-wrap gap-2.5">
                         {visibleStolas.map((s) => {
                           const active = stolaColor === s.id;
-                          const displayLabel = ((pkg?.kind === "B" || pkg?.kind === "C") && s.id === "blanco") ? "Blanco (Diseño)" : s.label;
                           return (
                             <button
                               key={s.id}
@@ -1253,7 +1248,7 @@ export function StepConfigTabs({
                                 className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
                                 style={{ background: (s as any).gradient || s.hex }}
                               />
-                              <span>{displayLabel}</span>
+                              <span>{s.label}</span>
                             </button>
                           );
                         })}
