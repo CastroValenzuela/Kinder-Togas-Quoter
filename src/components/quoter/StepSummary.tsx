@@ -122,9 +122,9 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
         }
       } else {
         // service === "renta"
-        const togaColorText = level === "preescolar" ? selectedToga : "Negro";
+        const togaColorText = selectedToga;
         rows.splice(packageIndex + 1, 0, 
-          { label: "Color Toga", value: togaColorText, step: level === "preescolar" ? 3 : null },
+          { label: "Color Toga", value: togaColorText, step: 3 },
           { label: "Estola", value: stolaVal, step: 3 }
         );
       }
@@ -396,7 +396,7 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
             }
           } else {
             // service === "renta"
-            const togaValText = (level !== "preescolar" || pkg?.kind === "A") ? selectedToga : "Negro";
+            const togaValText = selectedToga;
             detailsLine += `🎨 *Color Toga:* ${togaValText}\n`;
             detailsLine += `🎗️ *Estola:* ${selectedStola}\n`;
             includesText = "Toga, Birrete, Borla del año, Estola personalizada y logística coordinada.";

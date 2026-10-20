@@ -233,21 +233,16 @@ export function Quoter() {
     });
   }, []);
 
-  // Force correct toga/stola color locks when level or package changes
+  // Force correct stola color locks when package changes in renta
   useEffect(() => {
-    if (level && level !== "preescolar") {
-      if (togaColor !== "negro") {
-        setTogaColor("negro");
-      }
-      if (pkg?.kind === "A" && stolaColor !== "dorada") {
-        setStolaColor("dorada");
-      }
-    } else if (level === "preescolar" && service === "renta") {
+    if (service === "renta") {
       if (pkg?.kind === "A" && stolaColor === "blanco") {
+        setStolaColor("dorada");
+      } else if (level !== "preescolar" && pkg?.kind === "A" && stolaColor !== "dorada") {
         setStolaColor("dorada");
       }
     }
-  }, [level, service, pkg, togaColor, stolaColor]);
+  }, [level, service, pkg, stolaColor]);
 
   // Default to "azul" when graduation bear is selected and no valid color is set
   useEffect(() => {

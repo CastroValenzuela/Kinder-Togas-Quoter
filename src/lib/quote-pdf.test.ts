@@ -49,6 +49,48 @@ describe("quote-pdf helpers", () => {
       expect(summary).toContain("Color Toga: Azul");
     });
 
+    it("should include custom toga color for primaria paquete B in summary", () => {
+      const mockQuote: QuoteData = {
+        level: "primaria",
+        city: "tijuana",
+        pkg: { kind: "B", variant: "pri_c" },
+        quantity: 20,
+        school: "Primaria Benito Juárez",
+        contact: "Laura Soto",
+        phone: "6647654321",
+        date: "2026-07-10",
+        quoteNumber: "KT-PRI-101",
+        service: "renta",
+        togaColor: "rojo",
+        stolaColor: "blanco",
+      };
+
+      const summary = buildSummaryText(mockQuote);
+      expect(summary).toContain("Color Toga: Rojo");
+      expect(summary).toContain("Estola: Blanco");
+    });
+
+    it("should include custom toga color for preparatoria paquete C in summary", () => {
+      const mockQuote: QuoteData = {
+        level: "preparatoria",
+        city: "ensenada",
+        pkg: { kind: "C", variant: "prep_c1" },
+        quantity: 30,
+        school: "Prepa Federal",
+        contact: "Carlos Morales",
+        phone: "6461239999",
+        date: "2026-07-15",
+        quoteNumber: "KT-PREP-202",
+        service: "renta",
+        togaColor: "verde",
+        stolaColor: "dorada",
+      };
+
+      const summary = buildSummaryText(mockQuote);
+      expect(summary).toContain("Color Toga: Verde");
+      expect(summary).toContain("Estola: Dorado");
+    });
+
     it("should generate a multi-product summary string when items array has multiple products", () => {
       const mockMultiQuote: QuoteData = {
         level: "preescolar",

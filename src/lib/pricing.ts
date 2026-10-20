@@ -666,7 +666,7 @@ export function getItemInfo(item: {
     }
   } else {
     // Renta
-    const togaColorText = item.level === "preescolar" ? selectedToga : "Negro";
+    const togaColorText = selectedToga;
     parts.push(`Toga: ${togaColorText}`);
     parts.push(`Estola: ${selectedStola}`);
   }

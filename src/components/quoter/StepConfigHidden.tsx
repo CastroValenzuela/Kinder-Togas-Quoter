@@ -1066,7 +1066,7 @@ export function StepConfigHidden({
                     Color de Toga
                   </p>
                   <div className="flex flex-wrap gap-2.5">
-                    {TOGA_COLORS.filter((c) => level === "preescolar" || c.id === "negro").map(
+                    {TOGA_COLORS.map(
                       (c) => {
                         const active = togaColor === c.id;
                         return (
@@ -1097,7 +1097,7 @@ export function StepConfigHidden({
 
             {/* Color de Estola */}
             {(() => {
-              const visibleStolas = STOLA_COLORS.filter((s: any) => {
+              const rawStolas = STOLA_COLORS.filter((s: any) => {
                 if (level === "preescolar") {
                   if (service === "venta") {
                     if (productCategory === "birretes") {
@@ -1144,6 +1144,10 @@ export function StepConfigHidden({
                 return s.id === "dorada";
               });
 
+              const visibleStolas = ((pkg?.kind === "B" || pkg?.kind === "C") && service !== "venta")
+                ? [...rawStolas].sort((a, b) => (a.id === "blanco" ? -1 : b.id === "blanco" ? 1 : 0))
+                : rawStolas;
+
               if (visibleStolas.length === 0) return null;
 
               return (
@@ -1158,6 +1162,7 @@ export function StepConfigHidden({
                   <div className="flex flex-wrap gap-2.5">
                     {visibleStolas.map((s) => {
                       const active = stolaColor === s.id;
+                      const displayLabel = ((pkg?.kind === "B" || pkg?.kind === "C") && s.id === "blanco") ? "Blanco (Diseño)" : s.label;
                       return (
                         <button
                           key={s.id}
@@ -1175,7 +1180,7 @@ export function StepConfigHidden({
                             className="h-3.5 w-3.5 rounded-full border border-black/10 shrink-0 block"
                             style={{ background: (s as any).gradient || s.hex }}
                           />
-                          <span>{s.label}</span>
+                          <span>{displayLabel}</span>
                         </button>
                       );
                     })}

@@ -73,6 +73,8 @@ import {
   PRICES,
   TOGA_COLORS,
   STOLA_COLORS,
+  colorLabel,
+  stolaLabel,
   formatMXN,
   unitPrice,
   unitOriginalPrice,
@@ -675,11 +677,11 @@ export function StepConfig({
                       <div 
                         className="absolute inset-0 mix-blend-multiply"
                         style={{ 
-                          filter: `drop-shadow(1px 0 0 ${stolaSolidHex}) drop-shadow(-1px 0 0 ${stolaSolidHex}) drop-shadow(0 1px 0 ${stolaSolidHex}) drop-shadow(0 -1px 0 ${stolaSolidHex}) drop-shadow(0 0 1px ${stolaSolidHex})` 
+                          filter: `drop-shadow(1px 0 0 ${stolaSolidHex}) drop-shadow(-1px 0 0 ${stolaSolidHex}) drop-shadow(0 1px 0 ${stolaSolidHex}) drop-shadow(0 -1px 0 ${stolaSolidHex}) drop-shadow(1px 1px 0 ${stolaSolidHex}) drop-shadow(-1px -1px 0 ${stolaSolidHex}) drop-shadow(1px -1px 0 ${stolaSolidHex}) drop-shadow(-1px 1px 0 ${stolaSolidHex})` 
                         }}
                       >
                         <div 
-                          className="w-full h-full"
+                          className="w-full h-full scale-[1.015] origin-center"
                           style={{
                             background: stolaBg,
                             ...maskStyles
@@ -690,6 +692,23 @@ export function StepConfig({
                   })()}
                 </motion.div>
               </AnimatePresence>
+
+              {/* Badge en vivo con selección de Toga y Estola */}
+              {service === "renta" && (
+                <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md shadow-md border border-black/10 text-[11px] sm:text-xs font-medium text-navy pointer-events-none select-none">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Toga:</span>
+                    <span className="w-2.5 h-2.5 rounded-full border border-black/15 shrink-0" style={{ backgroundColor: TOGA_COLORS.find(c => c.id === togaColor)?.hex || "#1A1A1A" }} />
+                    <span className="font-semibold text-foreground">{colorLabel(togaColor)}</span>
+                  </div>
+                  <span className="text-muted-foreground/40">•</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-semibold">Estola:</span>
+                    <span className="w-2.5 h-2.5 rounded-full border border-black/15 shrink-0" style={{ background: (STOLA_COLORS.find(c => c.id === stolaColor) as any)?.gradient || STOLA_COLORS.find(c => c.id === stolaColor)?.hex || "#EAB308" }} />
+                    <span className="font-semibold text-foreground">{((pkg?.kind === "B" || pkg?.kind === "C") && stolaColor === "blanco") ? "Blanco (Diseño)" : stolaLabel(stolaColor)}</span>
+                  </div>
+                </div>
+              )}
             </motion.div>
           </div>
 
@@ -1042,14 +1061,12 @@ export function StepConfig({
                               );
                               const variant = hasValidCVariant ? pkg.variant : "prep_c1";
                               onPkg({ kind: "C", variant });
+                              if (service === "renta") {
+                                onStolaColor("blanco");
+                              }
                             } else if (k === "B") {
                               let defaultVariant: PackageBVariant | undefined = undefined;
-                              if (level === "preescolar") {
-                                defaultVariant = "hybrid";
-                                if (stolaColor === "dorada") {
-                                  onStolaColor("blanco");
-                                }
-                              }
+                              if (level === "preescolar") defaultVariant = "hybrid";
                               else if (level === "primaria") defaultVariant = "pri_c";
                               else if (level === "secundaria") defaultVariant = "sec_b";
                               else if (level === "preparatoria") defaultVariant = "prep_b";
@@ -1063,9 +1080,12 @@ export function StepConfig({
 
                               const variant = hasValidBVariant ? pkg.variant : defaultVariant;
                               onPkg({ kind: "B", variant });
+                              if (service === "renta") {
+                                onStolaColor("blanco");
+                              }
                             } else {
                               onPkg({ kind: "A" });
-                              if (level === "preescolar" && stolaColor === "blanco") {
+                              if (stolaColor === "blanco") {
                                 onStolaColor("dorada");
                               }
                             }
@@ -1112,8 +1132,7 @@ export function StepConfig({
                                 type="button"
                                 onClick={() => {
                                   onPkg({ kind: pkg?.kind || "B", variant: v.id });
-                                  if (level === "preescolar" && service !== "venta") {
-                                    onTogaColor("negro");
+                                  if (service !== "venta") {
                                     onStolaColor("blanco");
                                   }
                                 }}
@@ -1210,7 +1229,7 @@ export function StepConfig({
                     if (service === "venta" && productCategory === "togas") {
                       return ["azul", "guinda", "negro", "rojo", "rosa"].includes(c.id);
                     }
-                    return level === "preescolar" || c.id === "negro";
+                    return true;
                   }).map((c) => {
                     const active = togaColor === c.id;
                     return (
@@ -1276,7 +1295,7 @@ export function StepConfig({
                   return s.id === "dorada";
                 });
 
-                if (level === "preescolar" && pkg?.kind === "B" && service !== "venta") {
+                if ((pkg?.kind === "B" || pkg?.kind === "C") && service !== "venta") {
                   return [...list].sort((a, b) => (a.id === "blanco" ? -1 : b.id === "blanco" ? 1 : 0));
                 }
                 return list;
@@ -1292,7 +1311,7 @@ export function StepConfig({
                   <div className="flex flex-wrap gap-2.5">
                     {visibleStolas.map((s) => {
                       const active = stolaColor === s.id;
-                      const displayLabel = (level === "preescolar" && pkg?.kind === "B" && s.id === "blanco") ? "Blanco (Diseño)" : s.label;
+                      const displayLabel = ((pkg?.kind === "B" || pkg?.kind === "C") && s.id === "blanco") ? "Blanco (Diseño)" : s.label;
                       return (
                         <button
                           key={s.id}
