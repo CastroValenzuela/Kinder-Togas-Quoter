@@ -3337,14 +3337,14 @@ export function AdminDashboard() {
                       {
                         key: "V_TOGA_BIRRETE_ESTOLA",
                         service: "venta",
-                        title: "Venta Preescolar — Toga Completa",
-                        desc: "Incluye Toga, Birrete y Estola para Venta.",
+                        title: "Venta Preescolar — Paquete T2 (Toga Completa)",
+                        desc: "Incluye Toga, Birrete, Borla y Estola para Venta.",
                         levels: ["preescolar"],
                       },
                       {
                         key: "V_TOGA_BIRRETE_BORLA",
                         service: "venta",
-                        title: "Venta Preescolar — Toga y Birrete con Borla",
+                        title: "Venta Preescolar — Paquete T1 (Toga y Birrete)",
                         desc: "Toga y birrete con borla del año, sin estola para Venta.",
                         levels: ["preescolar"],
                       },
