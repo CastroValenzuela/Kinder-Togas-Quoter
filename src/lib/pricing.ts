@@ -188,8 +188,8 @@ export const PRICES = {
   V_E3_PREESCOLAR: 200,
   V_B_DECORADO: 250,
   V_B_LISO: 160,
-  V_B_BORLA_DIJE: 50,
-  V_B_BORLA_CLASICA: 25,
+  V_B_BORLA_DIJE: 120,
+  V_B_BORLA_CLASICA: 80,
   V_TOGA_BIRRETE_ESTOLA: 450,
   V_TOGA_BIRRETE_BORLA: 380,
   V_MEDALLA_STANDARD: 35,
@@ -806,7 +806,7 @@ export function bundleToQuoteItems(params: {
 
   if (addons?.borla?.enabled && addons.borla.quantity > 0) {
     const borlaPkg: PackageChoice = { kind: "B", variant: "borla_clasica" };
-    const borlaPrice = PRICES.V_B_BORLA_CLASICA || 25;
+    const borlaPrice = PRICES.V_B_BORLA_CLASICA || 80;
     items.push({
       id: "addon-borla",
       category: "borlas",

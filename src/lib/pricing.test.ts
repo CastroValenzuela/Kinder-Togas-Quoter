@@ -212,7 +212,7 @@ describe("pricing helper functions", () => {
 
       const borlaItem = items.find((i: any) => i.id === "addon-borla");
       expect(borlaItem).toBeDefined();
-      expect(borlaItem.totalPrice).toBe(25 * 20);
+      expect(borlaItem.totalPrice).toBe(80 * 20);
 
       const docenteItem = items.find((i: any) => i.id === "addon-docente");
       expect(docenteItem).toBeDefined();
