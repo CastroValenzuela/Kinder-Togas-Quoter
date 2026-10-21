@@ -522,20 +522,7 @@ export function StepConfig({
             result = VENTA_PREESCOLAR_PAQUETE_B[pkg.variant] || { src: getAsset('Venta/Preescolar/Estolas/E2.jpg') };
           }
         } else {
-          // Preescolar Renta Paquete B:
-          // Si el usuario selecciona un color de toga (azul, rojo, verde, turquesa, etc.)
-          // o un color de estola específico (dorada, plateada, azul, roja), actualizamos
-          // la visualización en vivo para reflejar exactamente la combinación seleccionada,
-          // tal como en el Paquete A. Si está en blanco o predeterminado, muestra el gráfico del paquete.
-          const isColoredToga = togaColor && togaColor !== "negro";
-          const isColoredStola = stolaColor && stolaColor !== "blanco";
-
-          if (isColoredToga || isColoredStola) {
-            const colorVariants = PREESCOLAR_PAQUETE_A[togaColor] || PREESCOLAR_PAQUETE_A.negro;
-            result = colorVariants[stolaColor] || colorVariants.default;
-          } else {
-            result = PREESCOLAR_PAQUETE_B[pkg.variant] || getAsset('Renta/Preescolar/balance.jpg');
-          }
+          result = PREESCOLAR_PAQUETE_B[pkg.variant] || getAsset('Renta/Preescolar/balance.jpg');
         }
       }
     } else {
