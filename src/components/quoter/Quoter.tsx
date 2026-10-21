@@ -786,7 +786,7 @@ export function Quoter() {
                   if (s === "venta" && level === "preescolar") {
                     setProductCategory("togas");
                     setPkg({ kind: "B", variant: "toga_birrete_borla" });
-                    setTogaColor("guinda");
+                    setTogaColor("negro");
                     setStolaColor("blanco");
                   } else {
                     setProductCategory(undefined);

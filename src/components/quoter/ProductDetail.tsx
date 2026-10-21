@@ -40,7 +40,7 @@ export function ProductDetail({ category, onBack, variant = "default" }: Product
       setStolaColor("dorada");
     } else if (category === "togas") {
       setPkg({ kind: "B", variant: "toga_birrete_borla" });
-      setTogaColor("guinda");
+      setTogaColor("negro");
       setStolaColor("blanco");
     } else {
       setPkg({ kind: "B", variant: "esencial" });
