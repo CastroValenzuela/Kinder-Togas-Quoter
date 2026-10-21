@@ -347,7 +347,7 @@ export function AdminDashboard() {
         { key: "PREP_C2", price: 720, discount_percent: 0 },
         { key: "UNI_A", price: 350, discount_percent: 0 },
         { key: "UNI_B", price: 600, discount_percent: 0 },
-        { key: "UNI_C", price: 680, discount_percent: 0 },
+        { key: "UNI_C", price: 720, discount_percent: 0 },
       ];
 
       // Merge Supabase active rows into our static templates to ensure all exist
@@ -3493,7 +3493,7 @@ export function AdminDashboard() {
                         key: "UNI_C",
                         service: "renta",
                         title: "Universidad — Opción C",
-                        desc: "Renta de Toga, Birrete y Estola bordada con logotipo, nombre, licenciatura y generación (U.C).",
+                        desc: "Renta de Toga, Birrete y Estola personalizada con bordado premium (U.C).",
                         levels: ["universidad"],
                       },
                     ];

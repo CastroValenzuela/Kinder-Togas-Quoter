@@ -250,7 +250,7 @@ const FEATURES_UNI_B = [
 
 const FEATURES_UNI_C = [
   { icon: Shirt, text: "Renta de toga premium y Birrete con borla institucional" },
-  { icon: Layers, text: "Estola bordada con logotipo, nombre, licenciatura y generación." },
+  { icon: Layers, text: "Estola personalizada satinada con bordado de alta calidad en ambos lados" },
   { icon: Truck, text: "Entrega y recolección coordinadas" },
   { icon: Users, text: "Atención personalizada y asesoría" },
 ];
@@ -816,8 +816,8 @@ export function StepConfig({
                     {
                       id: "uni_c",
                       code: "C",
-                      title: "Opción C — Bordado Premium",
-                      desc: "Estola bordada con logotipo, nombre, licenciatura y generación.",
+                      title: "Opción C — Bordado de Alta Calidad",
+                      desc: "Estola personalizada con bordado de alta resolución",
                       payload: { kind: "B", variant: "uni_c" } as const,
                       isActive: pkg?.kind === "B" && pkg.variant === "uni_c"
                     }

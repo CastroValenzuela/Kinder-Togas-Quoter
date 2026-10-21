@@ -219,7 +219,7 @@ export const PRICES = {
   // Universidad / Posgrado
   UNI_A: 350,
   UNI_B: 600,
-  UNI_C: 680,
+  UNI_C: 720,
 };
 
 // Descuentos editables (% de descuento) — Objeto mutable
@@ -364,8 +364,8 @@ export const B_VARIANTS: {
   {
     id: "uni_c",
     code: "U.C",
-    title: "Opción C — Bordado Premium",
-    desc: "Estola bordada con logotipo, nombre, licenciatura y generación.",
+    title: "Opción C — Bordado de Alta Calidad",
+    desc: "Estola personalizada con bordado de alta resolución",
     price: PRICES.UNI_C,
   },
   {

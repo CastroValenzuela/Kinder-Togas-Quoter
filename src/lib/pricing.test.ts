@@ -128,7 +128,7 @@ describe("pricing helper functions", () => {
     it("should calculate original price correctly for both renta and venta", () => {
       expect(unitOriginalPrice({ kind: "A" }, "preescolar", "renta")).toBe(350);
       expect(unitOriginalPrice({ kind: "B", variant: "birrete_decorado" }, "preescolar", "venta")).toBe(250);
-      expect(unitOriginalPrice({ kind: "B", variant: "uni_c" }, "universidad", "renta")).toBe(680);
+      expect(unitOriginalPrice({ kind: "B", variant: "uni_c" }, "universidad", "renta")).toBe(720);
     });
 
     it("should return zero for invalid parameters", () => {
