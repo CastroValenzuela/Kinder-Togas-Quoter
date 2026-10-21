@@ -473,14 +473,15 @@ export function StepConfig({
             if (colorSuffix === "azul_cielo") colorSuffix = "azul";
             
             if (pkg.variant === "toga_birrete_estola") {
-              const src = colorSuffix === "rojo"
-                ? getAsset(`Venta/Preescolar/Togas/T2.rojo.jpeg`)
-                : getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}.jpeg`);
+              const src = getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}.jpeg`)
+                || getAsset(`Venta/Preescolar/Togas/T2.${colorSuffix}.jpeg`);
               const mask = getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}-mask.png`)
                 || getAsset(`Venta/Preescolar/Togas/T2-estola-mask.png`);
               result = { src, mask };
             } else {
-              result = getAsset(`Venta/Preescolar/Togas/T1-${colorSuffix}.jpeg`);
+              const src = getAsset(`Venta/Preescolar/Togas/T1-${colorSuffix}.jpeg`)
+                || getAsset(`Venta/Preescolar/Togas/T1.${colorSuffix}.jpeg`);
+              result = src;
             }
           } else if (productCategory === "birretes") {
             let colorSuffix = "negro"; // default
@@ -1171,9 +1172,12 @@ export function StepConfig({
                 <div className="flex flex-wrap gap-2.5">
                   {TOGA_COLORS.filter((c) => {
                     if (service === "venta" && productCategory === "togas") {
-                      return ["azul", "negro", "rojo"].includes(c.id);
+                      return ["azul", "guinda", "negro", "rojo", "rosa"].includes(c.id);
                     }
-                    return level === "preescolar" || c.id === "negro";
+                    if (service !== "venta" && level === "preescolar") {
+                      return !["guinda", "rosa"].includes(c.id);
+                    }
+                    return c.id === "negro";
                   }).map((c) => {
                     const active = togaColor === c.id;
                     return (
