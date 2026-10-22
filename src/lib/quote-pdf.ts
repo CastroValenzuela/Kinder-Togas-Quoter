@@ -97,9 +97,6 @@ export function buildSummaryText(q: QuoteData): string {
       if (q.togaSize) {
         rows.push(`Talla de Toga: ${q.togaSize}`);
       }
-      if (variant === "toga_birrete_estola") {
-        rows.push(`Estola: ${stolaVal}`);
-      }
     } else if (variant === "medalla_standard" || variant === "medalla_personalizada") {
       // Medallas no tienen color
     } else if (variant === "oso_graduacion") {
@@ -257,7 +254,7 @@ export function generateQuotePDF(q: QuoteData): void {
     if (q.service === "venta") {
       if (q.level === "preescolar" && (variant === "toga_birrete_estola" || variant === "toga_birrete_borla")) {
         if (variant === "toga_birrete_estola") {
-          itemDescription = `Paquete Toga Completa (Venta Preescolar):\n• Incluye Toga, Birrete y Estola\n• Color de Toga: ${selectedToga}${togaSizeStr}\n• Color de Estola: ${stolaVal}`;
+          itemDescription = `Paquete Toga Completa (Venta Preescolar):\n• Incluye Toga, Birrete y Estola\n• Color de Toga: ${selectedToga}${togaSizeStr}`;
         } else {
           itemDescription = `Paquete Toga y Birrete (Venta Preescolar):\n• Incluye Toga y Birrete con Borla del Año (Sin Estola)\n• Color de Toga: ${selectedToga}${togaSizeStr}`;
         }

@@ -525,9 +525,7 @@ export function StepConfigHidden({
             if (pkg.variant === "toga_birrete_estola") {
               const src = getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}.jpeg`)
                 || getAsset(`Venta/Preescolar/Togas/T2.${colorSuffix}.jpeg`);
-              const mask = getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}-mask.png`)
-                || getAsset(`Venta/Preescolar/Togas/T2-estola-mask.png`);
-              result = { src, mask };
+              result = src;
             } else {
               result = getAsset(`Venta/Preescolar/Togas/T1-${colorSuffix}.jpeg`);
             }
@@ -1119,6 +1117,9 @@ export function StepConfigHidden({
               const visibleStolas = STOLA_COLORS.filter((s: any) => {
                 if (level === "preescolar") {
                   if (service === "venta") {
+                    if (productCategory === "togas") {
+                      return false;
+                    }
                     if (productCategory === "birretes") {
                       return ["negro", "azul", "roja", "rosa_claro", "azul_cielo"].includes(s.id);
                     }

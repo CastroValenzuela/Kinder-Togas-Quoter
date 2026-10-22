@@ -90,13 +90,7 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
     const packageIndex = rows.findIndex(r => r.label === "Paquete");
     if (packageIndex !== -1) {
       if (service === "venta") {
-        if (pkgVariant === "toga_birrete_estola") {
-          rows.splice(packageIndex + 1, 0, 
-            { label: "Color Toga", value: selectedToga, step: 3 },
-            { label: "Talla de Toga", value: togaSize || "M", step: 3 },
-            { label: "Estola", value: stolaVal, step: 3 }
-          );
-        } else if (pkgVariant === "toga_birrete_borla") {
+        if (pkgVariant === "toga_birrete_estola" || pkgVariant === "toga_birrete_borla") {
           rows.splice(packageIndex + 1, 0, 
             { label: "Color Toga", value: selectedToga, step: 3 },
             { label: "Talla de Toga", value: togaSize || "M", step: 3 }
@@ -374,7 +368,6 @@ export function StepSummary({ level, city, pkg, quantity, school, contact, phone
                 detailsLine += `📏 *Talla:* ${togaSize}\n`;
               }
               if (pkgVariant === "toga_birrete_estola") {
-                detailsLine += `🎗️ *Estola:* ${selectedStola}\n`;
                 includesText = "Toga, Birrete y Estola personalizada listos para comprar y conservar.";
               } else {
                 includesText = "Toga y Birrete con Borla del Año listos para comprar y conservar.";

@@ -651,7 +651,6 @@ export function getItemInfo(item: {
       if (variant === "toga_birrete_estola" || variant === "toga_birrete_borla") {
         parts.push(`Toga: ${selectedToga}`);
         if (item.togaSize) parts.push(`Talla: ${item.togaSize}`);
-        if (variant === "toga_birrete_estola") parts.push(`Estola: ${selectedStola}`);
       } else if (variant === "oso_graduacion") {
         parts.push(`Color: ${item.stolaColor === "azul" ? "Azul" : "Rosa"}`);
       } else if (variant?.startsWith("birrete_")) {
