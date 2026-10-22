@@ -518,9 +518,8 @@ export function StepConfigTabs({
             if (colorSuffix === "azul_cielo") colorSuffix = "azul";
             
             if (pkg.variant === "toga_birrete_estola") {
-              const src = colorSuffix === "rojo"
-                ? getAsset(`Venta/Preescolar/Togas/T2.rojo.jpeg`)
-                : getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}.jpeg`);
+              const src = getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}.jpeg`)
+                || getAsset(`Venta/Preescolar/Togas/T2.${colorSuffix}.jpeg`);
               const mask = getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}-mask.png`)
                 || getAsset(`Venta/Preescolar/Togas/T2-estola-mask.png`);
               result = { src, mask };
