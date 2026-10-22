@@ -626,7 +626,7 @@ export function StepConfig({
                           style={{ 
                             // Este drop shadow expande la estola negra 1 pixel hacia afuera en todas direcciones.
                             // Esto cubre perfectamente la línea blanca de la estola original que se asomaba por detrás.
-                            filter: `drop-shadow(1px 0 0 #1A1A1A) drop-shadow(-1px 0 0 #1A1A1A) drop-shadow(0 1px 0 #1A1A1A) drop-shadow(0 -1px 0 #1A1A1A)` 
+                            filter: service === "venta" ? undefined : `drop-shadow(1px 0 0 #1A1A1A) drop-shadow(-1px 0 0 #1A1A1A) drop-shadow(0 1px 0 #1A1A1A) drop-shadow(0 -1px 0 #1A1A1A)` 
                           }}
                         >
                           {/* El contenedor con la máscara recorta exactamente la silueta de la estola */}
@@ -635,11 +635,13 @@ export function StepConfig({
                               src={showcaseMedia.src}
                               alt="Estola negra con logos blancos"
                               // TRUCO MAESTRO DINÁMICO: scaleClass empuja las orillas blancas brillantes fuera de la máscara.
-                              className={`w-full h-full object-contain invert grayscale brightness-[90%] contrast-[130%] ${scaleClass} origin-center`}
+                              className={`w-full h-full object-contain invert grayscale brightness-[90%] contrast-[130%] ${service === "venta" ? "" : scaleClass} origin-center`}
                             />
                             
-                            {/* Cubrimos la mancha del cuello con negro puro desvanecido */}
-                            <div className="absolute top-0 left-0 w-full h-[45%] bg-gradient-to-b from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent pointer-events-none" />
+                            {/* Cubrimos la mancha del cuello con negro puro desvanecido solo para renta antigua */}
+                            {service !== "venta" && (
+                              <div className="absolute top-0 left-0 w-full h-[45%] bg-gradient-to-b from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent pointer-events-none" />
+                            )}
                           </div>
                         </div>
                       );
@@ -651,11 +653,11 @@ export function StepConfig({
                       <div 
                         className="absolute inset-0 mix-blend-multiply"
                         style={{ 
-                          filter: `drop-shadow(1px 0 0 ${stolaSolidHex}) drop-shadow(-1px 0 0 ${stolaSolidHex}) drop-shadow(0 1px 0 ${stolaSolidHex}) drop-shadow(0 -1px 0 ${stolaSolidHex}) drop-shadow(1px 1px 0 ${stolaSolidHex}) drop-shadow(-1px -1px 0 ${stolaSolidHex}) drop-shadow(1px -1px 0 ${stolaSolidHex}) drop-shadow(-1px 1px 0 ${stolaSolidHex})` 
+                          filter: service === "venta" ? undefined : `drop-shadow(1px 0 0 ${stolaSolidHex}) drop-shadow(-1px 0 0 ${stolaSolidHex}) drop-shadow(0 1px 0 ${stolaSolidHex}) drop-shadow(0 -1px 0 ${stolaSolidHex}) drop-shadow(1px 1px 0 ${stolaSolidHex}) drop-shadow(-1px -1px 0 ${stolaSolidHex}) drop-shadow(1px -1px 0 ${stolaSolidHex}) drop-shadow(-1px 1px 0 ${stolaSolidHex})` 
                         }}
                       >
                         <div 
-                          className="w-full h-full scale-[1.015] origin-center"
+                          className={cn("w-full h-full origin-center", service !== "venta" && "scale-[1.015]")}
                           style={{
                             background: stolaBg,
                             ...maskStyles
