@@ -521,6 +521,19 @@ export function StepConfigAccordion({
             } else {
               result = getAsset(`Venta/Preescolar/Borlas/dije-${colorSuffix}.jpg`);
             }
+          } else if (productCategory === "togas") {
+            let colorSuffix = togaColor;
+            if (colorSuffix === "azul_cielo") colorSuffix = "azul";
+            
+            if (pkg.variant === "toga_birrete_estola") {
+              const src = getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}.jpeg`)
+                || getAsset(`Venta/Preescolar/Togas/T2.${colorSuffix}.jpeg`);
+              const mask = getAsset(`Venta/Preescolar/Togas/T2-${colorSuffix}-mask.png`)
+                || getAsset(`Venta/Preescolar/Togas/T2-estola-mask.png`);
+              result = { src, mask };
+            } else {
+              result = getAsset(`Venta/Preescolar/Togas/T1-${colorSuffix}.jpeg`);
+            }
           } else {
             result = VENTA_PREESCOLAR_PAQUETE_B[pkg.variant] || {
               src: getAsset("Venta/Preescolar/Estolas/E2.jpg"),
@@ -1096,18 +1109,22 @@ export function StepConfigAccordion({
                 className="p-6 border-t border-border space-y-8"
               >
                 {/* Color de Toga */}
-                {service !== "venta" &&
-                  ((pkg?.kind === "A" && level === "preescolar") ||
-                    level === "primaria" ||
-                    level === "secundaria" ||
-                    level === "preparatoria" ||
-                    level === "universidad") && (
+                {((service === "venta" && level === "preescolar" && productCategory === "togas") ||
+                  (service !== "venta" && !!level)) && (
                     <section className="animate-in fade-in slide-in-from-top-2 duration-300">
                       <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
                         Color de Toga
                       </p>
                       <div className="flex flex-wrap gap-2.5">
-                        {TOGA_COLORS.filter((c) => level === "preescolar" || c.id === "negro").map(
+                        {TOGA_COLORS.filter((c) => {
+                          if (service === "venta" && productCategory === "togas") {
+                            return ["azul", "guinda", "negro", "rojo", "rosa"].includes(c.id);
+                          }
+                          if (service !== "venta" && level === "preescolar") {
+                            return !["guinda", "rosa"].includes(c.id);
+                          }
+                          return level === "preescolar" || c.id === "negro";
+                        }).map(
                           (c) => {
                             const active = togaColor === c.id;
                             return (

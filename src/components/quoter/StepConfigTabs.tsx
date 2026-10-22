@@ -1135,7 +1135,10 @@ export function StepConfigTabs({
                       <div className="flex flex-wrap gap-2.5">
                         {TOGA_COLORS.filter((c) => {
                           if (service === "venta" && productCategory === "togas") {
-                            return ["azul", "negro", "rojo"].includes(c.id);
+                            return ["azul", "guinda", "negro", "rojo", "rosa"].includes(c.id);
+                          }
+                          if (service !== "venta" && level === "preescolar") {
+                            return !["guinda", "rosa"].includes(c.id);
                           }
                           return level === "preescolar" || c.id === "negro";
                         }).map(
@@ -1172,6 +1175,26 @@ export function StepConfigTabs({
                   const visibleStolas = STOLA_COLORS.filter((s: any) => {
                     if (level === "preescolar") {
                       if (service === "venta") {
+                        if (productCategory === "togas") {
+                          if (pkg?.variant === "toga_birrete_borla") return false;
+                          const ids = [
+                            "azul_pastel",
+                            "azul_turquesa",
+                            "azul_marino",
+                            "rosa_claro",
+                            "rosa_fiusha",
+                            "lila",
+                            "morado",
+                            "anaranjado",
+                            "verde_limon",
+                            "verde_esmeralda",
+                            "verde_bandera",
+                            "roja",
+                            "blanco",
+                            "amarillo",
+                          ];
+                          return ids.includes(s.id);
+                        }
                         if (productCategory === "birretes") {
                           return ["negro", "azul", "roja", "rosa_claro", "azul_cielo"].includes(
                             s.id,
