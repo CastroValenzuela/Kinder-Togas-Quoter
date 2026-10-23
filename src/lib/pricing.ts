@@ -315,14 +315,14 @@ export const B_VARIANTS: {
   {
     id: "sec_b",
     code: "B.1",
-    title: "Diseño B1",
+    title: "Clásico Escencial",
     desc: "Impresión discreta en ambos lados",
     price: PRICES.SEC_B,
   },
   {
     id: "sec_a",
     code: "B.2",
-    title: "Diseño B2",
+    title: "Clásico Equilibrado",
     desc: "Impresión mixta (institucional + discreta)",
     price: PRICES.SEC_A,
   },
