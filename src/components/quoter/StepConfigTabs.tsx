@@ -163,6 +163,7 @@ import {
   PRICES,
   TOGA_COLORS,
   STOLA_COLORS,
+  PREESCOLAR_STOLA_IDS,
   formatMXN,
   unitPrice,
   unitOriginalPrice,
@@ -968,8 +969,14 @@ export function StepConfigTabs({
 
                                   const variant = hasValidBVariant ? pkg.variant : defaultVariant;
                                   onPkg({ kind: "B", variant });
+                                  if (level === "preescolar" && !(PREESCOLAR_STOLA_IDS as readonly string[]).includes(stolaColor)) {
+                                    onStolaColor("blanco");
+                                  }
                                 } else {
                                   onPkg({ kind: "A" });
+                                  if (level === "preescolar" && !["dorada", "plateada", "azul", "roja"].includes(stolaColor)) {
+                                    onStolaColor("dorada");
+                                  }
                                 }
                               }}
                               className="relative flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -1216,6 +1223,7 @@ export function StepConfigTabs({
                         return ids.includes(s.id);
                       }
                       if (pkg?.kind === "A") return s.isBasic;
+                      if (pkg?.kind === "B") return (PREESCOLAR_STOLA_IDS as readonly string[]).includes(s.id);
                       return false;
                     }
                     if (pkg?.kind === "B" || pkg?.kind === "C") return true;

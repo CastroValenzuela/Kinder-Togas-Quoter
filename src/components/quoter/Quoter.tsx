@@ -28,6 +28,7 @@ import {
   type ServiceType,
   type City,
   type PackageChoice,
+  PREESCOLAR_STOLA_IDS,
   type QuoteItem,
 } from "@/lib/pricing";
 import logo from "@/assets/logo.png";
@@ -367,8 +368,11 @@ export function Quoter() {
       if (service === "renta" && (togaColor === "guinda" || togaColor === "rosa")) {
         setTogaColor("negro");
       }
-      if (service === "renta" && pkg?.kind === "A" && stolaColor === "blanco") {
+      if (service === "renta" && pkg?.kind === "A" && !["dorada", "plateada", "azul", "roja"].includes(stolaColor)) {
         setStolaColor("dorada");
+      }
+      if (service === "renta" && pkg?.kind === "B" && !(PREESCOLAR_STOLA_IDS as readonly string[]).includes(stolaColor)) {
+        setStolaColor("blanco");
       }
     }
   }, [level, service, pkg, togaColor, stolaColor]);

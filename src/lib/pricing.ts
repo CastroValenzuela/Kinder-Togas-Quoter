@@ -136,6 +136,23 @@ export const STOLA_COLORS = [
   { id: "amarillo", label: "Amarillo", hex: "#FDE047" },
 ];
 
+export const PREESCOLAR_STOLA_IDS = [
+  "azul_pastel",
+  "azul_turquesa",
+  "azul_marino",
+  "rosa_claro",
+  "rosa_fiusha",
+  "lila",
+  "morado",
+  "anaranjado",
+  "verde_limon",
+  "verde_esmeralda",
+  "verde_bandera",
+  "roja",
+  "blanco",
+  "amarillo",
+] as const;
+
 export function stolaLabel(stola?: string): string {
   if (!stola) return "—";
   const dict: Record<string, string> = {

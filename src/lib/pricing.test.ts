@@ -10,6 +10,8 @@ import {
   getDiscountPercent,
   bundleToQuoteItems,
   isSameProductConfig,
+  PREESCOLAR_STOLA_IDS,
+  STOLA_COLORS,
 } from "./pricing";
 
 describe("pricing helper functions", () => {
@@ -23,6 +25,17 @@ describe("pricing helper functions", () => {
     it("should return fallback for unknown or empty colors", () => {
       expect(colorLabel(undefined)).toBe("—");
       expect(colorLabel("unknown_color")).toBe("unknown_color");
+    });
+  });
+
+  describe("PREESCOLAR_STOLA_IDS", () => {
+    it("contains all 14 colors matching the catalog palette", () => {
+      expect(PREESCOLAR_STOLA_IDS).toHaveLength(14);
+      for (const id of PREESCOLAR_STOLA_IDS) {
+        expect(STOLA_COLORS.some((s) => s.id === id)).toBe(true);
+        expect(stolaLabel(id)).not.toBe("—");
+        expect(stolaLabel(id)).not.toBe(id); // must have a friendly label
+      }
     });
   });
 
