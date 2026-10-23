@@ -91,10 +91,22 @@ const PAQUETE_A_ASSETS: Record<string, string> = {
   universidad: getAsset("Renta/Universidad/A.jpg"),
 };
 
-const PREESCOLAR_PAQUETE_B: Record<string, string> = {
-  esencial: getAsset("Renta/Preescolar/esencial.jpg"),
-  hybrid: getAsset("Renta/Preescolar/balance.jpg"),
-  max: getAsset("Renta/Preescolar/premium.jpg"),
+const PREESCOLAR_PAQUETE_B: Record<string, { src: string; mask?: string; stolaNegro?: string }> = {
+  esencial: {
+    src: getAsset("Renta/Preescolar/esencial.jpg"),
+    mask: getAsset("Renta/Preescolar/esencial-mask.png"),
+    stolaNegro: getAsset("Renta/Preescolar/esencial-estola-negro.png"),
+  },
+  hybrid: {
+    src: getAsset("Renta/Preescolar/balance.jpg"),
+    mask: getAsset("Renta/Preescolar/balance-mask.png"),
+    stolaNegro: getAsset("Renta/Preescolar/balance-estola-negro.png"),
+  },
+  max: {
+    src: getAsset("Renta/Preescolar/premium.jpg"),
+    mask: getAsset("Renta/Preescolar/premium-mask.png"),
+    stolaNegro: getAsset("Renta/Preescolar/premium-estola-negro.png"),
+  },
 };
 
 const VENTA_PREESCOLAR_PAQUETE_B: Record<string, { src: string; mask?: string }> = {
@@ -581,7 +593,7 @@ export function StepConfigTabs({
                   transition={{ duration: 0.4, ease: "easeInOut" }}
                   className={cn(
                     "relative max-h-full flex items-center justify-center z-10",
-                    service === "venta" ? "w-full h-full" : "aspect-[816/1118]",
+                    service === "venta" ? "w-full h-full" : level === "preescolar" ? "aspect-[1132/1390]" : "aspect-[816/1118]",
                   )}
                 >
                   <img
