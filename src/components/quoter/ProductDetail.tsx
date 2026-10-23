@@ -48,6 +48,16 @@ export function ProductDetail({ category, onBack, variant = "default" }: Product
     }
   }, [category]);
 
+  useEffect(() => {
+    if (category === "birretes" && pkg?.kind === "B") {
+      if (pkg.variant === "birrete_decorado" && stolaColor !== "negro") {
+        setStolaColor("negro");
+      } else if (pkg.variant === "birrete_liso" && !["negro", "azul", "roja"].includes(stolaColor)) {
+        setStolaColor("negro");
+      }
+    }
+  }, [category, pkg, stolaColor]);
+
   return (
     <div className="animate-in fade-in slide-in-from-right-8 duration-500 bg-[#F8FAFC] flex-1 flex flex-col min-h-0 pb-4 sm:pb-8">
       {/* Controles extra para el Mockup (Regresar y Nivel Escolar) */}

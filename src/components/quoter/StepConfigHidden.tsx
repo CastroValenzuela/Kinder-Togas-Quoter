@@ -841,7 +841,14 @@ export function StepConfigHidden({
                       <button
                         key={opt.id}
                         type="button"
-                        onClick={() => onPkg(opt.payload)}
+                        onClick={() => {
+                            onPkg(opt.payload);
+                            if (opt.id === "birrete_decorado") {
+                              onStolaColor("negro");
+                            } else if (opt.id === "birrete_liso" && !["negro", "azul", "roja"].includes(stolaColor)) {
+                              onStolaColor("negro");
+                            }
+                          }}
                         className={cn(
                           "w-full flex items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left transition-colors cursor-pointer",
                           "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -1128,7 +1135,10 @@ export function StepConfigHidden({
                       return false;
                     }
                     if (productCategory === "birretes") {
-                      return ["negro", "azul", "roja", "rosa_claro", "azul_cielo"].includes(s.id);
+                      if (pkg?.variant === "birrete_decorado") {
+                        return s.id === "negro";
+                      }
+                      return ["negro", "azul", "roja"].includes(s.id);
                     }
                     if (productCategory === "borlas") {
                       // Negro, Azul Rey, Azul Bebé, Fucsia, Lila, Rojo, Guinda, Verde Esmeralda, Verde Limón, Dorado, Blanco

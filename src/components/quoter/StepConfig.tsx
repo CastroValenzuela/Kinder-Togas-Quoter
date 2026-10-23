@@ -945,6 +945,10 @@ export function StepConfig({
                           onPkg(opt.payload);
                           if (opt.id === "oso_graduacion") {
                             onStolaColor("azul");
+                          } else if (opt.id === "birrete_decorado") {
+                            onStolaColor("negro");
+                          } else if (opt.id === "birrete_liso" && !["negro", "azul", "roja"].includes(stolaColor)) {
+                            onStolaColor("negro");
                           }
                         }}
                         className={cn(
@@ -1231,7 +1235,10 @@ export function StepConfig({
                         return false;
                       }
                       if (productCategory === "birretes") {
-                        return ["negro", "azul", "roja", "rosa_claro", "azul_cielo"].includes(s.id);
+                        if (pkg?.variant === "birrete_decorado") {
+                          return s.id === "negro";
+                        }
+                        return ["negro", "azul", "roja"].includes(s.id);
                       }
                       if (productCategory === "borlas") {
                         // Negro, Azul Rey, Azul Bebé, Fucsia, Lila, Rojo, Guinda, Verde Esmeralda, Verde Limón, Dorado, Blanco

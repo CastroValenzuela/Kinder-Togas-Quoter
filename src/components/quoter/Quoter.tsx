@@ -386,6 +386,17 @@ export function Quoter() {
     }
   }, [level, service, productCategory, pkg, stolaColor]);
 
+  // Lock birretes colors for Preescolar Venta
+  useEffect(() => {
+    if (level === "preescolar" && service === "venta" && productCategory === "birretes" && pkg?.kind === "B") {
+      if (pkg.variant === "birrete_decorado" && stolaColor !== "negro") {
+        setStolaColor("negro");
+      } else if (pkg.variant === "birrete_liso" && !["negro", "azul", "roja"].includes(stolaColor)) {
+        setStolaColor("negro");
+      }
+    }
+  }, [level, service, productCategory, pkg, stolaColor]);
+
   // Persistence
   useEffect(() => {
     if (!isMounted) return;
