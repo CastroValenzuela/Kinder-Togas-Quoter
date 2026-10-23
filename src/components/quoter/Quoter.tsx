@@ -901,7 +901,15 @@ export function Quoter() {
         onRemoveItem={handleRemoveItem}
         onAddMore={() => {
           setIsCartOpen(false);
-          if (step !== 3) setStep(3);
+          setLevel(undefined);
+          setService(undefined);
+          setProductCategory(undefined);
+          setPkg(undefined);
+          setQuantity(1);
+          setTogaColor("negro");
+          setStolaColor("dorada");
+          setTogaSize("M");
+          setStep(1);
         }}
         onProceed={() => {
           setIsCartOpen(false);
