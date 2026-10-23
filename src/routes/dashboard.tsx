@@ -627,7 +627,7 @@ export function AdminDashboard() {
       prep_a: "Paquete B — B.2 Diseño B2",
       prep_c1: "Paquete C — C.1 Diseño C1",
       prep_c2: "Paquete C — C.2 Diseño C2",
-      pri_c: "Paquete B — B.1 Básico Funcional",
+      pri_c: "Paquete B — B.1 Clásico Escencial",
       pri_b: "Paquete B — B.2 Clásico Equilibrado",
       pri_a: "Paquete B — B.3 Clásico Destacado",
       uni_b: "Opción B — Bordado Sencillo",
@@ -3395,7 +3395,7 @@ export function AdminDashboard() {
                       {
                         key: "PRI_C",
                         service: "renta",
-                        title: "Primaria — Básico Funcional",
+                        title: "Primaria — Clásico Escencial",
                         desc: "Estola con impresión sencilla en ambos lados 9 x 12 cm (B.1).",
                         levels: ["primaria"],
                       },

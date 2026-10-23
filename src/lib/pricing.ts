@@ -357,7 +357,7 @@ export const B_VARIANTS: {
   {
     id: "pri_c",
     code: "B.1",
-    title: "Básico Funcional",
+    title: "Clásico Escencial",
     desc: "Impresión sencilla en ambos lados (9 x 12 cm)",
     price: PRICES.PRI_C,
   },
