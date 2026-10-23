@@ -1044,7 +1044,7 @@ export function StepConfig({
                               }
                             } else {
                               onPkg({ kind: "A" });
-                              if (level === "preescolar" && !["dorada", "plateada", "azul", "roja"].includes(stolaColor)) {
+                              if (!["dorada", "plateada", "azul", "roja"].includes(stolaColor)) {
                                 onStolaColor("dorada");
                               }
                             }
@@ -1252,7 +1252,7 @@ export function StepConfig({
                     return false;
                   }
                   if (pkg?.kind === "B" || pkg?.kind === "C") return true;
-                  return s.id === "dorada";
+                  return s.isBasic;
                 });
               })();
 

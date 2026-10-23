@@ -361,7 +361,7 @@ export function Quoter() {
       if (togaColor !== "negro") {
         setTogaColor("negro");
       }
-      if (pkg?.kind === "A" && stolaColor !== "dorada") {
+      if (pkg?.kind === "A" && !["dorada", "plateada", "azul", "roja"].includes(stolaColor)) {
         setStolaColor("dorada");
       }
     } else if (level === "preescolar") {
