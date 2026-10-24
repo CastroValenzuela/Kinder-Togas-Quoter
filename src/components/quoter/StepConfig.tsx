@@ -584,7 +584,7 @@ export function StepConfig({
                   exit={{ opacity: 0, filter: "blur(8px)" }}
                   transition={{ duration: 0.4, ease: "easeInOut" }}
                   className={cn(
-                    "relative max-h-full flex items-center justify-center z-10",
+                    "relative max-h-full flex items-center justify-center z-10 overflow-hidden",
                     service === "venta" ? "w-full h-full" : level === "preescolar" ? "aspect-[1132/1390]" : "aspect-[816/1118]"
                   )}
                 >
@@ -659,16 +659,18 @@ export function StepConfig({
                     }
 
                     const stolaSolidHex = activeStola?.hex || "transparent";
+                    const isPrepC1 = pkg?.variant === "prep_c1";
+                    const enableShadowAndScale = service !== "venta" && !isPrepC1;
 
                     return (
                       <div 
                         className="absolute inset-0 mix-blend-multiply"
                         style={{ 
-                          filter: service === "venta" ? undefined : `drop-shadow(1px 0 0 ${stolaSolidHex}) drop-shadow(-1px 0 0 ${stolaSolidHex}) drop-shadow(0 1px 0 ${stolaSolidHex}) drop-shadow(0 -1px 0 ${stolaSolidHex}) drop-shadow(1px 1px 0 ${stolaSolidHex}) drop-shadow(-1px -1px 0 ${stolaSolidHex}) drop-shadow(1px -1px 0 ${stolaSolidHex}) drop-shadow(-1px 1px 0 ${stolaSolidHex})` 
+                          filter: enableShadowAndScale ? `drop-shadow(1px 0 0 ${stolaSolidHex}) drop-shadow(-1px 0 0 ${stolaSolidHex}) drop-shadow(0 1px 0 ${stolaSolidHex}) drop-shadow(0 -1px 0 ${stolaSolidHex}) drop-shadow(1px 1px 0 ${stolaSolidHex}) drop-shadow(-1px -1px 0 ${stolaSolidHex}) drop-shadow(1px -1px 0 ${stolaSolidHex}) drop-shadow(-1px 1px 0 ${stolaSolidHex})` : undefined 
                         }}
                       >
                         <div 
-                          className={cn("w-full h-full origin-center", service !== "venta" && "scale-[1.015]")}
+                          className={cn("w-full h-full origin-center", enableShadowAndScale && "scale-[1.015]")}
                           style={{
                             background: stolaBg,
                             ...maskStyles
