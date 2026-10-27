@@ -57,9 +57,12 @@ const PAQUETE_A_ASSETS: Record<string, Record<string, string>> = {
   },
   universidad: {
     dorada: getAsset('Renta/Universidad/A-dorado.jpg') || getAsset('Renta/Universidad/A.jpg'),
+    dorado: getAsset('Renta/Universidad/A-dorado.jpg') || getAsset('Renta/Universidad/A.jpg'),
     plateada: getAsset('Renta/Universidad/A-plata.jpg') || getAsset('Renta/Universidad/A.jpg'),
+    plata: getAsset('Renta/Universidad/A-plata.jpg') || getAsset('Renta/Universidad/A.jpg'),
     azul: getAsset('Renta/Universidad/A-azul.jpg') || getAsset('Renta/Universidad/A.jpg'),
     roja: getAsset('Renta/Universidad/A-rojo.jpg') || getAsset('Renta/Universidad/A.jpg'),
+    rojo: getAsset('Renta/Universidad/A-rojo.jpg') || getAsset('Renta/Universidad/A.jpg'),
     default: getAsset('Renta/Universidad/A-dorado.jpg') || getAsset('Renta/Universidad/A.jpg'),
   },
 };
