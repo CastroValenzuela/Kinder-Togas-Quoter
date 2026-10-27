@@ -115,18 +115,33 @@ const PAQUETE_A_ASSETS: Record<string, Record<string, string>> = {
   },
 };
 
-const PREESCOLAR_PAQUETE_B: Record<string, { src: string; mask?: string; stolaNegro?: string }> = {
+const PREESCOLAR_PAQUETE_B: Record<string, { src: string; mask?: string; stolaNegro?: string; assetPrefix?: string }> = {
   esencial: {
+    assetPrefix: "esencial",
     src: getAsset("Renta/Preescolar/esencial.jpg"),
     mask: getAsset("Renta/Preescolar/esencial-mask.png"),
     stolaNegro: getAsset("Renta/Preescolar/esencial-estola-negro.png"),
   },
   hybrid: {
+    assetPrefix: "balance",
+    src: getAsset("Renta/Preescolar/balance.jpg"),
+    mask: getAsset("Renta/Preescolar/balance-mask.png"),
+    stolaNegro: getAsset("Renta/Preescolar/balance-estola-negro.png"),
+  },
+  balance: {
+    assetPrefix: "balance",
     src: getAsset("Renta/Preescolar/balance.jpg"),
     mask: getAsset("Renta/Preescolar/balance-mask.png"),
     stolaNegro: getAsset("Renta/Preescolar/balance-estola-negro.png"),
   },
   max: {
+    assetPrefix: "premium",
+    src: getAsset("Renta/Preescolar/premium.jpg"),
+    mask: getAsset("Renta/Preescolar/premium-mask.png"),
+    stolaNegro: getAsset("Renta/Preescolar/premium-estola-negro.png"),
+  },
+  premium: {
+    assetPrefix: "premium",
     src: getAsset("Renta/Preescolar/premium.jpg"),
     mask: getAsset("Renta/Preescolar/premium-mask.png"),
     stolaNegro: getAsset("Renta/Preescolar/premium-estola-negro.png"),
@@ -574,7 +589,19 @@ export function StepConfigHidden({
         } else {
           const bVariant = PREESCOLAR_PAQUETE_B[pkg.variant];
           if (bVariant) {
-            const colorSrc = togaColor !== "negro" ? getAsset(`Renta/Preescolar/${pkg.variant}-${togaColor}.jpg`) : null;
+            const prefix = bVariant.assetPrefix || pkg.variant;
+            let colorSrc: string | null = null;
+            if (togaColor !== "negro") {
+              const colorSuffix = togaColor === "magenta" ? "turquesa" : togaColor;
+              colorSrc =
+                getAsset(`Renta/Preescolar/${prefix}-${colorSuffix}.jpg`) ||
+                getAsset(`Renta/Preescolar/${prefix}-${colorSuffix}.jpeg`) ||
+                getAsset(`Renta/Preescolar/${prefix}-${togaColor}.jpg`) ||
+                getAsset(`Renta/Preescolar/${prefix}-${togaColor}.jpeg`) ||
+                getAsset(`Renta/Preescolar/${pkg.variant}-${colorSuffix}.jpg`) ||
+                getAsset(`Renta/Preescolar/${pkg.variant}-${togaColor}.jpg`) ||
+                null;
+            }
             result = {
               ...bVariant,
               src: colorSrc || bVariant.src,
