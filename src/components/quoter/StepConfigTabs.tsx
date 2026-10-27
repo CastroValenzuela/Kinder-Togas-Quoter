@@ -87,23 +87,32 @@ const PACKAGE_ASSETS: Record<string, { src: string; mask?: string; stolaNegro?: 
 const PAQUETE_A_ASSETS: Record<string, Record<string, string>> = {
   primaria: {
     dorada: getAsset("Renta/Primaria/Paquete A/negro-dorado.jpg"),
+    dorado: getAsset("Renta/Primaria/Paquete A/negro-dorado.jpg"),
     plateada: getAsset("Renta/Primaria/Paquete A/negro-plata.jpg"),
+    plata: getAsset("Renta/Primaria/Paquete A/negro-plata.jpg"),
     azul: getAsset("Renta/Primaria/Paquete A/negro-azul.jpg"),
     roja: getAsset("Renta/Primaria/Paquete A/negro-rojo.jpg"),
+    rojo: getAsset("Renta/Primaria/Paquete A/negro-rojo.jpg"),
     default: getAsset("Renta/Primaria/Paquete A/negro-dorado.jpg"),
   },
   secundaria: {
     dorada: getAsset("Renta/Secundaria/Paquete A/negro-dorado.jpg"),
+    dorado: getAsset("Renta/Secundaria/Paquete A/negro-dorado.jpg"),
     plateada: getAsset("Renta/Secundaria/Paquete A/negro-plata.jpg"),
+    plata: getAsset("Renta/Secundaria/Paquete A/negro-plata.jpg"),
     azul: getAsset("Renta/Secundaria/Paquete A/negro-azul.jpg"),
     roja: getAsset("Renta/Secundaria/Paquete A/negro-rojo.jpg"),
+    rojo: getAsset("Renta/Secundaria/Paquete A/negro-rojo.jpg"),
     default: getAsset("Renta/Secundaria/Paquete A/negro-dorado.jpg"),
   },
   preparatoria: {
     dorada: getAsset("Renta/Preparatoria/Paquete A/negro-dorado.jpg"),
+    dorado: getAsset("Renta/Preparatoria/Paquete A/negro-dorado.jpg"),
     plateada: getAsset("Renta/Preparatoria/Paquete A/negro-plata.jpg"),
+    plata: getAsset("Renta/Preparatoria/Paquete A/negro-plata.jpg"),
     azul: getAsset("Renta/Preparatoria/Paquete A/negro-azul.jpg"),
     roja: getAsset("Renta/Preparatoria/Paquete A/negro-rojo.jpg"),
+    rojo: getAsset("Renta/Preparatoria/Paquete A/negro-rojo.jpg"),
     default: getAsset("Renta/Preparatoria/Paquete A/negro-dorado.jpg"),
   },
   universidad: {
