@@ -24,11 +24,35 @@ const PACKAGE_ASSETS: Record<string, { src: string, mask?: string, stolaNegro?: 
   uni_c: { src: getAsset('Renta/Universidad/C/C-base.jpg'), mask: getAsset('Renta/Universidad/C/C-estola-base.png'), stolaNegro: getAsset('Renta/Universidad/C/C-estola-negro.png') },
 };
 
-const PAQUETE_A_ASSETS: Record<string, string> = {
-  primaria: getAsset('Renta/Primaria/Paquete A/negro-dorado.jpg'),
-  secundaria: getAsset('Renta/Secundaria/Paquete A/negro-dorado.jpg'),
-  preparatoria: getAsset('Renta/Preparatoria/Paquete A/negro-dorado.jpg'),
-  universidad: getAsset('Renta/Universidad/A.jpg'),
+const PAQUETE_A_ASSETS: Record<string, Record<string, string>> = {
+  primaria: {
+    dorada: getAsset('Renta/Primaria/Paquete A/negro-dorado.jpg'),
+    plateada: getAsset('Renta/Primaria/Paquete A/negro-plata.jpg'),
+    azul: getAsset('Renta/Primaria/Paquete A/negro-azul.jpg'),
+    roja: getAsset('Renta/Primaria/Paquete A/negro-rojo.jpg'),
+    default: getAsset('Renta/Primaria/Paquete A/negro-dorado.jpg'),
+  },
+  secundaria: {
+    dorada: getAsset('Renta/Secundaria/Paquete A/negro-dorado.jpg'),
+    plateada: getAsset('Renta/Secundaria/Paquete A/negro-plata.jpg'),
+    azul: getAsset('Renta/Secundaria/Paquete A/negro-azul.jpg'),
+    roja: getAsset('Renta/Secundaria/Paquete A/negro-rojo.jpg'),
+    default: getAsset('Renta/Secundaria/Paquete A/negro-dorado.jpg'),
+  },
+  preparatoria: {
+    dorada: getAsset('Renta/Preparatoria/Paquete A/negro-dorado.jpg'),
+    plateada: getAsset('Renta/Preparatoria/Paquete A/negro-plata.jpg'),
+    azul: getAsset('Renta/Preparatoria/Paquete A/negro-azul.jpg'),
+    roja: getAsset('Renta/Preparatoria/Paquete A/negro-rojo.jpg'),
+    default: getAsset('Renta/Preparatoria/Paquete A/negro-dorado.jpg'),
+  },
+  universidad: {
+    dorada: getAsset('Renta/Universidad/A.jpg'),
+    plateada: getAsset('Renta/Universidad/A.jpg'),
+    azul: getAsset('Renta/Universidad/A.jpg'),
+    roja: getAsset('Renta/Universidad/A.jpg'),
+    default: getAsset('Renta/Universidad/A.jpg'),
+  },
 };
 
 const PREESCOLAR_PAQUETE_B: Record<string, { src: string; mask?: string; stolaNegro?: string }> = {
@@ -534,12 +558,22 @@ export function StepConfig({
             result = VENTA_PREESCOLAR_PAQUETE_B[pkg.variant] || { src: getAsset('Venta/Preescolar/Estolas/E2.jpg') };
           }
         } else {
-          result = PREESCOLAR_PAQUETE_B[pkg.variant] || getAsset('Renta/Preescolar/balance.jpg');
+          const bVariant = PREESCOLAR_PAQUETE_B[pkg.variant];
+          if (bVariant) {
+            const colorSrc = togaColor !== "negro" ? getAsset(`Renta/Preescolar/${pkg.variant}-${togaColor}.jpg`) : null;
+            result = {
+              ...bVariant,
+              src: colorSrc || bVariant.src,
+            };
+          } else {
+            result = getAsset('Renta/Preescolar/balance.jpg');
+          }
         }
       }
     } else {
       if (pkg?.kind === "A") {
-        result = PAQUETE_A_ASSETS[level!] || getAsset('gown-showcase.jpg');
+        const levelAssets = PAQUETE_A_ASSETS[level!];
+        result = levelAssets ? (levelAssets[stolaColor] || levelAssets.default) : getAsset('gown-showcase.jpg');
       } else if ((pkg?.kind === "B" || pkg?.kind === "C") && pkg?.variant) {
         result = PACKAGE_ASSETS[pkg.variant] || getAsset('gown-showcase.jpg');
       }
