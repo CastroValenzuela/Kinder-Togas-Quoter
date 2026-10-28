@@ -201,13 +201,7 @@ export function AdminDashboard() {
 
   // Check auth session
   useEffect(() => {
-    // 1. Check legacy sessionStorage or localStorage backup
-    const session =
-      sessionStorage.getItem("kt_admin_session") || localStorage.getItem("kt_admin_session");
-    if (session === "authorized") {
-      setIsAuthenticated(true);
-      return;
-    }
+    
 
     // Function to handle unauthorized signouts
     const handleUnauthorizedUser = async () => {
@@ -422,22 +416,7 @@ export function AdminDashboard() {
     }
     setAuthError("");
 
-    // 1. Backdoor for legacy static password
-    if (password === "adminKT2026") {
-      if (rememberMe) {
-        localStorage.setItem("kt_admin_session", "authorized");
-        localStorage.setItem("kt_remember_email", loginEmail.trim());
-        localStorage.setItem("kt_remember_me", "true");
-      } else {
-        sessionStorage.setItem("kt_admin_session", "authorized");
-        localStorage.removeItem("kt_remember_email");
-        localStorage.setItem("kt_remember_me", "false");
-        localStorage.removeItem("kt_admin_session");
-      }
-      setIsAuthenticated(true);
-      setAuthError("");
-      return;
-    }
+    
 
     // 2. Real Supabase password authentication
     try {
