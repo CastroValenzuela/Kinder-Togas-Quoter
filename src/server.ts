@@ -71,7 +71,20 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const normalized = await normalizeCatastrophicSsrResponse(response);
+
+      const url = new URL(request.url);
+      if (url.pathname === "/sw.js") {
+        const newHeaders = new Headers(normalized.headers);
+        newHeaders.set("Cache-Control", "no-cache, no-store, must-revalidate");
+        return new Response(normalized.body, {
+          status: normalized.status,
+          statusText: normalized.statusText,
+          headers: newHeaders,
+        });
+      }
+
+      return normalized;
     } catch (error) {
       console.error(error);
       return brandedErrorResponse();
