@@ -1,0 +1,29 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Se ejecuta cada 3 días a las 05:00 UTC
+    - cron: '0 5 */3 * *'
+  workflow_dispatch: # Permite ejecución manual desde la pestaña Actions en GitHub
+
+jobs:
+  keep-alive:
+    name: Ping Supabase Database
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send keep-alive query to Supabase
+        run: |
+          echo "Enviando consulta a Supabase para mantener el proyecto activo..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X GET "https://qqfqwvxmhiacoyqwobjd.supabase.co/rest/v1/pricing?select=key&limit=1" \
+            -H "apikey: sb_publishable_koOhz9hug0yv6t46X5HUxQ_Ynt8Bv0X" \
+            -H "Authorization: Bearer sb_publishable_koOhz9hug0yv6t46X5HUxQ_Ynt8Bv0X")
+          
+          echo "Código HTTP de respuesta: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "Ping exitoso. La base de datos registró actividad y continuará activa."
+            exit 0
+          else
+            echo "Error: Código HTTP $HTTP_STATUS recibido de Supabase"
+            exit 1
+          fi
